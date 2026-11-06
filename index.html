@@ -515,7 +515,7 @@ function genProblem(level){
 }
 const opWord=op=>op==='+'?'plus':op==='-'?'minus':'times';
 function startMath(level){M={level,idx:0,total:0,mistakes:0};$('#mathStars').textContent=store.stars;show('math');renderProblem();}
-function pal(n,i,jump){const d=document.createElement('div');d.className='pal';d.style.setProperty('--i',i||0);if(n==='?')d.appendChild(img(numArt('q','idle')));else String(n).split('').forEach(dg=>d.appendChild(img(numArt(dg,(jump&&HAS_JUMP(dg))?'jump':'idle'))));return d;}
+function pal(n,i,jump){const d=document.createElement('div');d.className='pal';d.style.setProperty('--i',i||0);if(n==='?')d.appendChild(img(numArt('q','idle')));else if(String(n)==='10')d.appendChild(img(numArt('10','idle')));else String(n).split('').forEach(dg=>d.appendChild(img(numArt(dg,(jump&&HAS_JUMP(dg))?'jump':'idle'))));return d;}
 function renderProblem(){
   const p=genProblem(M.level);M.p=p;M.mistakes=0;M.done=false;M.typed='';
   renderDots($('#mathDots'),M.idx,ROUND);$('#nextBtn2').classList.remove('show');
