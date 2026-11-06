@@ -298,6 +298,9 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 .sticker small{font-size:14px;font-weight:700;color:var(--ink2)}
 .empty{text-align:center;color:var(--ink2);padding:20px;background:var(--card);border-radius:20px;grid-column:1/-1}
 
+.updbar{display:none;position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--mint);color:#fff;font-weight:700;font-size:17px;padding:12px 20px;border-radius:999px;box-shadow:0 6px 0 #22a85a,0 10px 24px rgba(0,0,0,.25);z-index:50;animation:popin .4s cubic-bezier(.3,1.7,.5,1)}
+.updbar.on{display:block}
+.chk{background:var(--slotline);color:var(--ink);font-weight:700;font-size:14px;padding:8px 12px;border-radius:999px;box-shadow:0 4px 0 var(--tileshadow)}
 /* overlays */
 .overlay{position:fixed;inset:0;background:rgba(30,30,80,.55);display:none;place-items:center;padding:20px;z-index:20}
 .overlay.on{display:grid}
@@ -399,6 +402,7 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
     <div class="setrow"><span>🎵 Music</span><button class="icon" id="musicBtn" aria-label="Music">🎵</button></div>
     <div class="setrow"><span>🗑️ Reset all progress</span><button class="icon" id="resetBtn" aria-label="Reset progress">↺</button></div>
     <p class="hint-text dark" id="syncBadge">📱 Progress saved on this device</p>
+    <div class="setrow"><span>🔄 Version <span id="verNum"></span></span><button class="pressable chk" id="checkUpd">Check for updates</button></div>
     <div class="row"><button id="settingsClose">Done</button></div>
   </div></div>
 
@@ -460,6 +464,8 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
     <h2 id="sumTitle">Great job!</h2><p id="sumText"></p>
     <div class="row"><button id="againBtn">Play again</button><button class="quiet" id="homeBtn">Home</button></div>
   </div></div>
+
+  <button class="updbar" id="updBar">🎉 New version ready — tap to update</button>
 
   <div class="overlay" id="treasure"><div class="panel">
     <img id="treasureImg" src="" alt="">
@@ -864,7 +870,7 @@ function renderAlbum(){
 }
 
 /* ============ wiring ============ */
-renderLogo();renderHome();initCloud();
+renderLogo();renderHome();initCloud();fetch('./sw.js',{cache:'no-store'}).then(r=>r.text()).then(t=>{const m=t.match(/VERSION='(\w+)'/);if(m)$('#verNum').textContent=m[1];}).catch(()=>{});
 $('#playBtn').onclick=()=>{
   try{audio();}catch(e){}
   say(['p_welcome'],'Welcome to Word and Number Land!');
@@ -896,7 +902,17 @@ $('#nextBtn2').onclick=()=>{sfxWhoosh();nextProblem();};
 $('#againBtn').onclick=()=>{$('#summary').classList.remove('on');const st=lastGame==='spell'?S.station:M.station;if(st!=null){renderMap();show('mapScreen');}else lastGame==='spell'?startSpell(S.level):startMath(M.level);};
 $('#homeBtn').onclick=()=>{$('#summary').classList.remove('on');renderHome();show('home');};
 $('#advBtn').onclick=()=>{sfxWhoosh();show('mapScreen');renderMap();};
-if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
+if('serviceWorker' in navigator){
+  window.addEventListener('load',async()=>{try{const reg=await navigator.serviceWorker.register('./sw.js');
+    const onNew=w=>{w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller){const b=$('#updBar');if(b)b.classList.add('on');}});};
+    if(reg.waiting&&navigator.serviceWorker.controller){const b=$('#updBar');if(b)b.classList.add('on');}
+    reg.addEventListener('updatefound',()=>{if(reg.installing)onNew(reg.installing);});
+    setInterval(()=>reg.update().catch(()=>{}),60*60*1000);
+  }catch(e){}});
+  let refreshing=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(refreshing)return;refreshing=true;location.reload();});
+}
+$('#updBtn').onclick=()=>location.reload();
+$('#checkUpd').onclick=async()=>{const b=$('#checkUpd');b.textContent='Checking…';try{const reg=await navigator.serviceWorker.getRegistration();if(reg){await reg.update();}await new Promise(r=>setTimeout(r,1500));b.textContent=$('#updBar').classList.contains('on')?'Update ready — tap the green bar':'You have the latest version';}catch(e){b.textContent='Could not check';}setTimeout(()=>b.textContent='Check for updates',4000);};
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stopMusic();else if(store.music&&ac&&!$('#start').classList.contains('on'))startMusic();});
 </script>
 </body>
