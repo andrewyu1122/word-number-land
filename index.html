@@ -282,6 +282,7 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 .pal{display:flex;align-items:flex-end;gap:2px;animation:bob 2.4s ease-in-out infinite;animation-delay:calc(var(--i)*.3s)}
 .pal img{height:96px;filter:drop-shadow(0 5px 0 rgba(0,0,0,.2))}
 .pal.dance{animation:dance .55s ease-in-out infinite}
+.pal.cssjump .digits{animation:hop .7s ease-in-out infinite}
 @keyframes dance{0%,100%{transform:rotate(-8deg) translateY(0)}50%{transform:rotate(8deg) translateY(-14px)}}
 .pal.big{animation:popin .5s cubic-bezier(.3,1.7,.5,1),dance .55s .5s ease-in-out infinite}
 .op{font-size:44px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.2);padding-bottom:26px}
@@ -902,7 +903,16 @@ const HEADROOM={"0": 0.37, "1": 0.42, "2": 0.32, "3": 0.26, "4": 0.3, "5": 0.23,
 function pal(n,i,jump){const d=document.createElement('div');d.className='pal';d.style.setProperty('--i',i||0);const parts=n==='?'?['q']:String(n)==='10'?['10']:String(n).split('');const hr=Math.min(...parts.map(x=>HEADROOM[x]??.25));d.style.setProperty('--hr',hr);
   const lbl=document.createElement('span');lbl.className='lbl'+(n==='?'?' q':'');lbl.textContent=n;d.appendChild(lbl);
   const digits=document.createElement('div');digits.className='digits';d.appendChild(digits);
-  if(n==='?')digits.appendChild(img(numArt('q','idle')));else if(String(n)==='10')digits.appendChild(img(numArt('10',jump?'jump':'idle')));else String(n).split('').forEach(dg=>digits.appendChild(img(numArt(dg,(jump&&HAS_JUMP(dg))?'jump':'idle'))));return d;}
+  const byDigits=()=>{digits.innerHTML='';String(n).split('').forEach(dg=>digits.appendChild(img(numArt(dg,(jump&&HAS_JUMP(dg))?'jump':'idle'))));};
+  if(n==='?')digits.appendChild(img(numArt('q','idle')));
+  else if(String(n)==='10'||+n<=9)digits.appendChild(img(numArt(String(n),(jump&&HAS_JUMP(String(n)))?'jump':'idle')));
+  else{ // 11–100: use a dedicated character when it exists, otherwise two digits
+    const N=String(n);if(NUM_MISSING[N]){byDigits();}
+    else{const one=img(numArt(N,jump&&!NUM_NOJUMP[N]?'jump':'idle'));one.onerror=()=>{if(jump&&!NUM_NOJUMP[N]){NUM_NOJUMP[N]=true;one.onerror=()=>{NUM_MISSING[N]=true;byDigits();};one.src=numArt(N,'idle');}else{NUM_MISSING[N]=true;byDigits();}};digits.appendChild(one);
+      if(jump){d.classList.add('cssjump');}}
+  }
+  return d;}
+const NUM_MISSING={},NUM_NOJUMP={};
 function renderProblem(){
   const p=genProblem(M.level);M.p=p;M.mistakes=0;M.done=false;M.typed='';
   renderDots($('#mathDots'),M.idx,ROUND);$('#nextBtn2').classList.remove('show');
