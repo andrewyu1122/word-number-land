@@ -99,7 +99,7 @@ img{-webkit-user-drag:none;pointer-events:none}
 .advhero h2{margin:0;font-size:28px;text-shadow:0 2px 0 rgba(0,0,0,.3)}
 .advhero p{margin:2px 0 10px;font-size:15px;font-weight:600;opacity:.95;text-shadow:0 1px 0 rgba(0,0,0,.3)}
 .advhero .qbar{background:rgba(255,255,255,.35);height:14px}
-.advhero .hero-m{position:absolute;right:16px;bottom:8px;height:120px;filter:drop-shadow(0 6px 0 rgba(0,0,0,.25));animation:hop 1.8s ease-in-out infinite}
+.advhero .hero-m{position:absolute;right:16px;bottom:8px;height:120px;filter:drop-shadow(0 6px 0 rgba(0,0,0,.25))}
 .advhero .go{position:absolute;right:16px;top:14px;width:40px;height:40px;border-radius:50%;background:#fff;color:var(--ink);display:grid;place-items:center;font-size:22px;box-shadow:0 4px 0 rgba(0,0,0,.2)}
 .duo{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .mini{background:var(--card);border-radius:24px;padding:12px;box-shadow:0 8px 0 var(--tileshadow);display:flex;align-items:center;gap:10px;text-align:left;border-top:6px solid var(--c,var(--slotline));min-height:84px}
@@ -452,6 +452,7 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
     <h2>Settings</h2>
     <div class="setrow"><span>🔊 Voice & sounds</span><button class="icon" id="soundBtn" aria-label="Voice and sounds">🔊</button></div>
     <div class="setrow"><span>🎵 Music</span><button class="icon" id="musicBtn" aria-label="Music">🎵</button></div>
+    <div class="setrow"><span>🔠 Letters</span><button class="icon" id="caseBtn" aria-label="Letter case" style="font-size:18px">abc</button></div>
     <div class="setrow"><span>✏️ Edit <b id="editWho"></b>’s name & avatar</span><button class="icon" id="editBtn" aria-label="Edit player">✏️</button></div>
     <div class="setrow"><span>🗑️ Reset <b id="resetWho"></b>’s progress</span><button class="icon" id="resetBtn" aria-label="Reset progress">↺</button></div>
     <div class="setrow" id="delRow"><span>👋 Remove <b id="delWho"></b> from this device</span><button class="icon" id="delBtn" aria-label="Remove player">✖</button></div>
@@ -534,7 +535,7 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
   </div></div>
 
   <div class="overlay on" id="start"><div class="panel">
-    <img class="mascot" src="assets/mascot/mascot_idle.webp" alt="">
+    <img class="mascot" src="assets/mascot/mascot_wave.webp" alt="">
     <h2>Word & Number Land</h2>
     <button class="play pressable" id="playBtn" aria-label="Play">▶</button>
     <p>Tap to play — turn your sound up!</p>
@@ -544,11 +545,11 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 <script>
 /* ============ assets ============ */
 const A='assets/';
-const ART={'ant':'drive','bag':'wiggle','ball':'hop','bat':'fly','bear':'hop','bed':'float','bee':'fly','bell':'ring','bike':'drive','bird':'fly','boat':'swim','book':'wiggle','box':'wiggle','bug':'wiggle','bus':'drive','cake':'wiggle','cap':'wiggle','car':'drive','cat':'hop','coin':'spin','corn':'grow','cow':'hop','crab':'swim','cup':'wiggle','deer':'hop','dog':'hop','drum':'wiggle','duck':'swim','egg':'wiggle','fan':'wiggle','fire':'flash','fish':'swim','fox':'hop','frog':'hop','gift':'wiggle','goat':'hop','hat':'wiggle','hen':'hop','ice':'wiggle','jet':'fly','key':'spin','kite':'fly','leaf':'float','lion':'hop','map':'wiggle','milk':'wiggle','moon':'float','nut':'wiggle','owl':'fly','pen':'wiggle','pie':'wiggle','pig':'hop','rain':'float','rat':'drive','ring':'spin','rose':'grow','seal':'swim','ship':'swim','snow':'float','star':'spin','sun':'spin','swan':'swim','taxi':'drive','tent':'wiggle','toy':'hop','tree':'grow','web':'spin','wolf':'hop','worm':'wiggle'};
-const OBJECTS=['apple','balloon','car','chick','cookie','cupcake','fish','flower','star','strawberry'];
+const ART={'ant':'drive','bag':'wiggle','ball':'hop','bat':'fly','bear':'hop','bed':'float','bee':'fly','bell':'ring','bike':'drive','bird':'fly','boat':'swim','book':'wiggle','box':'wiggle','bug':'wiggle','bus':'drive','cake':'wiggle','cap':'wiggle','car':'drive','cat':'hop','coin':'spin','corn':'grow','cow':'hop','crab':'swim','cup':'wiggle','deer':'hop','dog':'hop','drum':'wiggle','duck':'swim','egg':'wiggle','fan':'wiggle','fire':'flash','fish':'swim','fox':'hop','frog':'hop','gift':'wiggle','goat':'hop','hat':'wiggle','hen':'hop','ice':'wiggle','jet':'fly','key':'spin','kite':'fly','leaf':'float','lion':'hop','map':'wiggle','milk':'wiggle','moon':'float','nut':'wiggle','owl':'fly','pen':'wiggle','pie':'wiggle','pig':'hop','rain':'float','rat':'drive','ring':'spin','rose':'grow','seal':'swim','ship':'swim','snow':'float','star':'spin','sun':'spin','swan':'swim','taxi':'drive','tent':'wiggle','toy':'hop','tree':'grow','web':'spin','wolf':'hop','worm':'wiggle','airplane':'fly','ambulance':'drive','apple':'wiggle','athlete':'drive','backpack':'hop','balloon':'float','banana':'wiggle','basketball':'hop','bread':'wiggle','broccoli':'grow','butterfly':'fly','calendar':'wiggle','camel':'drive','candy':'spin','carrot':'wiggle','castle':'grow','cherry':'wiggle','chicken':'hop','clock':'ring','cloud':'float','compete':'spin','computer':'wiggle','cookie':'spin','crocodile':'swim','crown':'spin','dinosaur':'hop','dolphin':'swim','donut':'spin','dragon':'fly','eagle':'fly','elephant':'hop','flamingo':'wiggle','flower':'grow','football':'spin','ghost':'float','giraffe':'hop','grape':'wiggle','guitar':'wiggle','hamster':'hop','hedgehog':'drive','helicopter':'fly','horse':'drive','house':'wiggle','kangaroo':'hop','koala':'hop','lemon':'wiggle','lobster':'swim','lollipop':'spin','monkey':'hop','mountain':'grow','mouse':'hop','octopus':'swim','panda':'hop','parrot':'fly','peach':'wiggle','pencil':'wiggle','penguin':'wiggle','piano':'wiggle','pineapple':'wiggle','pirate':'wiggle','pizza':'spin','planet':'spin','popcorn':'hop','pumpkin':'wiggle','rabbit':'hop','rainbow':'grow','robot':'wiggle','rocket':'fly','sandwich':'wiggle','scissors':'wiggle','shark':'swim','sheep':'hop','snake':'swim','snowman':'wiggle','spider':'float','squirrel':'hop','strawberry':'wiggle','telephone':'ring','tiger':'hop','tomato':'hop','tornado':'spin','tractor':'drive','train':'drive','truck':'drive','trumpet':'wiggle','turtle':'drive','umbrella':'float','unicorn':'hop','volcano':'flash','whale':'swim','zebra':'hop'};
+const OBJECTS=['apple', 'balloon', 'car', 'chick', 'cookie', 'cupcake', 'fish', 'flower', 'star', 'strawberry', 'acorn', 'ball', 'crayon', 'crown', 'donut', 'drum', 'feather', 'gem', 'icecream', 'kite', 'lollipop', 'medal', 'pencil', 'pinecone', 'pretzel', 'seashell', 'shell', 'teddy', 'trophy'];
 const GARDEN=['sprout','tulip','sunflower','mushroom','blossom','snail','daisy','ladybug','cactus','butterfly','palm','bee','tree','frog','rainbow','hedgehog','clover','bunny','rose','parrot','watermelon','peacock','hibiscus','turtle'];
 const wordArt=(w,k)=>A+'words/'+w+'_'+k+'.webp';
-const letterArt=(l,k)=>A+'letters/'+l+'_'+k+'.webp';
+const letterArt=(l,k)=>root.settings.upper?A+'letters_upper/'+l.toUpperCase()+'_'+k+'.webp':A+'letters/'+l+'_'+k+'.webp';
 const numArt=(d,k)=>A+'num/n'+d+'_'+k+'.webp';
 const HAS_JUMP=d=>/^([0-9]|10|q)$/.test(String(d));
 
@@ -573,7 +574,7 @@ const KEY='wnl_v3';
 const AVATARS=['train','horse','dog','cat','fox','frog','bee','owl','lion','pig','duck','bear','cow','fish','rocket','dinosaur'];
 function avatarEl(a,cls){if(ART[a]){const i=img(wordArt(a,'idle'));if(cls)i.className=cls;return i;}const e=document.createElement('span');e.className='avemoji'+(cls?' '+cls:'');e.textContent=(EMOJI_BY_WORD[a]||{}).e||'⭐';return e;}
 const freshProfile=(name,avatar)=>({id:'p'+Date.now().toString(36),name,avatar,stars:0,words:{},lvl:{},album:{},daily:null,treasures:[],map:{},sr:{},mr:{}});
-let root={settings:{sound:true,music:true},profiles:[],current:null};
+let root={settings:{sound:true,music:true,upper:false},profiles:[],current:null};
 try{const r=JSON.parse(localStorage.getItem(KEY)||'null');if(r&&r.profiles&&r.profiles.length)root=r;}catch(e){}
 if(!root.profiles.length){
   const pr=freshProfile('Jaron','train');
@@ -693,9 +694,9 @@ function startParticles(stage,actorEl,anim){
     stage.appendChild(p);setTimeout(()=>p.remove(),1700);
   },kind==='dust'?300:170);
 }
-function buddy(stage){const b=img(A+'mascot/mascot_idle.webp','buddy');b.id='buddy';stage.appendChild(b);return b;}
+function buddy(stage){const b=img(A+'mascot/mascot_think.webp','buddy');b.id='buddy';stage.appendChild(b);return b;}
 let buddyTimer=null;
-function buddyPlay(kind){const b=$('#buddy');if(!b)return;clearTimeout(buddyTimer);const fresh=img(A+'mascot/mascot_'+kind+'.webp','buddy'+(kind==='cheer'?' cheer':''));fresh.id='buddy';b.replaceWith(fresh);buddyTimer=setTimeout(()=>{const n=img(A+'mascot/mascot_idle.webp','buddy');n.id='buddy';const cur=$('#buddy');if(cur)cur.replaceWith(n);},kind==='cheer'?1100:2600);}
+function buddyPlay(kind){const b=$('#buddy');if(!b)return;clearTimeout(buddyTimer);const fresh=img(A+'mascot/mascot_'+kind+'.webp','buddy'+(kind==='cheer'?' cheer':''));fresh.id='buddy';b.replaceWith(fresh);buddyTimer=setTimeout(()=>{const n=img(A+'mascot/mascot_'+(kind==='happy'?'idle':'think')+'.webp','buddy');n.id='buddy';const cur=$('#buddy');if(cur)cur.replaceWith(n);},kind==='cheer'?1100:2600);}
 
 /* ============ home ============ */
 function renderLogo(){const el=$('#logo');el.innerHTML='';[['w','letters/w'],['o','letters/o'],['r','letters/r'],['d','letters/d'],['1','num/n1'],['2','num/n2'],['3','num/n3']].forEach(([t,p],i)=>{const im=img(A+p+'_idle.webp');im.style.setProperty('--i',i);el.appendChild(im);});}
@@ -709,7 +710,7 @@ function openSheet(game){
   sfxPop(2);$('#levelSheet').classList.add('on');
 }
 const PLANTS=['tulip','sunflower','mushroom','blossom','daisy','cactus','palm','tree','clover','rose','watermelon','hibiscus'];
-const WALKERS=['snail','turtle','hedgehog','bunny','frog'],FLYERS=['bee','butterfly','ladybug','parrot','peacock'];
+const WALKERS=['snail','turtle','bunny'],FLYERS=['bee','butterfly','ladybug'];
 const QUEST_N=5;
 const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
 function daily(){if(!store.daily||store.daily.date!==today())store.daily={date:today(),spelled:0,solved:0,done:false};return store.daily;}
@@ -726,10 +727,11 @@ function renderGarden(el){
     const past=store.stars-i*5;const g=past>=15?1:past>=10?.8:.6;
     if(i%4===3){const isFly=(i%8===7);const name=isFly?FLYERS[fi++%FLYERS.length]:WALKERS[wi++%WALKERS.length];
       const c=document.createElement('button');c.className='critter '+(isFly?'flyer':'walk');c.style.setProperty('--d',(14+(i*7)%12)+'s');c.style.setProperty('--dl',(-(i*3)%14)+'s');if(isFly)c.style.top=(8+(i*13)%30)+'%';
-      c.appendChild(img(A+'garden/'+name+'_idle.webp'));c.onclick=()=>{sfxPop(i%8);if(ART[name])say(['w_'+name],name);};el.appendChild(c);continue;}
+      c.appendChild(img(A+'garden/'+name+'_move.webp'));c.onclick=()=>{sfxPop(i%8);if(ART[name])say(['w_'+name],name);};el.appendChild(c);continue;}
     const name=past<5?'sprout':PLANTS[pi%PLANTS.length];if(past>=5)pi++;
-    const b=document.createElement('button');b.className='plant';b.style.setProperty('--i',i);b.style.setProperty('--g',past<5?.7:g);
-    b.appendChild(img(A+'garden/'+name+'_idle.webp'));
+    const stage=past<5?'idle':past<10?'s1':past<15?'s2':'s3';
+    const b=document.createElement('button');b.className='plant';b.style.setProperty('--i',i);b.style.setProperty('--g',past<5?.7:stage==='s1'?.75:stage==='s2'?.9:1);
+    b.appendChild(img(A+'garden/'+name+'_'+stage+'.webp'));
     b.onclick=()=>{b.classList.remove('poke');void b.offsetWidth;b.classList.add('poke');sfxPop(i%8);if(ART[name])say(['w_'+name],name);};
     plants.appendChild(b);
   }
@@ -741,7 +743,7 @@ const STATIONS=[];BANDS.forEach((b,bi)=>{const lvl=bi<2?1:bi<4?2:bi<6?3:4;STATIO
 function currentStation(){for(let i=0;i<STATIONS.length;i++)if((store.map[i]||0)<2)return i;return STATIONS.length;}
 function renderAdvCard(){const cur=currentStation();const el=$('#advBtn');const done=cur>=STATIONS.length;const st=STATIONS[Math.min(cur,STATIONS.length-1)];
   el.style.backgroundImage='url('+A+'scenes/'+BANDS[st.band][0]+'.webp)';
-  el.innerHTML='<div class="txt"><h2>Adventure</h2><p>'+(done?'You finished the whole journey! 🎉':'Station '+(cur+1)+' of '+STATIONS.length+' · '+BANDS[st.band][1])+'</p><div class="qbar"><i style="width:'+(Math.min(cur,STATIONS.length)/STATIONS.length*100)+'%"></i></div></div><span class="go">➜</span><img class="hero-m" src="'+A+'mascot/mascot_idle.webp" alt="">';}
+  el.innerHTML='<div class="txt"><h2>Adventure</h2><p>'+(done?'You finished the whole journey! 🎉':'Station '+(cur+1)+' of '+STATIONS.length+' · '+BANDS[st.band][1])+'</p><div class="qbar"><i style="width:'+(Math.min(cur,STATIONS.length)/STATIONS.length*100)+'%"></i></div></div><span class="go">➜</span><img class="hero-m" src="'+A+'mascot/mascot_wave.webp" alt="">';}
 function renderMap(){
   const cur=currentStation();$('#mapStars').textContent=store.stars;
   const m=$('#map');m.innerHTML='';
@@ -1003,6 +1005,8 @@ $('#resetYes').onclick=async()=>{
   if(db&&cloudCan){try{setSync('saving');const doc=progressDoc();await db.doc('progress/'+store.id).set(doc);lastCloud=JSON.stringify([doc.stars,doc.words,doc.lvl,doc.album]);setSync('synced');}catch(e){setSync('error');}}
   sfxWhoosh();say(['p_allclear'],'All clear! Let’s start again!');
 };
+$('#caseBtn').onclick=()=>{root.settings.upper=!root.settings.upper;save();$('#caseBtn').textContent=root.settings.upper?'ABC':'abc';sfxPop(2);renderLogo();};
+$('#caseBtn').textContent=root.settings.upper?'ABC':'abc';
 $('#musicBtn').onclick=()=>{store.music=!store.music;save();renderHome();store.music?startMusic():stopMusic();};
 $('#sayBtn').onclick=()=>say(['w_'+S.word.word],S.word.word);
 $('#hintBtn').onclick=()=>showHint(true);
@@ -1024,6 +1028,8 @@ if('serviceWorker' in navigator){
 }
 $('#updBar').onclick=async()=>{try{const reg=await navigator.serviceWorker.getRegistration();if(reg&&reg.waiting){reg.waiting.postMessage({type:'SKIP_WAITING'});return;}}catch(e){}location.reload();};
 $('#checkUpd').onclick=async()=>{const b=$('#checkUpd');b.textContent='Checking…';try{const reg=await navigator.serviceWorker.getRegistration();if(reg){await reg.update();}await new Promise(r=>setTimeout(r,1500));b.textContent=$('#updBar').classList.contains('on')?'Update ready — tap the green bar':'You have the latest version';}catch(e){b.textContent='Could not check';}setTimeout(()=>b.textContent='Check for updates',4000);};
+let idleT=null;function idleReset(){clearTimeout(idleT);const hm=document.querySelector('#advBtn .hero-m');if(hm&&/sleep/.test(hm.src))hm.src=A+'mascot/mascot_wave.webp';idleT=setTimeout(()=>{const h=document.querySelector('#advBtn .hero-m');if(h&&$('#home').classList.contains('on'))h.src=A+'mascot/mascot_sleep.webp';},40000);}
+['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev,idleReset,{passive:true}));idleReset();
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stopMusic();else if(store.music&&ac&&!$('#start').classList.contains('on'))startMusic();});
 </script>
 </body>
