@@ -170,7 +170,11 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 @keyframes dance{0%,100%{transform:rotate(-8deg) translateY(0)}50%{transform:rotate(8deg) translateY(-14px)}}
 .pal.big{animation:popin .5s cubic-bezier(.3,1.7,.5,1),dance .55s .5s ease-in-out infinite}
 .op{font-size:44px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.2);padding-bottom:26px}
-.mathstage{height:auto;min-height:150px;display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;padding:16px 16px 16px 80px}
+.mathstage{height:300px;display:flex;justify-content:center;align-items:flex-end;gap:6px;flex-wrap:nowrap;padding:0 8px 34px 8px}
+.mathstage .pal{position:relative;z-index:1}
+.mathstage .pal img{height:var(--ph,150px)}
+.mathstage .op{position:relative;z-index:1;font-size:48px;padding-bottom:36px;color:#fff;text-shadow:0 3px 0 rgba(0,0,0,.25)}
+.mathstage .buddy{height:60px;left:8px;bottom:6px}
 .group{display:grid;gap:4px;justify-items:center;position:relative;z-index:1}
 .group.g5{grid-template-columns:repeat(5,1fr)}
 .group img{height:40px;animation:popin .4s cubic-bezier(.3,1.7,.5,1) both;animation-delay:calc(var(--i)*.06s);filter:drop-shadow(0 3px 0 rgba(0,0,0,.15))}
@@ -236,11 +240,10 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
   .tiles{gap:10px}
   .pal img{height:140px}
   .op{font-size:64px;padding-bottom:40px}
-  .mathstage{min-height:240px;padding-left:120px}
-  .group img{height:60px}
-  .group.small img{height:44px}
-  .dot{width:34px;height:34px}
-  .bigeq{font-size:84px}
+  .mathstage{height:460px;padding-bottom:50px;gap:12px}
+  .mathstage .pal img{height:calc(var(--ph,150px)*1.6)}
+  .mathstage .op{font-size:76px;padding-bottom:56px}
+  .mathstage .buddy{height:110px}
   .choice{width:130px;height:110px;font-size:52px}
   .keypad{max-width:400px}
   .key{height:72px;font-size:34px}
@@ -316,7 +319,6 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
       <div class="dots" id="mathDots"></div>
       <div class="pill">⭐ <span id="mathStars">0</span></div>
     </div>
-    <div class="eq" id="eq"></div>
     <div class="stage mathstage" id="visual"></div>
     <div class="choices" id="choices"></div>
     <div class="actions">
@@ -593,21 +595,15 @@ function pal(n,i,jump){const d=document.createElement('div');d.className='pal';d
 function renderProblem(){
   const p=genProblem(M.level);M.p=p;M.mistakes=0;M.done=false;M.typed='';
   renderDots($('#mathDots'),M.idx,ROUND);$('#nextBtn2').classList.remove('show');
-  const eq=$('#eq');eq.innerHTML='';
-  eq.appendChild(pal(p.a,0));let o=document.createElement('span');o.className='op';o.textContent=p.op;eq.appendChild(o);
-  eq.appendChild(pal(p.b,1));o=document.createElement('span');o.className='op';o.textContent='=';eq.appendChild(o);
-  const q=pal('?',2);q.id='palQ';eq.appendChild(q);
-  const v=$('#visual');v.className='stage mathstage';v.innerHTML='';v.appendChild(img(A+'scenes/'+pick(['meadow','sky','room'])+'.webp','bg'));buddy(v);
-  if(p.visual==='objects'){
-    const ob=pick(OBJECTS);let k=0;const small=(p.a+p.b)>10||p.a>10;
-    const mk=(n,takenFrom)=>{const g=document.createElement('div');g.className='group g5'+(small?' small':'');for(let i=0;i<n;i++){const s=img(A+'objects/'+ob+'_idle.webp');s.dataset.ob=ob;s.style.setProperty('--i',k++);if(takenFrom!=null&&i>=takenFrom)s.classList.add('taken');g.appendChild(s);}return g;};
-    if(p.op==='+'){v.appendChild(mk(p.a));const pl=document.createElement('span');pl.className='op';pl.textContent='+';v.appendChild(pl);v.appendChild(mk(p.b));}
-    else v.appendChild(mk(p.a,p.a-p.b));
-    preload(A+'objects/'+ob+'_jump.webp');
-  }else if(p.visual==='array'){
-    const g=document.createElement('div');g.className='group';g.style.gridTemplateColumns='repeat('+p.b+',1fr)';g.style.gap='8px';
-    for(let i=0;i<p.a*p.b;i++){const s=document.createElement('span');s.className='dot';s.style.setProperty('--c',PAL_COLORS[Math.floor(i/p.b)+1]);s.style.setProperty('--i',i);g.appendChild(s);}v.appendChild(g);
-  }else{const big=document.createElement('span');big.className='bigeq';big.textContent=p.a+' '+p.op+' '+p.b+' = ?';v.appendChild(big);}
+  const v=$('#visual');v.className='stage mathstage';v.innerHTML='';
+  v.appendChild(img(A+'scenes/'+pick(['meadow','sky','room','road','space'])+'.webp','bg'));buddy(v);
+  const digits=String(p.a).length+String(p.b).length+String(p.ans).length;
+  v.style.setProperty('--ph',({3:150,4:128,5:106,6:92})[digits]+'px');
+  const addPal=(n,i,extra)=>{const e=pal(n,i);if(extra)e.classList.add(extra);v.appendChild(e);return e;};
+  addPal(p.a,0);let o=document.createElement('span');o.className='op';o.textContent=p.op;v.appendChild(o);
+  addPal(p.b,1);o=document.createElement('span');o.className='op';o.textContent='=';v.appendChild(o);
+  const q=addPal('?',2);q.id='palQ';
+  [p.a,p.b,p.ans].forEach(n=>String(n).split('').forEach(d=>{if(HAS_JUMP(d))preload(numArt(d,'jump'));}));
   const ch=$('#choices');ch.innerHTML='';ch.className='choices';
   if(p.input==='choices'){
     const cands=[p.ans+1,p.ans-1,p.ans+2,p.ans-2,p.a,p.b,p.ans+10,p.a+p.b,Math.abs(p.a-p.b)].filter(x=>x>=0&&x!==p.ans);
@@ -630,11 +626,10 @@ function answer(n,el){
   if(n===p.ans){
     M.done=true;const stars=M.mistakes===0?3:M.mistakes<=2?2:1;M.total+=stars;addStars(stars);
     el.classList.remove('no');el.classList.add('ok');
-    const q=pal(p.ans,2,true);q.id='palQ';q.classList.add('big');$('#palQ').replaceWith(q);
-    [...document.querySelectorAll('#eq .pal')].slice(0,2).forEach(x=>x.classList.add('dance'));
-    document.querySelectorAll('#visual .taken').forEach(x=>x.style.display='none');
-    document.querySelectorAll('#visual .group img').forEach(x=>{if(x.dataset.ob)x.src=A+'objects/'+x.dataset.ob+'_jump.webp';});
-    document.querySelectorAll('#visual .dot').forEach(x=>{x.style.animation='hop .7s ease-in-out infinite';x.style.animationDelay=(parseInt(x.style.getPropertyValue('--i'))*.05)+'s';});
+    const old=$('#palQ');const q=pal(p.ans,2,true);q.id='palQ';q.classList.add('big');old.replaceWith(q);
+    [...document.querySelectorAll('#visual .pal')].slice(0,2).forEach(x=>x.classList.add('dance'));
+    document.querySelectorAll('#visual .pal img').forEach(x=>{const m=x.src.match(/n(\d+)_idle/);if(m&&HAS_JUMP(m[1]))x.src=numArt(m[1],'jump');});
+    startParticles($('#visual'),q,'spin');
     const r=el.getBoundingClientRect();burstAt(r.left+r.width/2,r.top+r.height/2,['⭐','✨','🌟']);
     buddyPlay('happy');sfxWin();confetti();
     say(['x_'+p.ans,'n_'+p.a,OPKEY[p.op],'n_'+p.b,'p_is','n_'+p.ans],p.ans+'! '+p.a+' '+opWord(p.op)+' '+p.b+' is '+p.ans+'!');
