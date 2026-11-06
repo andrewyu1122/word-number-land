@@ -750,7 +750,7 @@ function renderProblem(){
   sayProblem();
 }
 function typeKey(d){if(M.done||M.typed.length>=3)return;M.typed+=d;$('#typed').textContent=M.typed;sfxPop(+d);}
-function sayProblem(){const p=M.p;say(['n_'+p.a,OPKEY[p.op],'n_'+p.b],p.a+' '+opWord(p.op)+' '+p.b+'?');}
+function sayProblem(){const p=M.p;say(['n_'+p.a,OPKEY[p.op],'n_'+p.b],p.a+' '+opWord(p.op)+' '+p.b+'?');const q=$('#palQ');if(q&&!M.done){const im=q.querySelector('img');if(im&&/nq_idle/.test(im.src)){im.src=numArt('q','jump');setTimeout(()=>{if(im.isConnected&&!M.done)im.src=numArt('q','idle');},1100);}}}
 function answer(n,el){
   if(M.done)return;const p=M.p;
   if(n===p.ans){
