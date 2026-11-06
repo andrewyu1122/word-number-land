@@ -449,6 +449,7 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
     <h2>Settings</h2>
     <div class="setrow"><span>🔊 Voice & sounds</span><button class="icon" id="soundBtn" aria-label="Voice and sounds">🔊</button></div>
     <div class="setrow"><span>🎵 Music</span><button class="icon" id="musicBtn" aria-label="Music">🎵</button></div>
+    <div class="setrow"><span>✏️ Edit <b id="editWho"></b>’s name & avatar</span><button class="icon" id="editBtn" aria-label="Edit player">✏️</button></div>
     <div class="setrow"><span>🗑️ Reset <b id="resetWho"></b>’s progress</span><button class="icon" id="resetBtn" aria-label="Reset progress">↺</button></div>
     <div class="setrow" id="delRow"><span>👋 Remove <b id="delWho"></b> from this device</span><button class="icon" id="delBtn" aria-label="Remove player">✖</button></div>
     <p class="hint-text dark" id="syncBadge">📱 Progress saved on this device</p>
@@ -571,10 +572,12 @@ const freshProfile=(name,avatar)=>({id:'p'+Date.now().toString(36),name,avatar,s
 let root={settings:{sound:true,music:true},profiles:[],current:null};
 try{const r=JSON.parse(localStorage.getItem(KEY)||'null');if(r&&r.profiles&&r.profiles.length)root=r;}catch(e){}
 if(!root.profiles.length){
-  const pr=freshProfile('Player 1','dog');
+  const pr=freshProfile('Jaron','dog');
   try{const old=JSON.parse(localStorage.getItem('wnl_v2')||'null');if(old){['stars','words','lvl','album','daily','treasures','map'].forEach(k=>{if(old[k]!=null)pr[k]=old[k];});root.settings={sound:old.sound!==false,music:old.music!==false};}}catch(e){}
-  root.profiles=[pr];root.current=pr.id;
+  const pr2=freshProfile('Jaden','cat');pr2.id='p'+(Date.now()+1).toString(36);
+  root.profiles=[pr,pr2];root.current=pr.id;
 }
+if(!root.seeded){root.seeded=true;root.profiles.forEach(x=>{if(x.name==='Player 1')x.name='Jaron';});if(!root.profiles.some(x=>x.name==='Jaden')){const pr2=freshProfile('Jaden','cat');root.profiles.push(pr2);}}
 let store=root.profiles.find(x=>x.id===root.current)||root.profiles[0];root.current=store.id;
 ['sr','mr','map','treasures'].forEach(k=>{if(store[k]==null)store[k]=k==='treasures'?[]:{};});
 Object.defineProperty(store,'sound',{get(){return root.settings.sound;},set(v){root.settings.sound=v;},enumerable:false,configurable:true});
@@ -748,8 +751,8 @@ function renderMap(){
 }
 function renderProfileBtn(){$('#avatarImg').src=wordArt(store.avatar||'dog','idle');$('#avatarName').textContent=store.name||'';}
 function renderProfiles(){const el=$('#plist');el.innerHTML='';root.profiles.forEach(pr=>{const b=document.createElement('button');b.className='prow'+(pr.id===store.id?' cur':'');b.innerHTML='<img src="'+wordArt(pr.avatar||'dog','idle')+'" alt=""><b>'+pr.name+'</b><small>⭐ '+pr.stars+'</small>';b.onclick=()=>{if(pr.id!==store.id){sfxWhoosh();switchProfile(pr.id);}else $('#profiles').classList.remove('on');};el.appendChild(b);});}
-let newAvatar='cat';
-function openNewProfile(){$('#profiles').classList.remove('on');$('#newName').value='';newAvatar=AVATARS[(root.profiles.length)%AVATARS.length];const g=$('#avgrid');g.innerHTML='';AVATARS.forEach(a=>{const b=document.createElement('button');b.className=a===newAvatar?'sel':'';b.innerHTML='<img src="'+wordArt(a,'idle')+'" alt="">';b.onclick=()=>{newAvatar=a;g.querySelectorAll('button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');sfxPop(2);};g.appendChild(b);});$('#newProfile').classList.add('on');setTimeout(()=>$('#newName').focus(),100);}
+let newAvatar='cat',editing=false;
+function openNewProfile(edit){editing=!!edit;$('#profiles').classList.remove('on');$('#settings').classList.remove('on');$('#newProfile h2').textContent=editing?'Edit player':'New player';$('#newOk').textContent=editing?'Save':'Let’s go!';$('#newName').value=editing?store.name:'';newAvatar=editing?(store.avatar||'dog'):AVATARS[(root.profiles.length)%AVATARS.length];const g=$('#avgrid');g.innerHTML='';AVATARS.forEach(a=>{const b=document.createElement('button');b.className=a===newAvatar?'sel':'';b.innerHTML='<img src="'+wordArt(a,'idle')+'" alt="">';b.onclick=()=>{newAvatar=a;g.querySelectorAll('button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');sfxPop(2);};g.appendChild(b);});$('#newProfile').classList.add('on');setTimeout(()=>$('#newName').focus(),100);}
 function renderHome(){renderProfileBtn();renderAdvCard();$('#homeStars').textContent=store.stars;renderLevels();renderQuest();renderGarden($('#homeGarden'));const c=Object.keys(store.album).length;$('#albumCount').textContent=c?c+' collected':'Spell to collect';$('#soundBtn').textContent=store.sound?'🔊':'🔇';$('#soundBtn').classList.toggle('off',!store.sound);$('#musicBtn').classList.toggle('off',!store.music);}
 
 /* ============ spelling ============ */
@@ -971,10 +974,11 @@ $('#albumBtn').onclick=()=>{sfxWhoosh();renderAlbum();show('album');};
 $('#spellOpen').onclick=()=>openSheet('spell');$('#mathOpen').onclick=()=>openSheet('math');$('#sheetClose').onclick=()=>$('#levelSheet').classList.remove('on');
 $('#profileBtn').onclick=()=>{sfxPop(2);renderProfiles();$('#profiles').classList.add('on');};
 $('#profilesClose').onclick=()=>$('#profiles').classList.remove('on');
-$('#addProfile').onclick=openNewProfile;
+$('#addProfile').onclick=()=>openNewProfile(false);
+$('#editBtn').onclick=()=>openNewProfile(true);
 $('#newCancel').onclick=()=>$('#newProfile').classList.remove('on');
-$('#newOk').onclick=()=>{const name=($('#newName').value||'').trim()||('Player '+(root.profiles.length+1));const pr=freshProfile(name,newAvatar);root.profiles.push(pr);root.current=pr.id;save();sfxWin();location.reload();};
-$('#settingsBtn').onclick=()=>{sfxPop(1);$('#resetWho').textContent=store.name;$('#delWho').textContent=store.name;$('#delRow').style.display=root.profiles.length>1?'':'none';$('#settings').classList.add('on');};
+$('#newOk').onclick=()=>{const name=($('#newName').value||'').trim()||('Player '+(root.profiles.length+1));if(editing){store.name=name;store.avatar=newAvatar;save();sfxPop(4);$('#newProfile').classList.remove('on');renderHome();return;}const pr=freshProfile(name,newAvatar);root.profiles.push(pr);root.current=pr.id;save();sfxWin();location.reload();};
+$('#settingsBtn').onclick=()=>{sfxPop(1);$('#resetWho').textContent=store.name;$('#delWho').textContent=store.name;$('#editWho').textContent=store.name;$('#delRow').style.display=root.profiles.length>1?'':'none';$('#settings').classList.add('on');};
 $('#delBtn').onclick=()=>{if(root.profiles.length<2)return;if(!confirm('Remove '+store.name+' and all their progress from this device?'))return;root.profiles=root.profiles.filter(x=>x.id!==store.id);root.current=root.profiles[0].id;save();location.reload();};$('#settingsClose').onclick=()=>$('#settings').classList.remove('on');
 $('#quest').onclick=()=>{sfxPop(3);const d=daily();say([d.done?'p_greatjob':'p_hi'],d.done?'Great job!':'Let’s play!');};
 $('#soundBtn').onclick=()=>{store.sound=!store.sound;save();renderHome();if(store.sound){sfxPop(4);say(['p_soundon'],'Sound on!');}};
