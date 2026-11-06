@@ -69,6 +69,9 @@ img{-webkit-user-drag:none;pointer-events:none}
 
 /* profiles */
 .avatar{display:flex;flex-direction:column;align-items:center;gap:0;width:64px;flex:none}
+.avatar .avemoji{font-size:40px;line-height:52px;display:block;animation:hop 2.4s ease-in-out infinite;filter:drop-shadow(0 3px 0 rgba(0,0,0,.15))}
+.prow .avemoji{font-size:36px;width:48px;text-align:center}
+.avgrid .avemoji{font-size:34px;line-height:44px;display:block}
 .avatar img{height:52px;filter:drop-shadow(0 3px 0 rgba(0,0,0,.15));animation:hop 2.4s ease-in-out infinite}
 .avatar span{font-size:12px;font-weight:700;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.3);max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .plist{display:flex;flex-direction:column;gap:10px;margin:10px 0 16px}
@@ -410,7 +413,7 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 
   <section class="screen on" id="home">
     <header class="hdr">
-      <button class="avatar" id="profileBtn" aria-label="Switch player"><img id="avatarImg" src="" alt=""><span id="avatarName"></span></button>
+      <button class="avatar" id="profileBtn" aria-label="Switch player"><span id="avatarSlot"></span><span id="avatarName"></span></button>
       <div class="htitle"><div class="logo" id="logo"></div><h1>Word & Number Land</h1></div>
       <div class="hright"><div class="pill">⭐ <span id="homeStars">0</span></div><button class="icon small" id="settingsBtn" aria-label="Settings">⚙️</button></div>
     </header>
@@ -567,17 +570,19 @@ const PAL_COLORS=['#8a8fa8','#ff4f8b','#ff9a2e','#ffd43b','#38d47a','#3aa6ff','#
 
 /* ============ storage ============ */
 const KEY='wnl_v3';
-const AVATARS=['dog','cat','fox','frog','bee','owl','lion','pig','duck','bear','cow','fish'];
+const AVATARS=['train','horse','dog','cat','fox','frog','bee','owl','lion','pig','duck','bear','cow','fish','rocket','dinosaur'];
+function avatarEl(a,cls){if(ART[a]){const i=img(wordArt(a,'idle'));if(cls)i.className=cls;return i;}const e=document.createElement('span');e.className='avemoji'+(cls?' '+cls:'');e.textContent=(EMOJI_BY_WORD[a]||{}).e||'⭐';return e;}
 const freshProfile=(name,avatar)=>({id:'p'+Date.now().toString(36),name,avatar,stars:0,words:{},lvl:{},album:{},daily:null,treasures:[],map:{},sr:{},mr:{}});
 let root={settings:{sound:true,music:true},profiles:[],current:null};
 try{const r=JSON.parse(localStorage.getItem(KEY)||'null');if(r&&r.profiles&&r.profiles.length)root=r;}catch(e){}
 if(!root.profiles.length){
-  const pr=freshProfile('Jaron','dog');
+  const pr=freshProfile('Jaron','train');
   try{const old=JSON.parse(localStorage.getItem('wnl_v2')||'null');if(old){['stars','words','lvl','album','daily','treasures','map'].forEach(k=>{if(old[k]!=null)pr[k]=old[k];});root.settings={sound:old.sound!==false,music:old.music!==false};}}catch(e){}
-  const pr2=freshProfile('Jaden','cat');pr2.id='p'+(Date.now()+1).toString(36);
+  const pr2=freshProfile('Jaden','horse');pr2.id='p'+(Date.now()+1).toString(36);
   root.profiles=[pr,pr2];root.current=pr.id;
 }
-if(!root.seeded){root.seeded=true;root.profiles.forEach(x=>{if(x.name==='Player 1')x.name='Jaron';});if(!root.profiles.some(x=>x.name==='Jaden')){const pr2=freshProfile('Jaden','cat');root.profiles.push(pr2);}}
+if(!root.seeded){root.seeded=true;root.profiles.forEach(x=>{if(x.name==='Player 1')x.name='Jaron';});if(!root.profiles.some(x=>x.name==='Jaden')){const pr2=freshProfile('Jaden','horse');root.profiles.push(pr2);}}
+if(!root.seeded2){root.seeded2=true;root.profiles.forEach(x=>{if(x.name==='Jaron'&&x.avatar==='dog')x.avatar='train';if(x.name==='Jaden'&&x.avatar==='cat')x.avatar='horse';});}
 let store=root.profiles.find(x=>x.id===root.current)||root.profiles[0];root.current=store.id;
 ['sr','mr','map','treasures'].forEach(k=>{if(store[k]==null)store[k]=k==='treasures'?[]:{};});
 Object.defineProperty(store,'sound',{get(){return root.settings.sound;},set(v){root.settings.sound=v;},enumerable:false,configurable:true});
@@ -749,10 +754,10 @@ function renderMap(){
     m.appendChild(b);});
   setTimeout(()=>{const c=m.querySelector('.station.current');if(c)c.scrollIntoView({block:'center',behavior:'smooth'});},50);
 }
-function renderProfileBtn(){$('#avatarImg').src=wordArt(store.avatar||'dog','idle');$('#avatarName').textContent=store.name||'';}
-function renderProfiles(){const el=$('#plist');el.innerHTML='';root.profiles.forEach(pr=>{const b=document.createElement('button');b.className='prow'+(pr.id===store.id?' cur':'');b.innerHTML='<img src="'+wordArt(pr.avatar||'dog','idle')+'" alt=""><b>'+pr.name+'</b><small>⭐ '+pr.stars+'</small>';b.onclick=()=>{if(pr.id!==store.id){sfxWhoosh();switchProfile(pr.id);}else $('#profiles').classList.remove('on');};el.appendChild(b);});}
+function renderProfileBtn(){const sl=$('#avatarSlot');sl.innerHTML='';sl.appendChild(avatarEl(store.avatar||'dog'));$('#avatarName').textContent=store.name||'';}
+function renderProfiles(){const el=$('#plist');el.innerHTML='';root.profiles.forEach(pr=>{const b=document.createElement('button');b.className='prow'+(pr.id===store.id?' cur':'');b.appendChild(avatarEl(pr.avatar||'dog'));b.insertAdjacentHTML('beforeend','<b>'+pr.name+'</b><small>⭐ '+pr.stars+'</small>');b.onclick=()=>{if(pr.id!==store.id){sfxWhoosh();switchProfile(pr.id);}else $('#profiles').classList.remove('on');};el.appendChild(b);});}
 let newAvatar='cat',editing=false;
-function openNewProfile(edit){editing=!!edit;$('#profiles').classList.remove('on');$('#settings').classList.remove('on');$('#newProfile h2').textContent=editing?'Edit player':'New player';$('#newOk').textContent=editing?'Save':'Let’s go!';$('#newName').value=editing?store.name:'';newAvatar=editing?(store.avatar||'dog'):AVATARS[(root.profiles.length)%AVATARS.length];const g=$('#avgrid');g.innerHTML='';AVATARS.forEach(a=>{const b=document.createElement('button');b.className=a===newAvatar?'sel':'';b.innerHTML='<img src="'+wordArt(a,'idle')+'" alt="">';b.onclick=()=>{newAvatar=a;g.querySelectorAll('button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');sfxPop(2);};g.appendChild(b);});$('#newProfile').classList.add('on');setTimeout(()=>$('#newName').focus(),100);}
+function openNewProfile(edit){editing=!!edit;$('#profiles').classList.remove('on');$('#settings').classList.remove('on');$('#newProfile h2').textContent=editing?'Edit player':'New player';$('#newOk').textContent=editing?'Save':'Let’s go!';$('#newName').value=editing?store.name:'';newAvatar=editing?(store.avatar||'dog'):AVATARS[(root.profiles.length)%AVATARS.length];const g=$('#avgrid');g.innerHTML='';AVATARS.forEach(a=>{const b=document.createElement('button');b.className=a===newAvatar?'sel':'';b.appendChild(avatarEl(a));b.onclick=()=>{newAvatar=a;g.querySelectorAll('button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');sfxPop(2);};g.appendChild(b);});$('#newProfile').classList.add('on');setTimeout(()=>$('#newName').focus(),100);}
 function renderHome(){renderProfileBtn();renderAdvCard();$('#homeStars').textContent=store.stars;renderLevels();renderQuest();renderGarden($('#homeGarden'));const c=Object.keys(store.album).length;$('#albumCount').textContent=c?c+' collected':'Spell to collect';$('#soundBtn').textContent=store.sound?'🔊':'🔇';$('#soundBtn').classList.toggle('off',!store.sound);$('#musicBtn').classList.toggle('off',!store.music);}
 
 /* ============ spelling ============ */
