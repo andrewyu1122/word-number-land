@@ -261,8 +261,12 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 @keyframes dance{0%,100%{transform:rotate(-8deg) translateY(0)}50%{transform:rotate(8deg) translateY(-14px)}}
 .pal.big{animation:popin .5s cubic-bezier(.3,1.7,.5,1),dance .55s .5s ease-in-out infinite}
 .op{font-size:44px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.2);padding-bottom:26px}
-.mathstage{height:300px;display:flex;justify-content:center;align-items:flex-end;gap:6px;flex-wrap:nowrap;padding:0 8px 34px 8px}
-.mathstage .pal{position:relative;z-index:1}
+.mathstage{height:330px;display:flex;justify-content:center;align-items:flex-end;gap:4px;flex-wrap:nowrap;padding:0 8px 34px 8px}
+.mathstage .pal{position:relative;z-index:1;flex-direction:column;align-items:center;gap:6px}
+.mathstage .digits{display:flex;align-items:flex-end;gap:2px}
+.mathstage .lbl{font-size:var(--lf,38px);font-weight:700;line-height:1;color:#fff;background:rgba(43,42,85,.78);padding:6px 14px;border-radius:999px;text-shadow:0 2px 0 rgba(0,0,0,.3);box-shadow:0 3px 0 rgba(0,0,0,.2)}
+.mathstage .lbl.q{background:var(--coral)}
+.mathstage .pal.big .lbl{background:var(--mint)}
 .mathstage .pal img{height:var(--ph,150px)}
 .mathstage .op{position:relative;z-index:1;font-size:48px;padding-bottom:36px;color:#fff;text-shadow:0 3px 0 rgba(0,0,0,.25)}
 .mathstage .buddy{height:60px;left:8px;bottom:6px}
@@ -331,9 +335,10 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
   .tiles{gap:10px}
   .pal img{height:140px}
   .op{font-size:64px;padding-bottom:40px}
-  .mathstage{height:460px;padding-bottom:50px;gap:12px}
+  .mathstage{height:500px;padding-bottom:50px;gap:12px}
   .mathstage .pal img{height:calc(var(--ph,150px)*1.6)}
   .mathstage .op{font-size:76px;padding-bottom:56px}
+  .mathstage .lbl{font-size:calc(var(--lf,38px)*1.5);padding:8px 22px}
   .mathstage .buddy{height:110px}
   .choice{width:130px;height:110px;font-size:52px}
   .keypad{max-width:400px}
@@ -763,14 +768,17 @@ function genProblem(level){
 }
 const opWord=op=>op==='+'?'plus':op==='-'?'minus':'times';
 function startMath(level,station){M={level,station:station==null?null:station,idx:0,total:0,mistakes:0};$('#mathStars').textContent=store.stars;show('math');renderProblem();}
-function pal(n,i,jump){const d=document.createElement('div');d.className='pal';d.style.setProperty('--i',i||0);if(n==='?')d.appendChild(img(numArt('q','idle')));else if(String(n)==='10')d.appendChild(img(numArt('10',jump?'jump':'idle')));else String(n).split('').forEach(dg=>d.appendChild(img(numArt(dg,(jump&&HAS_JUMP(dg))?'jump':'idle'))));return d;}
+function pal(n,i,jump){const d=document.createElement('div');d.className='pal';d.style.setProperty('--i',i||0);
+  const lbl=document.createElement('span');lbl.className='lbl'+(n==='?'?' q':'');lbl.textContent=n;d.appendChild(lbl);
+  const digits=document.createElement('div');digits.className='digits';d.appendChild(digits);
+  if(n==='?')digits.appendChild(img(numArt('q','idle')));else if(String(n)==='10')digits.appendChild(img(numArt('10',jump?'jump':'idle')));else String(n).split('').forEach(dg=>digits.appendChild(img(numArt(dg,(jump&&HAS_JUMP(dg))?'jump':'idle'))));return d;}
 function renderProblem(){
   const p=genProblem(M.level);M.p=p;M.mistakes=0;M.done=false;M.typed='';
   renderDots($('#mathDots'),M.idx,ROUND);$('#nextBtn2').classList.remove('show');
   const v=$('#visual');v.className='stage mathstage';v.innerHTML='';
   v.appendChild(img(A+'scenes/'+pick(['meadow','sky','room','road','space'])+'.webp','bg'));buddy(v);
   const digits=String(p.a).length+String(p.b).length+String(p.ans).length;
-  v.style.setProperty('--ph',({3:150,4:128,5:106,6:92})[digits]+'px');
+  v.style.setProperty('--ph',({3:140,4:120,5:100,6:88})[digits]+'px');v.style.setProperty('--lf',({3:38,4:34,5:28,6:24})[digits]+'px');
   const addPal=(n,i,extra)=>{const e=pal(n,i);if(extra)e.classList.add(extra);v.appendChild(e);return e;};
   addPal(p.a,0);let o=document.createElement('span');o.className='op';o.textContent=p.op;v.appendChild(o);
   addPal(p.b,1);o=document.createElement('span');o.className='op';o.textContent='=';v.appendChild(o);
