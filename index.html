@@ -96,6 +96,31 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 @keyframes sway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
 .hint-text{text-align:center;color:#fff;opacity:.9;font-size:14px;margin:0;text-shadow:0 1px 0 rgba(0,0,0,.2)}
 
+/* adventure map */
+.advcard{background:var(--card);border-radius:28px;padding:14px;box-shadow:0 10px 0 var(--tileshadow),0 14px 30px rgba(0,0,0,.08);display:flex;align-items:center;gap:12px;width:100%;text-align:left;position:relative;overflow:hidden}
+.advcard .thumb{width:84px;height:84px;border-radius:20px;background-size:cover;background-position:center;flex:none;box-shadow:inset 0 0 0 3px #fff;position:relative}
+.advcard .thumb img{position:absolute;left:50%;bottom:4px;transform:translateX(-50%);height:60px;animation:hop 1.6s ease-in-out infinite}
+.advcard h2{margin:0;font-size:24px}
+.advcard p{margin:2px 0 8px;color:var(--ink2);font-size:15px}
+.advcard .qbar{height:16px}
+.advcard .go{position:absolute;right:14px;top:14px;font-size:26px}
+.map{position:relative;border-radius:28px;overflow:hidden;box-shadow:0 10px 0 rgba(0,0,0,.12),inset 0 0 0 5px #fff}
+.map .band{height:260px;background-size:cover;background-position:center bottom;position:relative}
+.map .band::after{content:"";position:absolute;inset:auto 0 0 0;height:40px;background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,.35))}
+.map .band .bname{position:absolute;left:14px;top:12px;background:rgba(255,255,255,.85);color:var(--ink);font-weight:700;padding:4px 12px;border-radius:999px;font-size:14px}
+.map svg.path{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.station{position:absolute;width:72px;height:72px;margin:-36px 0 0 -36px;border-radius:50%;background:#fff;box-shadow:0 6px 0 rgba(0,0,0,.18);display:grid;place-items:center;transition:transform .15s}
+.station img{height:52px}
+.station .num{position:absolute;left:-6px;top:-6px;width:26px;height:26px;border-radius:50%;background:var(--coral);color:#fff;font-weight:700;font-size:14px;display:grid;place-items:center;box-shadow:0 2px 0 rgba(0,0,0,.2)}
+.station .st{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);font-size:14px;letter-spacing:1px;color:var(--sun);text-shadow:0 1px 0 rgba(0,0,0,.3);white-space:nowrap}
+.station .st .off{opacity:.3}
+.station.locked{background:rgba(255,255,255,.55);box-shadow:none}
+.station.locked img{opacity:.35;filter:grayscale(1)}
+.station.locked::after{content:"🔒";position:absolute;font-size:26px}
+.station.current{animation:pulse 1.2s ease-in-out infinite;box-shadow:0 0 0 5px var(--sun),0 6px 0 rgba(0,0,0,.18)}
+.station .me{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);height:74px;animation:hop 1.4s ease-in-out infinite;filter:drop-shadow(0 4px 0 rgba(0,0,0,.2))}
+.station.done{background:#fff7d6}
+@media (min-width:760px){.map .band{height:340px}.station{width:96px;height:96px;margin:-48px 0 0 -48px}.station img{height:70px}.station .me{height:100px;bottom:80px}.advcard h2{font-size:28px}}
 /* quest */
 .quest{background:var(--card);border-radius:24px;padding:12px 14px;box-shadow:0 8px 0 var(--tileshadow);display:flex;align-items:center;gap:12px}
 .quest .qrows{flex:1;display:flex;flex-direction:column;gap:8px}
@@ -318,6 +343,7 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
     </div>
     <p class="hint-text" id="syncBadge">📱 Progress saved on this device</p>
     <div class="cards">
+      <button class="advcard pressable" id="advBtn"></button>
       <div class="card" style="--c:var(--coral)"><div class="band"></div>
         <div class="card-head"><img src="assets/words/dog_idle.webp" alt=""><div><h2>Spell</h2><p>Tap letters to wake the picture</p></div></div>
         <div class="levels" id="spellLevels"></div>
@@ -331,6 +357,15 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
     </div>
     <div class="field" id="homeGarden"></div>
     <p class="hint-text">Every 5 stars grows something new in the garden</p>
+  </section>
+
+  <section class="screen" id="mapScreen">
+    <div class="topbar">
+      <button class="icon" data-home aria-label="Home">🏠</button>
+      <div class="pill" id="mapTitle">Adventure</div>
+      <div class="pill">⭐ <span id="mapStars">0</span></div>
+    </div>
+    <div class="map" id="map"></div>
   </section>
 
   <section class="screen" id="spell">
@@ -432,7 +467,7 @@ const PAL_COLORS=['#8a8fa8','#ff4f8b','#ff9a2e','#ffd43b','#38d47a','#3aa6ff','#
 
 /* ============ storage ============ */
 const KEY='wnl_v2';
-let store={stars:0,sound:true,music:true,voice:null,words:{},lvl:{},album:{},daily:null,treasures:[]};
+let store={stars:0,sound:true,music:true,voice:null,words:{},lvl:{},album:{},daily:null,treasures:[],map:{}};
 try{Object.assign(store,JSON.parse(localStorage.getItem(KEY)||'{}'));}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}}
 
@@ -498,15 +533,15 @@ function stopMusic(){if(musicTimer){clearInterval(musicTimer);musicTimer=null;}}
 function confetti(){const colors=['#ff6b4a','#3aa6ff','#38d47a','#ffc93c','#9b6bff','#ff4f8b'];for(let i=0;i<40;i++){const d=document.createElement('div');d.className='confetti';d.style.left=Math.random()*100+'vw';d.style.background=pick(colors);d.style.animationDelay=(Math.random()*.4)+'s';d.style.transform='rotate('+Math.random()*360+'deg)';document.body.appendChild(d);setTimeout(()=>d.remove(),2500);}}
 function burstAt(x,y,chars){for(let i=0;i<8;i++){const s=document.createElement('span');s.className='burst';s.textContent=pick(chars);s.style.left=x+'px';s.style.top=y+'px';const a=i/8*Math.PI*2,r=40+Math.random()*30;s.style.setProperty('--dx',Math.cos(a)*r+'px');s.style.setProperty('--dy',Math.sin(a)*r+'px');document.body.appendChild(s);setTimeout(()=>s.remove(),700);}}
 function addStars(n){store.stars+=n;save();refreshStars();pushCloud();}
-function refreshStars(){document.querySelectorAll('#homeStars,#spellStars,#mathStars,#albumStars').forEach(e=>e.textContent=store.stars);}
+function refreshStars(){document.querySelectorAll('#homeStars,#spellStars,#mathStars,#albumStars,#mapStars').forEach(e=>e.textContent=store.stars);}
 function roundStars(total,count){const r=total/(3*count);return r>=.9?3:r>=.6?2:r>0?1:0;}
 
 /* ============ cloud sync (works on claude.ai only; local fallback) ============ */
 let db=null,cloudCan=false,lastCloud='',pushTimer=null;
 const SYNC_TEXT={local:'📱 Progress saved on this device',synced:'☁️ Progress synced for the whole family',saving:'☁️ Saving…',readonly:'☁️ Family progress loaded (this account can only view)',error:'☁️ Could not save to the cloud right now'};
 let lastSync='local';function setSync(s){lastSync=s;const b=$('#syncBadge');if(b)b.textContent=SYNC_TEXT[s]||SYNC_TEXT.local;}
-function progressDoc(){return{stars:store.stars,words:store.words,lvl:store.lvl,album:store.album,treasures:store.treasures,updatedAt:Date.now()};}
-function mergeCloud(d){let localMore=false;if((d.stars||0)>store.stars)store.stars=d.stars;else if(store.stars>(d.stars||0))localMore=true;['words','lvl'].forEach(k=>{const c=d[k]||{};for(const w in c)if((c[w]||0)>(store[k][w]||0))store[k][w]=c[w];for(const w in store[k])if((store[k][w]||0)>(c[w]||0))localMore=true;});const al=d.album||{};for(const w in al)store.album[w]=true;for(const w in store.album)if(!al[w])localMore=true;const ct=d.treasures||[];if(ct.length>store.treasures.length)store.treasures=ct;else if(store.treasures.length>ct.length)localMore=true;save();refreshStars();return localMore;}
+function progressDoc(){return{stars:store.stars,words:store.words,lvl:store.lvl,album:store.album,treasures:store.treasures,map:store.map,updatedAt:Date.now()};}
+function mergeCloud(d){let localMore=false;if((d.stars||0)>store.stars)store.stars=d.stars;else if(store.stars>(d.stars||0))localMore=true;['words','lvl','map'].forEach(k=>{const c=d[k]||{};for(const w in c)if((c[w]||0)>(store[k][w]||0))store[k][w]=c[w];for(const w in store[k])if((store[k][w]||0)>(c[w]||0))localMore=true;});const al=d.album||{};for(const w in al)store.album[w]=true;for(const w in store.album)if(!al[w])localMore=true;const ct=d.treasures||[];if(ct.length>store.treasures.length)store.treasures=ct;else if(store.treasures.length>ct.length)localMore=true;save();refreshStars();return localMore;}
 function pushCloud(){if(!db||!cloudCan)return;clearTimeout(pushTimer);pushTimer=setTimeout(async()=>{const doc=progressDoc();const key=JSON.stringify([doc.stars,doc.words,doc.lvl,doc.album]);if(key===lastCloud)return;setSync('saving');try{await db.doc('progress/main').set(doc);lastCloud=key;setSync('synced');}catch(e){if(e&&e.code==='invalid_argument'){cloudCan=false;setSync('readonly');}else setSync('error');}},900);}
 async function initCloud(){try{if(!window.claude||typeof claude.use!=='function'){setSync('local');return;}const [d,user]=await Promise.all([claude.use('db'),claude.use('user')]);if(!d){setSync('local');return;}db=d;let w=null;try{w=user?await user.can('data.write'):null;}catch(e){}cloudCan=(w!==false);let first=true;db.doc('progress/main').onSnapshot(snap=>{let localMore=true;if(snap.exists){const data=snap.data()||{};lastCloud=JSON.stringify([data.stars||0,data.words||{},data.lvl||{},data.album||{}]);localMore=mergeCloud(data);}if(first&&localMore)pushCloud();first=false;setSync(cloudCan?'synced':'readonly');if($('#home').classList.contains('on'))renderHome();},err=>{setSync('local');});}catch(e){setSync('local');}}
 
@@ -571,12 +606,37 @@ function renderGarden(el){
   }
   if(n===0){const h=document.createElement('div');h.className='empty-hint';h.textContent='Earn 5 stars to plant your first seed 🌱';el.appendChild(h);}
 }
-function renderHome(){$('#homeStars').textContent=store.stars;renderLevels();renderQuest();renderGarden($('#homeGarden'));const c=Object.keys(store.album).length;$('#albumCount').textContent=c?c+' collected':'none yet';$('#soundBtn').textContent=store.sound?'🔊':'🔇';$('#soundBtn').classList.toggle('off',!store.sound);$('#musicBtn').classList.toggle('off',!store.music);}
+/* ============ adventure map ============ */
+const BANDS=[['meadow','Meadow'],['road','Town'],['sky','Sky'],['sea','Ocean'],['room','Cozy Room'],['night','Night'],['space','Space']];
+const STATIONS=[];BANDS.forEach((b,bi)=>{const lvl=bi<2?1:bi<4?2:bi<6?3:4;STATIONS.push({band:bi,game:'spell',level:lvl});STATIONS.push({band:bi,game:'math',level:lvl});});
+function currentStation(){for(let i=0;i<STATIONS.length;i++)if((store.map[i]||0)<2)return i;return STATIONS.length;}
+function renderAdvCard(){const cur=currentStation();const el=$('#advBtn');const done=cur>=STATIONS.length;const st=STATIONS[Math.min(cur,STATIONS.length-1)];
+  el.innerHTML='<div class="thumb" style="background-image:url('+A+'scenes/'+BANDS[st.band][0]+'.webp)"><img src="'+A+'mascot/mascot_idle.webp" alt=""></div><div style="flex:1"><h2>Adventure</h2><p>'+(done?'You reached the end of Space! 🎉':'Station '+(cur+1)+' of '+STATIONS.length+' · '+BANDS[st.band][1])+'</p><div class="qbar"><i style="width:'+(Math.min(cur,STATIONS.length)/STATIONS.length*100)+'%"></i></div></div><span class="go">➜</span>';}
+function renderMap(){
+  const cur=currentStation();$('#mapStars').textContent=store.stars;
+  const m=$('#map');m.innerHTML='';
+  BANDS.forEach((b,i)=>{const d=document.createElement('div');d.className='band';d.style.backgroundImage='url('+A+'scenes/'+b[0]+'.webp)';d.innerHTML='<span class="bname">'+(i+1)+'. '+b[1]+'</span>';m.appendChild(d);});
+  const W=m.clientWidth||400,BH=window.innerWidth>=760?340:260;
+  const pts=STATIONS.map((st,i)=>({x:(i%2?0.72:0.28)*W,y:st.band*BH+(i%2?BH*0.72:BH*0.30)}));
+  let dpath='M'+pts[0].x+' '+pts[0].y;for(let i=1;i<pts.length;i++){const a=pts[i-1],b=pts[i];const my=(a.y+b.y)/2;dpath+=' C'+a.x+' '+my+' '+b.x+' '+my+' '+b.x+' '+b.y;}
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('class','path');svg.setAttribute('viewBox','0 0 '+W+' '+(BH*BANDS.length));svg.setAttribute('preserveAspectRatio','none');
+  svg.innerHTML='<path d="'+dpath+'" fill="none" stroke="rgba(0,0,0,.18)" stroke-width="16" stroke-linecap="round"/><path d="'+dpath+'" fill="none" stroke="#fff" stroke-width="8" stroke-dasharray="16 14" stroke-linecap="round"/>';
+  m.appendChild(svg);
+  STATIONS.forEach((st,i)=>{const b=document.createElement('button');const best=store.map[i]||0;const state=i<cur?'done':i===cur?'current':'locked';b.className='station '+state;
+    b.style.left=pts[i].x+'px';b.style.top=pts[i].y+'px';
+    const icon=st.game==='spell'?letterArt('abcdefghijklmnopqrstuvwxyz'[(i*3)%26],'idle'):numArt(String(st.level+(i%2?2:0)),'idle');
+    b.innerHTML='<span class="num">'+(i+1)+'</span><img src="'+icon+'" alt="">'+(best?'<span class="st">'+starsText(best)+'</span>':'')+(state==='current'?'<img class="me" src="'+A+'mascot/mascot_idle.webp" alt="">':'');
+    b.setAttribute('aria-label',(st.game==='spell'?'Spell':'Count')+' station '+(i+1));
+    b.onclick=()=>{if(state==='locked'){sfxWrong();b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');return;}sfxWhoosh();st.game==='spell'?startSpell(st.level,i):startMath(st.level,i);};
+    m.appendChild(b);});
+  setTimeout(()=>{const c=m.querySelector('.station.current');if(c)c.scrollIntoView({block:'center',behavior:'smooth'});},50);
+}
+function renderHome(){renderAdvCard();$('#homeStars').textContent=store.stars;renderLevels();renderQuest();renderGarden($('#homeGarden'));const c=Object.keys(store.album).length;$('#albumCount').textContent=c?c+' collected':'none yet';$('#soundBtn').textContent=store.sound?'🔊':'🔇';$('#soundBtn').classList.toggle('off',!store.sound);$('#musicBtn').classList.toggle('off',!store.music);}
 
 /* ============ spelling ============ */
 let S={};
 function pickWords(level){const list=shuffle(WORDS[level].slice());list.sort((a,b)=>(store.words[a[0]]||0)-(store.words[b[0]]||0));return list.slice(0,ROUND).map(([word,emoji,anim])=>({word,emoji,anim}));}
-function startSpell(level){S={level,queue:pickWords(level),idx:0,total:0};$('#spellStars').textContent=store.stars;show('spell');renderWord();}
+function startSpell(level,station){S={level,station:station==null?null:station,queue:pickWords(level),idx:0,total:0};$('#spellStars').textContent=store.stars;show('spell');renderWord();}
 function renderDots(el,idx,n){el.innerHTML='';for(let i=0;i<n;i++){const d=document.createElement('i');if(i<idx)d.className='done';else if(i===idx)d.className='now';el.appendChild(d);}}
 function renderWord(){
   const w=S.queue[S.idx];S.word=w;S.pos=0;S.mistakes=0;S.slotMiss=0;S.done=false;
@@ -660,7 +720,7 @@ function genProblem(level){
   a=rnd(1,5);b=Math.random()<.5?2:rnd(1,5);op='×';return{a,b,op,ans:a*b,visual:'array',input:'choices'};
 }
 const opWord=op=>op==='+'?'plus':op==='-'?'minus':'times';
-function startMath(level){M={level,idx:0,total:0,mistakes:0};$('#mathStars').textContent=store.stars;show('math');renderProblem();}
+function startMath(level,station){M={level,station:station==null?null:station,idx:0,total:0,mistakes:0};$('#mathStars').textContent=store.stars;show('math');renderProblem();}
 function pal(n,i,jump){const d=document.createElement('div');d.className='pal';d.style.setProperty('--i',i||0);if(n==='?')d.appendChild(img(numArt('q','idle')));else if(String(n)==='10')d.appendChild(img(numArt('10','idle')));else String(n).split('').forEach(dg=>d.appendChild(img(numArt(dg,(jump&&HAS_JUMP(dg))?'jump':'idle'))));return d;}
 function renderProblem(){
   const p=genProblem(M.level);M.p=p;M.mistakes=0;M.done=false;M.typed='';
@@ -723,11 +783,14 @@ function finishRound(game){
   lastGame=game;stopParticles();
   const total=game==='spell'?S.total:M.total,level=game==='spell'?S.level:M.level;
   const rs=roundStars(total,ROUND);
+  const station=game==='spell'?S.station:M.station;let extra='';
+  if(station!=null){const was=currentStation();store.map[station]=Math.max(store.map[station]||0,rs);const now=currentStation();if(now>was)extra=now>=STATIONS.length?' You finished the whole adventure! 🚀':' New station unlocked: '+BANDS[STATIONS[now].band][1]+'!';else if(rs<2)extra=' Get 2 stars to move on!';}
   store.lvl[game+level]=Math.max(store.lvl[game+level]||0,rs);save();pushCloud();
   $('#sumStars').innerHTML=starsText(rs);
   $('#sumMascot').src=A+'mascot/mascot_'+(rs>=2?'happy':'cheer')+'.webp';
   $('#sumTitle').textContent=rs===3?'Amazing!':rs===2?'Great job!':'Nice try!';
-  $('#sumText').textContent='You earned '+total+' stars. Total: '+store.stars+' ⭐';
+  $('#sumText').textContent='You earned '+total+' stars. Total: '+store.stars+' ⭐'+extra;
+  $('#againBtn').textContent=station!=null?'Back to map':'Play again';
   $('#summary').classList.add('on');sfxWin();confetti();
   say([rs===3?'p_amazing':rs===2?'p_greatjob':'p_nicetry'],rs===3?'Amazing! You got every one!':rs===2?'Great job!':'Nice try! Let’s play again!');
 }
@@ -767,7 +830,7 @@ $('#treasureOk').onclick=()=>{$('#treasure').classList.remove('on');if($('#home'
 $('#resetNo').onclick=()=>$('#resetDlg').classList.remove('on');
 $('#resetYes').onclick=async()=>{
   $('#resetDlg').classList.remove('on');
-  store.stars=0;store.words={};store.lvl={};store.album={};store.daily=null;store.treasures=[];save();refreshStars();renderHome();
+  store.stars=0;store.words={};store.lvl={};store.album={};store.daily=null;store.treasures=[];store.map={};save();refreshStars();renderHome();
   if(db&&cloudCan){try{setSync('saving');const doc=progressDoc();await db.doc('progress/main').set(doc);lastCloud=JSON.stringify([doc.stars,doc.words,doc.lvl,doc.album]);setSync('synced');}catch(e){setSync('error');}}
   sfxWhoosh();say(['p_allclear'],'All clear! Let’s start again!');
 };
@@ -777,8 +840,9 @@ $('#hintBtn').onclick=()=>showHint(true);
 $('#nextBtn').onclick=()=>{sfxWhoosh();nextWord();};
 $('#sayBtn2').onclick=sayProblem;
 $('#nextBtn2').onclick=()=>{sfxWhoosh();nextProblem();};
-$('#againBtn').onclick=()=>{$('#summary').classList.remove('on');lastGame==='spell'?startSpell(S.level):startMath(M.level);};
+$('#againBtn').onclick=()=>{$('#summary').classList.remove('on');const st=lastGame==='spell'?S.station:M.station;if(st!=null){renderMap();show('mapScreen');}else lastGame==='spell'?startSpell(S.level):startMath(M.level);};
 $('#homeBtn').onclick=()=>{$('#summary').classList.remove('on');renderHome();show('home');};
+$('#advBtn').onclick=()=>{sfxWhoosh();show('mapScreen');renderMap();};
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stopMusic();else if(store.music&&ac&&!$('#start').classList.contains('on'))startMusic();});
 </script>
