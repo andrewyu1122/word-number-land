@@ -91,7 +91,7 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 .hint-text{text-align:center;color:#fff;opacity:.9;font-size:14px;margin:0;text-shadow:0 1px 0 rgba(0,0,0,.2)}
 
 /* stage */
-.stage{position:relative;border-radius:28px;height:260px;overflow:hidden;box-shadow:0 10px 0 rgba(0,0,0,.12),inset 0 0 0 5px #fff;background:#cfeeff}
+.stage{--mx:260px;--sx:120px;--fx:180px;position:relative;border-radius:28px;height:260px;overflow:hidden;box-shadow:0 10px 0 rgba(0,0,0,.12),inset 0 0 0 5px #fff;background:#cfeeff}
 .stage .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .buddy{position:absolute;left:10px;bottom:8px;height:72px;filter:drop-shadow(0 3px 0 rgba(0,0,0,.2));z-index:2;transition:transform .3s}
 .buddy.cheer{transform:scale(1.15) rotate(-6deg)}
@@ -110,9 +110,9 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 .alive .m-drive{animation:drive 3.2s linear infinite}
 .alive .m-swim{animation:swim 4s ease-in-out infinite}
 .alive .m-fly{animation:fly 3.4s ease-in-out infinite}
-@keyframes drive{0%{transform:translateX(-50%) translateX(-260px)}100%{transform:translateX(-50%) translateX(260px)}}
-@keyframes swim{0%{transform:translateX(-50%) translateX(-120px) scaleX(1)}48%{transform:translateX(-50%) translateX(120px) scaleX(1)}50%{transform:translateX(-50%) translateX(120px) scaleX(-1)}98%{transform:translateX(-50%) translateX(-120px) scaleX(-1)}100%{transform:translateX(-50%) translateX(-120px) scaleX(1)}}
-@keyframes fly{0%{transform:translateX(-50%) translate(-180px,20px)}50%{transform:translateX(-50%) translate(0,-50px)}100%{transform:translateX(-50%) translate(180px,20px)}}
+@keyframes drive{0%{transform:translateX(-50%) translateX(calc(var(--mx)*-1))}100%{transform:translateX(-50%) translateX(var(--mx))}}
+@keyframes swim{0%{transform:translateX(-50%) translateX(calc(var(--sx)*-1)) scaleX(1)}48%{transform:translateX(-50%) translateX(var(--sx)) scaleX(1)}50%{transform:translateX(-50%) translateX(var(--sx)) scaleX(-1)}98%{transform:translateX(-50%) translateX(calc(var(--sx)*-1)) scaleX(-1)}100%{transform:translateX(-50%) translateX(calc(var(--sx)*-1)) scaleX(1)}}
+@keyframes fly{0%{transform:translateX(-50%) translate(calc(var(--fx)*-1),20px)}50%{transform:translateX(-50%) translate(0,-50px)}100%{transform:translateX(-50%) translate(var(--fx),20px)}}
 /* emoji fallback animations */
 .alive .a-hop{animation:hop .7s ease-in-out infinite}
 .alive .a-spin{animation:spin 1.6s linear infinite}
@@ -219,6 +219,47 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 #start p{color:#fff;opacity:.9}
 .confetti{position:fixed;top:-20px;width:11px;height:17px;border-radius:3px;z-index:30;pointer-events:none;animation:fall 2s ease-in forwards}
 @keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.6}}
+/* desktop: everything bigger */
+@media (min-width: 760px){
+  #app{max-width:860px;padding:16px 24px 32px}
+  .screen{gap:16px}
+  .stage{height:420px;--mx:420px;--sx:220px;--fx:300px;border-radius:36px}
+  .actor{bottom:44px}
+  .actor .em{height:280px;max-width:600px}
+  .actor .emoji{font-size:190px}
+  .actor .shadow{width:200px;height:34px}
+  .buddy{height:110px;left:16px;bottom:12px}
+  .slot{width:84px;height:104px;border-radius:20px}
+  .slot img{height:96px;max-width:84px}
+  .tile{width:92px;height:108px}
+  .tile img{height:100px;max-width:92px}
+  .tiles{gap:10px}
+  .pal img{height:140px}
+  .op{font-size:64px;padding-bottom:40px}
+  .mathstage{min-height:240px;padding-left:120px}
+  .group img{height:60px}
+  .group.small img{height:44px}
+  .dot{width:34px;height:34px}
+  .bigeq{font-size:84px}
+  .choice{width:130px;height:110px;font-size:52px}
+  .keypad{max-width:400px}
+  .key{height:72px;font-size:34px}
+  .typed{height:84px}
+  .next{font-size:32px;padding:16px 44px}
+  .icon{width:60px;height:60px;font-size:28px}
+  .pill{font-size:24px}
+  .hero .mascot{height:150px}
+  .logo img{height:62px}
+  h1{font-size:30px}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .album-btn{grid-column:1/-1}
+  .card-head img{height:80px}
+  .lvl b{font-size:32px}
+  .lvl small{font-size:13px}
+  .garden img,.garden span{height:62px}
+  .stickers{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
+  .sticker img{height:84px;max-width:110px}
+}
 @media (prefers-reduced-motion: reduce){*{animation-duration:.01ms !important;animation-iteration-count:1 !important}}
 </style>
 </head>
@@ -235,6 +276,7 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
       <div class="pill">⭐ <span id="homeStars">0</span></div>
       <button class="icon" id="soundBtn" aria-label="Voice and sounds">🔊</button>
       <button class="icon" id="musicBtn" aria-label="Music">🎵</button>
+      <button class="icon" id="resetBtn" aria-label="Reset progress">↺</button>
     </div>
     <p class="hint-text" id="syncBadge">📱 Progress saved on this device</p>
     <div class="cards">
@@ -299,6 +341,12 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
     <div class="bigstar" id="sumStars"></div>
     <h2 id="sumTitle">Great job!</h2><p id="sumText"></p>
     <div class="row"><button id="againBtn">Play again</button><button class="quiet" id="homeBtn">Home</button></div>
+  </div></div>
+
+  <div class="overlay" id="resetDlg"><div class="panel">
+    <div style="font-size:56px">🗑️</div>
+    <h2>Reset everything?</h2><p>All stars, stickers and the garden will be erased. This cannot be undone.</p>
+    <div class="row"><button class="quiet" id="resetNo">Keep playing</button><button id="resetYes" style="background:var(--rose);box-shadow:0 7px 0 #c93566">Yes, reset</button></div>
   </div></div>
 
   <div class="overlay on" id="start"><div class="panel">
@@ -620,6 +668,14 @@ $('#playBtn').onclick=()=>{
 document.querySelectorAll('[data-home]').forEach(b=>b.onclick=()=>{sfxPop(3);renderHome();show('home');});
 $('#albumBtn').onclick=()=>{sfxWhoosh();renderAlbum();show('album');};
 $('#soundBtn').onclick=()=>{store.sound=!store.sound;save();renderHome();if(store.sound){sfxPop(4);speak('Sound on!');}};
+$('#resetBtn').onclick=()=>{sfxPop(1);$('#resetDlg').classList.add('on');};
+$('#resetNo').onclick=()=>$('#resetDlg').classList.remove('on');
+$('#resetYes').onclick=async()=>{
+  $('#resetDlg').classList.remove('on');
+  store.stars=0;store.words={};store.lvl={};store.album={};save();refreshStars();renderHome();
+  if(db&&cloudCan){try{setSync('saving');const doc=progressDoc();await db.doc('progress/main').set(doc);lastCloud=JSON.stringify([doc.stars,doc.words,doc.lvl,doc.album]);setSync('synced');}catch(e){setSync('error');}}
+  sfxWhoosh();speak('All clear! Let’s start again!');
+};
 $('#musicBtn').onclick=()=>{store.music=!store.music;save();renderHome();store.music?startMusic():stopMusic();};
 $('#sayBtn').onclick=()=>speak(S.word.word+'.',0.8);
 $('#hintBtn').onclick=()=>showHint(true);
