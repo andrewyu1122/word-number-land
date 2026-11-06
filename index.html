@@ -4,8 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Word & Number Land</title>
-<link rel="icon" href="assets/words/dog_idle.webp">
-<link rel="apple-touch-icon" href="assets/words/dog_idle.webp">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#7fd3ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Word Land">
+<link rel="icon" href="assets/icon-192.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -90,6 +96,35 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 @keyframes sway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
 .hint-text{text-align:center;color:#fff;opacity:.9;font-size:14px;margin:0;text-shadow:0 1px 0 rgba(0,0,0,.2)}
 
+/* quest */
+.quest{background:var(--card);border-radius:24px;padding:12px 14px;box-shadow:0 8px 0 var(--tileshadow);display:flex;align-items:center;gap:12px}
+.quest .qrows{flex:1;display:flex;flex-direction:column;gap:8px}
+.quest h3{margin:0 0 2px;font-size:17px}
+.qrow{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:var(--ink2)}
+.qrow img{height:30px}
+.qbar{flex:1;height:14px;border-radius:7px;background:var(--slotline);overflow:hidden}
+.qbar i{display:block;height:100%;background:linear-gradient(90deg,var(--mint),#8ff0b4);border-radius:7px;transition:width .6s cubic-bezier(.3,1.4,.5,1)}
+.qrow b{min-width:34px;text-align:right;color:var(--ink)}
+.quest .prize{width:64px;height:64px;border-radius:18px;background:var(--slot);border:3px dashed var(--slotline);display:grid;place-items:center;font-size:28px}
+.quest .prize img{height:54px}
+.quest.done .prize{border-style:solid;border-color:var(--sun);background:#fff7d6;animation:glow .8s ease-in-out infinite}
+/* garden field */
+.field{position:relative;height:170px;border-radius:24px;overflow:hidden;background:linear-gradient(180deg,#bfeaff 0%,#dff6ff 55%,#8ee07a 56%,#6fcf63 100%);box-shadow:0 8px 0 rgba(0,0,0,.1),inset 0 0 0 4px #fff}
+.field .plants{position:absolute;left:0;right:0;bottom:10px;display:flex;flex-wrap:wrap-reverse;justify-content:center;align-items:flex-end;gap:0 2px;padding:0 10px}
+.field .plant{height:62px;display:flex;align-items:flex-end;justify-content:center;width:40px;background:none;transform-origin:bottom center;animation:sway 3.4s ease-in-out infinite;animation-delay:calc(var(--i)*.37s)}
+.field .plant img{height:calc(60px*var(--g,1));filter:drop-shadow(0 3px 0 rgba(0,0,0,.15));transition:height .8s}
+.field .plant.poke{animation:pokeit .5s}
+@keyframes pokeit{0%,100%{transform:scale(1)}40%{transform:scale(1.25) rotate(-8deg)}70%{transform:scale(.95) rotate(6deg)}}
+.field .critter{position:absolute;height:40px;filter:drop-shadow(0 3px 0 rgba(0,0,0,.15));background:none}
+.field .critter img{height:100%}
+.field .critter.walk{bottom:8px;animation:walk var(--d,18s) linear infinite;animation-delay:var(--dl,0s)}
+.field .critter.flyer{top:12%;animation:flutter var(--d,14s) ease-in-out infinite;animation-delay:var(--dl,0s)}
+@keyframes walk{0%{left:-12%;transform:scaleX(1)}49%{left:95%;transform:scaleX(1)}50%{transform:scaleX(-1)}99%{left:-12%;transform:scaleX(-1)}100%{transform:scaleX(1)}}
+@keyframes flutter{0%{left:-10%;transform:translateY(0)}25%{transform:translateY(30px)}50%{left:95%;transform:translateY(0) scaleX(-1)}75%{transform:translateY(34px) scaleX(-1)}100%{left:-10%;transform:translateY(0)}}
+.field .empty-hint{position:absolute;inset:auto 0 44px 0;text-align:center;color:#2b6b3a;font-weight:600;font-size:15px}
+.field .sunlit{position:absolute;top:8px;right:14px;width:46px;height:46px;border-radius:50%;background:radial-gradient(circle,#fff7b0,#ffd84d 60%,rgba(255,216,77,0) 72%)}
+@media (min-width:760px){.field{height:240px}.field .plant{height:90px;width:56px}.field .plant img{height:calc(86px*var(--g,1))}.field .critter{height:56px}.quest h3{font-size:20px}.qrow{font-size:17px}}
+#treasure .panel img{height:140px;filter:drop-shadow(0 6px 0 rgba(0,0,0,.15))}
 /* stage */
 .stage{--mx:260px;--sx:120px;--fx:180px;position:relative;border-radius:28px;height:260px;overflow:hidden;box-shadow:0 10px 0 rgba(0,0,0,.12),inset 0 0 0 5px #fff;background:#cfeeff}
 .stage .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -291,9 +326,10 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
         <div class="card-head"><img src="assets/num/n3_idle.webp" alt="" style="animation-delay:.6s"><div><h2>Count</h2><p>Add, take away, and times</p></div></div>
         <div class="levels" id="mathLevels"></div>
       </div>
+      <div class="quest" id="quest"></div>
       <button class="card album-btn pressable" id="albumBtn">📒 My stickers <span id="albumCount"></span></button>
     </div>
-    <div class="garden" id="homeGarden"></div>
+    <div class="field" id="homeGarden"></div>
     <p class="hint-text">Every 5 stars grows something new in the garden</p>
   </section>
 
@@ -334,8 +370,10 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
     </div>
     <h2>My stickers</h2>
     <div class="stickers" id="stickers"></div>
+    <h2>Daily treasures</h2>
+    <div class="stickers" id="treasures"></div>
     <h2>Star garden</h2>
-    <div class="garden" id="albumGarden"></div>
+    <div class="field" id="albumGarden"></div>
   </section>
 
   <div class="overlay" id="summary"><div class="panel">
@@ -343,6 +381,12 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
     <div class="bigstar" id="sumStars"></div>
     <h2 id="sumTitle">Great job!</h2><p id="sumText"></p>
     <div class="row"><button id="againBtn">Play again</button><button class="quiet" id="homeBtn">Home</button></div>
+  </div></div>
+
+  <div class="overlay" id="treasure"><div class="panel">
+    <img id="treasureImg" src="" alt="">
+    <h2>Treasure!</h2><p id="treasureText">You finished today’s quest!</p>
+    <div class="row"><button id="treasureOk">Yay!</button></div>
   </div></div>
 
   <div class="overlay" id="resetDlg"><div class="panel">
@@ -388,7 +432,7 @@ const PAL_COLORS=['#8a8fa8','#ff4f8b','#ff9a2e','#ffd43b','#38d47a','#3aa6ff','#
 
 /* ============ storage ============ */
 const KEY='wnl_v2';
-let store={stars:0,sound:true,music:true,voice:null,words:{},lvl:{},album:{}};
+let store={stars:0,sound:true,music:true,voice:null,words:{},lvl:{},album:{},daily:null,treasures:[]};
 try{Object.assign(store,JSON.parse(localStorage.getItem(KEY)||'{}'));}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}}
 
@@ -461,8 +505,8 @@ function roundStars(total,count){const r=total/(3*count);return r>=.9?3:r>=.6?2:
 let db=null,cloudCan=false,lastCloud='',pushTimer=null;
 const SYNC_TEXT={local:'📱 Progress saved on this device',synced:'☁️ Progress synced for the whole family',saving:'☁️ Saving…',readonly:'☁️ Family progress loaded (this account can only view)',error:'☁️ Could not save to the cloud right now'};
 let lastSync='local';function setSync(s){lastSync=s;const b=$('#syncBadge');if(b)b.textContent=SYNC_TEXT[s]||SYNC_TEXT.local;}
-function progressDoc(){return{stars:store.stars,words:store.words,lvl:store.lvl,album:store.album,updatedAt:Date.now()};}
-function mergeCloud(d){let localMore=false;if((d.stars||0)>store.stars)store.stars=d.stars;else if(store.stars>(d.stars||0))localMore=true;['words','lvl'].forEach(k=>{const c=d[k]||{};for(const w in c)if((c[w]||0)>(store[k][w]||0))store[k][w]=c[w];for(const w in store[k])if((store[k][w]||0)>(c[w]||0))localMore=true;});const al=d.album||{};for(const w in al)store.album[w]=true;for(const w in store.album)if(!al[w])localMore=true;save();refreshStars();return localMore;}
+function progressDoc(){return{stars:store.stars,words:store.words,lvl:store.lvl,album:store.album,treasures:store.treasures,updatedAt:Date.now()};}
+function mergeCloud(d){let localMore=false;if((d.stars||0)>store.stars)store.stars=d.stars;else if(store.stars>(d.stars||0))localMore=true;['words','lvl'].forEach(k=>{const c=d[k]||{};for(const w in c)if((c[w]||0)>(store[k][w]||0))store[k][w]=c[w];for(const w in store[k])if((store[k][w]||0)>(c[w]||0))localMore=true;});const al=d.album||{};for(const w in al)store.album[w]=true;for(const w in store.album)if(!al[w])localMore=true;const ct=d.treasures||[];if(ct.length>store.treasures.length)store.treasures=ct;else if(store.treasures.length>ct.length)localMore=true;save();refreshStars();return localMore;}
 function pushCloud(){if(!db||!cloudCan)return;clearTimeout(pushTimer);pushTimer=setTimeout(async()=>{const doc=progressDoc();const key=JSON.stringify([doc.stars,doc.words,doc.lvl,doc.album]);if(key===lastCloud)return;setSync('saving');try{await db.doc('progress/main').set(doc);lastCloud=key;setSync('synced');}catch(e){if(e&&e.code==='invalid_argument'){cloudCan=false;setSync('readonly');}else setSync('error');}},900);}
 async function initCloud(){try{if(!window.claude||typeof claude.use!=='function'){setSync('local');return;}const [d,user]=await Promise.all([claude.use('db'),claude.use('user')]);if(!d){setSync('local');return;}db=d;let w=null;try{w=user?await user.can('data.write'):null;}catch(e){}cloudCan=(w!==false);let first=true;db.doc('progress/main').onSnapshot(snap=>{let localMore=true;if(snap.exists){const data=snap.data()||{};lastCloud=JSON.stringify([data.stars||0,data.words||{},data.lvl||{},data.album||{}]);localMore=mergeCloud(data);}if(first&&localMore)pushCloud();first=false;setSync(cloudCan?'synced':'readonly');if($('#home').classList.contains('on'))renderHome();},err=>{setSync('local');});}catch(e){setSync('local');}}
 
@@ -500,8 +544,34 @@ function renderLevels(){
     for(let l=1;l<=4;l++){const b=document.createElement('button');b.className='lvl';b.style.setProperty('--c',colors[l-1]);const best=store.lvl[game+l]||0;b.innerHTML='<b>'+l+'</b><small>'+names[l-1]+'</small><div class="st">'+starsText(best)+'</div>';b.onclick=()=>{sfxWhoosh();game==='spell'?startSpell(l):startMath(l);};el.appendChild(b);}
   });
 }
-function renderGarden(el){const n=Math.floor(store.stars/5);el.innerHTML='';const shown=Math.min(n,48);for(let i=0;i<shown;i++){const im=img(A+'garden/'+GARDEN[i%GARDEN.length]+'_idle.webp');im.style.setProperty('--i',i);el.appendChild(im);}if(n===0){const im=img(A+'garden/sprout_idle.webp');im.style.opacity='.5';el.appendChild(im);}}
-function renderHome(){$('#homeStars').textContent=store.stars;renderLevels();renderGarden($('#homeGarden'));const c=Object.keys(store.album).length;$('#albumCount').textContent=c?c+' collected':'none yet';$('#soundBtn').textContent=store.sound?'🔊':'🔇';$('#soundBtn').classList.toggle('off',!store.sound);$('#musicBtn').classList.toggle('off',!store.music);}
+const PLANTS=['tulip','sunflower','mushroom','blossom','daisy','cactus','palm','tree','clover','rose','watermelon','hibiscus'];
+const WALKERS=['snail','turtle','hedgehog','bunny','frog'],FLYERS=['bee','butterfly','ladybug','parrot','peacock'];
+const QUEST_N=5;
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+function daily(){if(!store.daily||store.daily.date!==today())store.daily={date:today(),spelled:0,solved:0,done:false};return store.daily;}
+function dayIndex(){return Math.floor(Date.now()/86400000);}
+function questProgress(kind){const d=daily();d[kind]++;save();if(!d.done&&d.spelled>=QUEST_N&&d.solved>=QUEST_N){d.done=true;const ob=OBJECTS[dayIndex()%OBJECTS.length];store.treasures.push({date:d.date,ob});save();pushCloud();setTimeout(()=>{$('#treasureImg').src=A+'objects/'+ob+'_jump.webp';$('#treasureText').textContent='You finished today’s quest and found a '+ob+'!';$('#treasure').classList.add('on');confetti();sfxWin();say(['p_amazing'],'Amazing!');},1400);}}
+function renderQuest(){const d=daily();const el=$('#quest');const ob=OBJECTS[dayIndex()%OBJECTS.length];el.className='quest'+(d.done?' done':'');
+  const row=(label,img,n)=>'<div class="qrow"><img src="'+img+'" alt=""><span>'+label+'</span><div class="qbar"><i style="width:'+Math.min(100,n/QUEST_N*100)+'%"></i></div><b>'+Math.min(n,QUEST_N)+'/'+QUEST_N+'</b></div>';
+  el.innerHTML='<div class="qrows"><h3>'+(d.done?'Quest done! See you tomorrow':'Today’s quest')+'</h3>'+row('Spell',A+'letters/a_idle.webp',d.spelled)+row('Count',A+'num/n5_idle.webp',d.solved)+'</div><div class="prize">'+(d.done?'<img src="'+A+'objects/'+ob+'_idle.webp" alt="">':'🎁')+'</div>';}
+function renderGarden(el){
+  const n=Math.floor(store.stars/5);el.innerHTML='<div class="sunlit"></div>';
+  const plants=document.createElement('div');plants.className='plants';el.appendChild(plants);
+  let pi=0,wi=0,fi=0;
+  for(let i=0;i<Math.min(n,60);i++){
+    const past=store.stars-i*5;const g=past>=15?1:past>=10?.8:.6;
+    if(i%4===3){const isFly=(i%8===7);const name=isFly?FLYERS[fi++%FLYERS.length]:WALKERS[wi++%WALKERS.length];
+      const c=document.createElement('button');c.className='critter '+(isFly?'flyer':'walk');c.style.setProperty('--d',(14+(i*7)%12)+'s');c.style.setProperty('--dl',(-(i*3)%14)+'s');if(isFly)c.style.top=(8+(i*13)%30)+'%';
+      c.appendChild(img(A+'garden/'+name+'_idle.webp'));c.onclick=()=>{sfxPop(i%8);if(ART[name])say(['w_'+name],name);};el.appendChild(c);continue;}
+    const name=past<5?'sprout':PLANTS[pi%PLANTS.length];if(past>=5)pi++;
+    const b=document.createElement('button');b.className='plant';b.style.setProperty('--i',i);b.style.setProperty('--g',past<5?.7:g);
+    b.appendChild(img(A+'garden/'+name+'_idle.webp'));
+    b.onclick=()=>{b.classList.remove('poke');void b.offsetWidth;b.classList.add('poke');sfxPop(i%8);if(ART[name])say(['w_'+name],name);};
+    plants.appendChild(b);
+  }
+  if(n===0){const h=document.createElement('div');h.className='empty-hint';h.textContent='Earn 5 stars to plant your first seed 🌱';el.appendChild(h);}
+}
+function renderHome(){$('#homeStars').textContent=store.stars;renderLevels();renderQuest();renderGarden($('#homeGarden'));const c=Object.keys(store.album).length;$('#albumCount').textContent=c?c+' collected':'none yet';$('#soundBtn').textContent=store.sound?'🔊':'🔇';$('#soundBtn').classList.toggle('off',!store.sound);$('#musicBtn').classList.toggle('off',!store.music);}
 
 /* ============ spelling ============ */
 let S={};
@@ -568,7 +638,7 @@ function wordDone(voiceOnly){
   if(voiceOnly){say(['s_'+w.word],spellOut(w.word));return;}
   const stars=S.mistakes===0?3:S.mistakes<=2?2:1;
   S.total+=stars;addStars(stars);
-  store.words[w.word]=Math.max(store.words[w.word]||0,stars);store.album[w.word]=true;save();
+  store.words[w.word]=Math.max(store.words[w.word]||0,stars);store.album[w.word]=true;save();questProgress('spelled');
   const stage=$('#stageWrap'),actor=$('#actor');let em=$('#stageEm');
   const fl=document.createElement('div');fl.className='flash';stage.appendChild(fl);setTimeout(()=>fl.remove(),700);
   if(ART[w.word]){const live=img(wordArt(w.word,'anim'),'em');live.id='stageEm';em.replaceWith(live);em=live;const mv={drive:'m-drive',swim:'m-swim',fly:'m-fly'}[ART[w.word]];if(mv)actor.classList.add(mv);}
@@ -624,7 +694,7 @@ function sayProblem(){const p=M.p;say(['n_'+p.a,OPKEY[p.op],'n_'+p.b],p.a+' '+op
 function answer(n,el){
   if(M.done)return;const p=M.p;
   if(n===p.ans){
-    M.done=true;const stars=M.mistakes===0?3:M.mistakes<=2?2:1;M.total+=stars;addStars(stars);
+    M.done=true;const stars=M.mistakes===0?3:M.mistakes<=2?2:1;M.total+=stars;addStars(stars);questProgress('solved');
     el.classList.remove('no');el.classList.add('ok');
     const old=$('#palQ');const q=pal(p.ans,2,true);q.id='palQ';q.classList.add('big');old.replaceWith(q);
     [...document.querySelectorAll('#visual .pal')].slice(0,2).forEach(x=>x.classList.add('dance'));
@@ -674,6 +744,9 @@ function renderAlbum(){
     const sm=document.createElement('small');sm.textContent=w;s.appendChild(sm);
     s.onclick=()=>{sfxPop(2);say(['s_'+w],spellOut(w));if(ART[w]){const live=img(wordArt(w,'anim'));s.firstChild.replaceWith(live);setTimeout(()=>{if(s.isConnected)live.replaceWith(img(wordArt(w,'idle')));},2000);}};
     el.appendChild(s);});
+  const tr=$('#treasures');tr.innerHTML='';
+  if(!store.treasures.length)tr.innerHTML='<div class="empty">Finish a daily quest to find a treasure</div>';
+  store.treasures.slice().reverse().forEach((t,i)=>{const s=document.createElement('button');s.className='sticker';s.style.setProperty('--r',(i%5)-2);s.appendChild(img(A+'objects/'+t.ob+'_idle.webp'));const sm=document.createElement('small');sm.textContent=t.date.slice(5);s.appendChild(sm);s.onclick=()=>{sfxPop(3);const j=img(A+'objects/'+t.ob+'_jump.webp');s.firstChild.replaceWith(j);setTimeout(()=>{if(s.isConnected)j.replaceWith(img(A+'objects/'+t.ob+'_idle.webp'));},1200);};tr.appendChild(s);});
   renderGarden($('#albumGarden'));
 }
 
@@ -690,10 +763,11 @@ document.querySelectorAll('[data-home]').forEach(b=>b.onclick=()=>{sfxPop(3);ren
 $('#albumBtn').onclick=()=>{sfxWhoosh();renderAlbum();show('album');};
 $('#soundBtn').onclick=()=>{store.sound=!store.sound;save();renderHome();if(store.sound){sfxPop(4);say(['p_soundon'],'Sound on!');}};
 $('#resetBtn').onclick=()=>{sfxPop(1);$('#resetDlg').classList.add('on');};
+$('#treasureOk').onclick=()=>{$('#treasure').classList.remove('on');if($('#home').classList.contains('on'))renderHome();};
 $('#resetNo').onclick=()=>$('#resetDlg').classList.remove('on');
 $('#resetYes').onclick=async()=>{
   $('#resetDlg').classList.remove('on');
-  store.stars=0;store.words={};store.lvl={};store.album={};save();refreshStars();renderHome();
+  store.stars=0;store.words={};store.lvl={};store.album={};store.daily=null;store.treasures=[];save();refreshStars();renderHome();
   if(db&&cloudCan){try{setSync('saving');const doc=progressDoc();await db.doc('progress/main').set(doc);lastCloud=JSON.stringify([doc.stars,doc.words,doc.lvl,doc.album]);setSync('synced');}catch(e){setSync('error');}}
   sfxWhoosh();say(['p_allclear'],'All clear! Let’s start again!');
 };
@@ -705,6 +779,7 @@ $('#sayBtn2').onclick=sayProblem;
 $('#nextBtn2').onclick=()=>{sfxWhoosh();nextProblem();};
 $('#againBtn').onclick=()=>{$('#summary').classList.remove('on');lastGame==='spell'?startSpell(S.level):startMath(M.level);};
 $('#homeBtn').onclick=()=>{$('#summary').classList.remove('on');renderHome();show('home');};
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stopMusic();else if(store.music&&ac&&!$('#start').classList.contains('on'))startMusic();});
 </script>
 </body>
