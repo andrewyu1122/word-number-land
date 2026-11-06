@@ -67,7 +67,38 @@ img{-webkit-user-drag:none;pointer-events:none}
 @keyframes popin{0%{transform:scale(.4);opacity:0}100%{transform:scale(1);opacity:1}}
 .actions{display:flex;justify-content:center;align-items:center;gap:14px;min-height:62px;margin-top:auto}
 
-/* home */
+/* home (v2) */
+.hdr{display:flex;align-items:center;gap:8px;padding-top:2px}
+.hmascot{height:64px;filter:drop-shadow(0 4px 0 rgba(0,0,0,.15));animation:hop 2.4s ease-in-out infinite}
+.htitle{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+.htitle .logo img{height:30px}
+.htitle h1{font-size:15px}
+.hright{display:flex;align-items:center;gap:6px}
+.icon.small{width:42px;height:42px;font-size:20px}
+.advhero{position:relative;width:100%;height:150px;border-radius:28px;overflow:hidden;background-size:cover;background-position:center;box-shadow:0 10px 0 rgba(0,0,0,.14),0 14px 30px rgba(0,0,0,.1);text-align:left;color:#fff}
+.advhero::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(20,30,80,.55) 0%,rgba(20,30,80,.15) 60%,rgba(20,30,80,0) 100%)}
+.advhero .txt{position:absolute;left:18px;top:16px;right:120px}
+.advhero h2{margin:0;font-size:28px;text-shadow:0 2px 0 rgba(0,0,0,.3)}
+.advhero p{margin:2px 0 10px;font-size:15px;font-weight:600;opacity:.95;text-shadow:0 1px 0 rgba(0,0,0,.3)}
+.advhero .qbar{background:rgba(255,255,255,.35);height:14px}
+.advhero .hero-m{position:absolute;right:16px;bottom:8px;height:120px;filter:drop-shadow(0 6px 0 rgba(0,0,0,.25));animation:hop 1.8s ease-in-out infinite}
+.advhero .go{position:absolute;right:16px;top:14px;width:40px;height:40px;border-radius:50%;background:#fff;color:var(--ink);display:grid;place-items:center;font-size:22px;box-shadow:0 4px 0 rgba(0,0,0,.2)}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mini{background:var(--card);border-radius:24px;padding:12px;box-shadow:0 8px 0 var(--tileshadow);display:flex;align-items:center;gap:10px;text-align:left;border-top:6px solid var(--c,var(--slotline));min-height:84px}
+.mini img{height:54px;filter:drop-shadow(0 3px 0 rgba(0,0,0,.15));flex:none}
+.mini .emoji{font-size:40px;line-height:1;flex:none}
+.mini h2{margin:0;font-size:20px}
+.mini p{margin:2px 0 0;font-size:13px;color:var(--ink2);font-weight:600}
+.mini p .st{color:var(--sun);letter-spacing:1px}
+.mini p .st .off{opacity:.25}
+.sheet .levels{grid-template-columns:repeat(2,1fr);gap:12px;margin:10px 0 16px}
+.sheet .lvl{padding:14px 6px 12px}
+.sheet .lvl b{font-size:30px}
+.sheet .lvl small{font-size:13px}
+.setrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;font-size:18px;font-weight:600;text-align:left}
+.hint-text.dark{color:var(--ink2);text-shadow:none;margin:8px 0 14px}
+@media (min-width:760px){.hmascot{height:90px}.htitle .logo img{height:44px}.htitle h1{font-size:22px}.advhero{height:210px}.advhero h2{font-size:38px}.advhero p{font-size:18px}.advhero .hero-m{height:170px}.mini{min-height:110px;padding:16px}.mini img{height:70px}.mini h2{font-size:26px}.mini p{font-size:16px}}
+/* home (old, mostly unused) */
 .hero{display:flex;align-items:center;justify-content:center;gap:8px;padding-top:4px}
 .hero .mascot{height:110px;filter:drop-shadow(0 6px 0 rgba(0,0,0,.15))}
 .title{display:flex;flex-direction:column;gap:4px;align-items:center}
@@ -122,16 +153,16 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 .station.done{background:#fff7d6}
 @media (min-width:760px){.map .band{height:340px}.station{width:96px;height:96px;margin:-48px 0 0 -48px}.station img{height:70px}.station .me{height:100px;bottom:80px}.advcard h2{font-size:28px}}
 /* quest */
-.quest{background:var(--card);border-radius:24px;padding:12px 14px;box-shadow:0 8px 0 var(--tileshadow);display:flex;align-items:center;gap:12px}
+.quest{--c:var(--mint);flex-direction:column;align-items:stretch;gap:6px}
 .quest .qrows{flex:1;display:flex;flex-direction:column;gap:8px}
-.quest h3{margin:0 0 2px;font-size:17px}
-.qrow{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:var(--ink2)}
-.qrow img{height:30px}
-.qbar{flex:1;height:14px;border-radius:7px;background:var(--slotline);overflow:hidden}
+.quest h3{margin:0;font-size:17px;display:flex;justify-content:space-between;align-items:center}
+.qrow{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--ink2)}
+.qrow img{height:22px}
+.qbar{flex:1;height:12px;border-radius:7px;background:var(--slotline);overflow:hidden}
 .qbar i{display:block;height:100%;background:linear-gradient(90deg,var(--mint),#8ff0b4);border-radius:7px;transition:width .6s cubic-bezier(.3,1.4,.5,1)}
-.qrow b{min-width:34px;text-align:right;color:var(--ink)}
-.quest .prize{width:64px;height:64px;border-radius:18px;background:var(--slot);border:3px dashed var(--slotline);display:grid;place-items:center;font-size:28px}
-.quest .prize img{height:54px}
+.qrow b{min-width:28px;font-size:13px;text-align:right;color:var(--ink)}
+.quest .prize{width:34px;height:34px;border-radius:10px;background:var(--slot);border:2px dashed var(--slotline);display:grid;place-items:center;font-size:18px}
+.quest .prize img{height:28px}
 .quest.done .prize{border-style:solid;border-color:var(--sun);background:#fff7d6;animation:glow .8s ease-in-out infinite}
 /* garden field */
 .field{position:relative;height:170px;border-radius:24px;overflow:hidden;background:linear-gradient(180deg,#bfeaff 0%,#dff6ff 55%,#8ee07a 56%,#6fcf63 100%);box-shadow:0 8px 0 rgba(0,0,0,.1),inset 0 0 0 4px #fff}
@@ -331,33 +362,40 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 <div id="app">
 
   <section class="screen on" id="home">
-    <header class="hero">
-      <img class="mascot" src="assets/mascot/mascot_idle.webp" alt="">
-      <div class="title"><div class="logo" id="logo"></div><h1>Word & Number Land</h1></div>
+    <header class="hdr">
+      <img class="hmascot" src="assets/mascot/mascot_idle.webp" alt="">
+      <div class="htitle"><div class="logo" id="logo"></div><h1>Word & Number Land</h1></div>
+      <div class="hright"><div class="pill">⭐ <span id="homeStars">0</span></div><button class="icon small" id="settingsBtn" aria-label="Settings">⚙️</button></div>
     </header>
-    <div class="stats">
-      <div class="pill">⭐ <span id="homeStars">0</span></div>
-      <button class="icon" id="soundBtn" aria-label="Voice and sounds">🔊</button>
-      <button class="icon" id="musicBtn" aria-label="Music">🎵</button>
-      <button class="icon" id="resetBtn" aria-label="Reset progress">↺</button>
+
+    <button class="advhero pressable" id="advBtn"></button>
+
+    <div class="duo">
+      <button class="mini pressable" id="spellOpen" style="--c:var(--coral)"><img src="assets/words/dog_idle.webp" alt=""><div><h2>Spell</h2><p id="spellSum"></p></div></button>
+      <button class="mini pressable" id="mathOpen" style="--c:var(--blue)"><img src="assets/num/n3_idle.webp" alt=""><div><h2>Count</h2><p id="mathSum"></p></div></button>
     </div>
-    <p class="hint-text" id="syncBadge">📱 Progress saved on this device</p>
-    <div class="cards">
-      <button class="advcard pressable" id="advBtn"></button>
-      <div class="card" style="--c:var(--coral)"><div class="band"></div>
-        <div class="card-head"><img src="assets/words/dog_idle.webp" alt=""><div><h2>Spell</h2><p>Tap letters to wake the picture</p></div></div>
-        <div class="levels" id="spellLevels"></div>
-      </div>
-      <div class="card" style="--c:var(--blue)"><div class="band"></div>
-        <div class="card-head"><img src="assets/num/n3_idle.webp" alt="" style="animation-delay:.6s"><div><h2>Count</h2><p>Add, take away, and times</p></div></div>
-        <div class="levels" id="mathLevels"></div>
-      </div>
-      <div class="quest" id="quest"></div>
-      <button class="card album-btn pressable" id="albumBtn">📒 My stickers <span id="albumCount"></span></button>
+    <div class="duo">
+      <button class="mini quest pressable" id="quest"></button>
+      <button class="mini pressable" id="albumBtn" style="--c:var(--grape)"><span class="emoji">📒</span><div><h2>Stickers</h2><p id="albumCount"></p></div></button>
     </div>
+
     <div class="field" id="homeGarden"></div>
-    <p class="hint-text">Every 5 stars grows something new in the garden</p>
   </section>
+
+  <div class="overlay" id="levelSheet"><div class="panel sheet">
+    <h2 id="sheetTitle">Spell</h2><p id="sheetSub">Pick a level</p>
+    <div class="levels" id="sheetLevels"></div>
+    <div class="row"><button class="quiet" id="sheetClose">Close</button></div>
+  </div></div>
+
+  <div class="overlay" id="settings"><div class="panel">
+    <h2>Settings</h2>
+    <div class="setrow"><span>🔊 Voice & sounds</span><button class="icon" id="soundBtn" aria-label="Voice and sounds">🔊</button></div>
+    <div class="setrow"><span>🎵 Music</span><button class="icon" id="musicBtn" aria-label="Music">🎵</button></div>
+    <div class="setrow"><span>🗑️ Reset all progress</span><button class="icon" id="resetBtn" aria-label="Reset progress">↺</button></div>
+    <p class="hint-text dark" id="syncBadge">📱 Progress saved on this device</p>
+    <div class="row"><button id="settingsClose">Done</button></div>
+  </div></div>
 
   <section class="screen" id="mapScreen">
     <div class="topbar">
@@ -573,11 +611,14 @@ function buddyPlay(kind){const b=$('#buddy');if(!b)return;clearTimeout(buddyTime
 
 /* ============ home ============ */
 function renderLogo(){const el=$('#logo');el.innerHTML='';[['w','letters/w'],['o','letters/o'],['r','letters/r'],['d','letters/d'],['1','num/n1'],['2','num/n2'],['3','num/n3']].forEach(([t,p],i)=>{const im=img(A+p+'_idle.webp');im.style.setProperty('--i',i);el.appendChild(im);});}
-function renderLevels(){
-  [['#spellLevels','spell',SPELL_LEVEL_NAMES,['#ff6b4a','#ff8a3d','#ff4f8b','#9b6bff']],['#mathLevels','math',MATH_LEVEL_NAMES,['#3aa6ff','#2fcfc0','#38d47a','#9b6bff']]].forEach(([sel,game,names,colors])=>{
-    const el=$(sel);el.innerHTML='';
-    for(let l=1;l<=4;l++){const b=document.createElement('button');b.className='lvl';b.style.setProperty('--c',colors[l-1]);const best=store.lvl[game+l]||0;b.innerHTML='<b>'+l+'</b><small>'+names[l-1]+'</small><div class="st">'+starsText(best)+'</div>';b.onclick=()=>{sfxWhoosh();game==='spell'?startSpell(l):startMath(l);};el.appendChild(b);}
-  });
+const LEVEL_COLORS={spell:['#ff6b4a','#ff8a3d','#ff4f8b','#9b6bff'],math:['#3aa6ff','#2fcfc0','#38d47a','#9b6bff']};
+function levelSum(game){let t=0;for(let l=1;l<=4;l++)t+=store.lvl[game+l]||0;return '<span class="st">★</span> '+t+'/12';}
+function renderLevels(){$('#spellSum').innerHTML=levelSum('spell');$('#mathSum').innerHTML=levelSum('math');}
+function openSheet(game){
+  $('#sheetTitle').textContent=game==='spell'?'Spell':'Count';$('#sheetSub').textContent=game==='spell'?'Tap letters to wake the picture':'Add, take away, and times';
+  const names=game==='spell'?SPELL_LEVEL_NAMES:MATH_LEVEL_NAMES;const el=$('#sheetLevels');el.innerHTML='';
+  for(let l=1;l<=4;l++){const b=document.createElement('button');b.className='lvl';b.style.setProperty('--c',LEVEL_COLORS[game][l-1]);const best=store.lvl[game+l]||0;b.innerHTML='<b>'+l+'</b><small>'+names[l-1]+'</small><div class="st">'+starsText(best)+'</div>';b.onclick=()=>{$('#levelSheet').classList.remove('on');sfxWhoosh();game==='spell'?startSpell(l):startMath(l);};el.appendChild(b);}
+  sfxPop(2);$('#levelSheet').classList.add('on');
 }
 const PLANTS=['tulip','sunflower','mushroom','blossom','daisy','cactus','palm','tree','clover','rose','watermelon','hibiscus'];
 const WALKERS=['snail','turtle','hedgehog','bunny','frog'],FLYERS=['bee','butterfly','ladybug','parrot','peacock'];
@@ -586,9 +627,9 @@ const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth
 function daily(){if(!store.daily||store.daily.date!==today())store.daily={date:today(),spelled:0,solved:0,done:false};return store.daily;}
 function dayIndex(){return Math.floor(Date.now()/86400000);}
 function questProgress(kind){const d=daily();d[kind]++;save();if(!d.done&&d.spelled>=QUEST_N&&d.solved>=QUEST_N){d.done=true;const ob=OBJECTS[dayIndex()%OBJECTS.length];store.treasures.push({date:d.date,ob});save();pushCloud();setTimeout(()=>{$('#treasureImg').src=A+'objects/'+ob+'_jump.webp';$('#treasureText').textContent='You finished today’s quest and found a '+ob+'!';$('#treasure').classList.add('on');confetti();sfxWin();say(['p_amazing'],'Amazing!');},1400);}}
-function renderQuest(){const d=daily();const el=$('#quest');const ob=OBJECTS[dayIndex()%OBJECTS.length];el.className='quest'+(d.done?' done':'');
-  const row=(label,img,n)=>'<div class="qrow"><img src="'+img+'" alt=""><span>'+label+'</span><div class="qbar"><i style="width:'+Math.min(100,n/QUEST_N*100)+'%"></i></div><b>'+Math.min(n,QUEST_N)+'/'+QUEST_N+'</b></div>';
-  el.innerHTML='<div class="qrows"><h3>'+(d.done?'Quest done! See you tomorrow':'Today’s quest')+'</h3>'+row('Spell',A+'letters/a_idle.webp',d.spelled)+row('Count',A+'num/n5_idle.webp',d.solved)+'</div><div class="prize">'+(d.done?'<img src="'+A+'objects/'+ob+'_idle.webp" alt="">':'🎁')+'</div>';}
+function renderQuest(){const d=daily();const el=$('#quest');const ob=OBJECTS[dayIndex()%OBJECTS.length];el.className='mini quest pressable'+(d.done?' done':'');
+  const row=(label,im,n)=>'<div class="qrow"><img src="'+im+'" alt=""><div class="qbar"><i style="width:'+Math.min(100,n/QUEST_N*100)+'%"></i></div><b>'+Math.min(n,QUEST_N)+'/'+QUEST_N+'</b></div>';
+  el.innerHTML='<h3><span>'+(d.done?'Quest done!':'Today’s quest')+'</span><span class="prize">'+(d.done?'<img src="'+A+'objects/'+ob+'_idle.webp" alt="">':'🎁')+'</span></h3>'+row('Spell',A+'letters/a_idle.webp',d.spelled)+row('Count',A+'num/n5_idle.webp',d.solved);}
 function renderGarden(el){
   const n=Math.floor(store.stars/5);el.innerHTML='<div class="sunlit"></div>';
   const plants=document.createElement('div');plants.className='plants';el.appendChild(plants);
@@ -611,7 +652,8 @@ const BANDS=[['meadow','Meadow'],['road','Town'],['sky','Sky'],['sea','Ocean'],[
 const STATIONS=[];BANDS.forEach((b,bi)=>{const lvl=bi<2?1:bi<4?2:bi<6?3:4;STATIONS.push({band:bi,game:'spell',level:lvl});STATIONS.push({band:bi,game:'math',level:lvl});});
 function currentStation(){for(let i=0;i<STATIONS.length;i++)if((store.map[i]||0)<2)return i;return STATIONS.length;}
 function renderAdvCard(){const cur=currentStation();const el=$('#advBtn');const done=cur>=STATIONS.length;const st=STATIONS[Math.min(cur,STATIONS.length-1)];
-  el.innerHTML='<div class="thumb" style="background-image:url('+A+'scenes/'+BANDS[st.band][0]+'.webp)"><img src="'+A+'mascot/mascot_idle.webp" alt=""></div><div style="flex:1"><h2>Adventure</h2><p>'+(done?'You reached the end of Space! 🎉':'Station '+(cur+1)+' of '+STATIONS.length+' · '+BANDS[st.band][1])+'</p><div class="qbar"><i style="width:'+(Math.min(cur,STATIONS.length)/STATIONS.length*100)+'%"></i></div></div><span class="go">➜</span>';}
+  el.style.backgroundImage='url('+A+'scenes/'+BANDS[st.band][0]+'.webp)';
+  el.innerHTML='<div class="txt"><h2>Adventure</h2><p>'+(done?'You finished the whole journey! 🎉':'Station '+(cur+1)+' of '+STATIONS.length+' · '+BANDS[st.band][1])+'</p><div class="qbar"><i style="width:'+(Math.min(cur,STATIONS.length)/STATIONS.length*100)+'%"></i></div></div><span class="go">➜</span><img class="hero-m" src="'+A+'mascot/mascot_idle.webp" alt="">';}
 function renderMap(){
   const cur=currentStation();$('#mapStars').textContent=store.stars;
   const m=$('#map');m.innerHTML='';
@@ -631,7 +673,7 @@ function renderMap(){
     m.appendChild(b);});
   setTimeout(()=>{const c=m.querySelector('.station.current');if(c)c.scrollIntoView({block:'center',behavior:'smooth'});},50);
 }
-function renderHome(){renderAdvCard();$('#homeStars').textContent=store.stars;renderLevels();renderQuest();renderGarden($('#homeGarden'));const c=Object.keys(store.album).length;$('#albumCount').textContent=c?c+' collected':'none yet';$('#soundBtn').textContent=store.sound?'🔊':'🔇';$('#soundBtn').classList.toggle('off',!store.sound);$('#musicBtn').classList.toggle('off',!store.music);}
+function renderHome(){renderAdvCard();$('#homeStars').textContent=store.stars;renderLevels();renderQuest();renderGarden($('#homeGarden'));const c=Object.keys(store.album).length;$('#albumCount').textContent=c?c+' collected':'Spell to collect';$('#soundBtn').textContent=store.sound?'🔊':'🔇';$('#soundBtn').classList.toggle('off',!store.sound);$('#musicBtn').classList.toggle('off',!store.music);}
 
 /* ============ spelling ============ */
 let S={};
@@ -824,8 +866,11 @@ $('#playBtn').onclick=()=>{
 };
 document.querySelectorAll('[data-home]').forEach(b=>b.onclick=()=>{sfxPop(3);renderHome();show('home');});
 $('#albumBtn').onclick=()=>{sfxWhoosh();renderAlbum();show('album');};
+$('#spellOpen').onclick=()=>openSheet('spell');$('#mathOpen').onclick=()=>openSheet('math');$('#sheetClose').onclick=()=>$('#levelSheet').classList.remove('on');
+$('#settingsBtn').onclick=()=>{sfxPop(1);$('#settings').classList.add('on');};$('#settingsClose').onclick=()=>$('#settings').classList.remove('on');
+$('#quest').onclick=()=>{sfxPop(3);const d=daily();say([d.done?'p_greatjob':'p_hi'],d.done?'Great job!':'Let’s play!');};
 $('#soundBtn').onclick=()=>{store.sound=!store.sound;save();renderHome();if(store.sound){sfxPop(4);say(['p_soundon'],'Sound on!');}};
-$('#resetBtn').onclick=()=>{sfxPop(1);$('#resetDlg').classList.add('on');};
+$('#resetBtn').onclick=()=>{sfxPop(1);$('#settings').classList.remove('on');$('#resetDlg').classList.add('on');};
 $('#treasureOk').onclick=()=>{$('#treasure').classList.remove('on');if($('#home').classList.contains('on'))renderHome();};
 $('#resetNo').onclick=()=>$('#resetDlg').classList.remove('on');
 $('#resetYes').onclick=async()=>{
