@@ -67,6 +67,21 @@ img{-webkit-user-drag:none;pointer-events:none}
 @keyframes popin{0%{transform:scale(.4);opacity:0}100%{transform:scale(1);opacity:1}}
 .actions{display:flex;justify-content:center;align-items:center;gap:14px;min-height:62px;margin-top:auto}
 
+/* profiles */
+.avatar{display:flex;flex-direction:column;align-items:center;gap:0;width:64px;flex:none}
+.avatar img{height:52px;filter:drop-shadow(0 3px 0 rgba(0,0,0,.15));animation:hop 2.4s ease-in-out infinite}
+.avatar span{font-size:12px;font-weight:700;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.3);max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.plist{display:flex;flex-direction:column;gap:10px;margin:10px 0 16px}
+.prow{display:flex;align-items:center;gap:12px;background:var(--slot);border-radius:18px;padding:10px 14px;box-shadow:var(--shadow);text-align:left;width:100%}
+.prow img{height:48px}
+.prow b{font-size:20px;flex:1}
+.prow small{color:var(--ink2);font-weight:600}
+.prow.cur{outline:3px solid var(--sun)}
+.namein{font:inherit;font-size:22px;font-weight:700;width:100%;padding:10px 14px;border-radius:16px;border:3px solid var(--slotline);background:var(--slot);color:var(--ink);text-align:center;margin:6px 0 12px;box-sizing:border-box}
+.avgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.avgrid button{background:var(--slot);border-radius:16px;padding:6px;box-shadow:var(--shadow)}
+.avgrid button img{height:44px}
+.avgrid button.sel{outline:3px solid var(--sun);background:#fff7d6}
 /* home (v2) */
 .hdr{display:flex;align-items:center;gap:8px;padding-top:2px}
 .hmascot{height:64px;filter:drop-shadow(0 4px 0 rgba(0,0,0,.15));animation:hop 2.4s ease-in-out infinite}
@@ -262,7 +277,8 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 .pal.big{animation:popin .5s cubic-bezier(.3,1.7,.5,1),dance .55s .5s ease-in-out infinite}
 .op{font-size:44px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.2);padding-bottom:26px}
 .mathstage{height:330px;display:flex;justify-content:center;align-items:flex-end;gap:4px;flex-wrap:nowrap;padding:0 8px 34px 8px}
-.mathstage .pal{position:relative;z-index:1;flex-direction:column;align-items:center;gap:6px}
+.mathstage .pal{position:relative;z-index:1;flex-direction:column;align-items:center;gap:0}
+.mathstage .lbl{position:relative;z-index:2;margin-bottom:calc(var(--ph,150px)*var(--hr,.25)*-1 + 4px)}
 .mathstage .digits{display:flex;align-items:flex-end;gap:2px}
 .mathstage .lbl{font-size:var(--lf,38px);font-weight:700;line-height:1;color:#fff;background:rgba(43,42,85,.78);padding:6px 14px;border-radius:999px;text-shadow:0 2px 0 rgba(0,0,0,.3);box-shadow:0 3px 0 rgba(0,0,0,.2)}
 .mathstage .lbl.q{background:var(--coral)}
@@ -340,6 +356,7 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
   .op{font-size:64px;padding-bottom:40px}
   .mathstage{height:500px;padding-bottom:50px;gap:12px}
   .mathstage .pal img{height:calc(var(--ph,150px)*1.6)}
+  .mathstage .lbl{margin-bottom:calc(var(--ph,150px)*1.6*var(--hr,.25)*-1 + 4px)}
   .mathstage .op{font-size:76px;padding-bottom:56px}
   .mathstage .lbl{font-size:calc(var(--lf,38px)*1.5);padding:8px 22px}
   .mathstage .buddy{height:110px}
@@ -362,6 +379,28 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
   .stickers{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
   .sticker img{height:84px;max-width:110px}
 }
+/* tablet / desktop landscape: side-by-side */
+@media (min-width:900px) and (orientation:landscape){
+  #app{max-width:1200px}
+  #spell.on,#math.on{display:grid;grid-template-columns:1.15fr 1fr;grid-template-rows:auto 1fr auto auto;column-gap:22px;row-gap:14px;align-items:start}
+  #spell .topbar,#math .topbar{grid-column:1/-1}
+  #spell .stage,#math .stage{grid-row:2/5;grid-column:1;height:calc(100vh - 170px);max-height:720px;min-height:380px;position:sticky;top:10px}
+  #math .stage.mathstage{height:calc(100vh - 170px)}
+  #spell .slots{grid-column:2;align-self:end;margin-top:20px}
+  #spell .tiles{grid-column:2}
+  #spell .actions,#math .actions{grid-column:2;margin-top:0;justify-self:center}
+  #math .choices{grid-column:2;align-self:center;margin-top:40px}
+  #math .keypad{grid-column:2;max-width:420px}
+  .mathstage .pal img{height:calc(var(--ph,150px)*2)}
+  .mathstage .lbl{margin-bottom:calc(var(--ph,150px)*2*var(--hr,.25)*-1 + 4px);font-size:calc(var(--lf,38px)*1.6)}
+  .mathstage .lbl{font-size:calc(var(--lf,38px)*1.4)}
+  .tile{width:82px;height:96px}.tile img{height:88px;max-width:82px}
+  .slot{width:76px;height:92px}.slot img{height:84px;max-width:76px}
+  .choice{width:120px;height:100px;font-size:46px}
+  .actor .em{height:min(300px,38vh)}
+  .duo{grid-template-columns:repeat(4,1fr)}
+  .advhero{height:180px}
+}
 @media (prefers-reduced-motion: reduce){*{animation-duration:.01ms !important;animation-iteration-count:1 !important}}
 </style>
 </head>
@@ -371,7 +410,7 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 
   <section class="screen on" id="home">
     <header class="hdr">
-      <img class="hmascot" src="assets/mascot/mascot_idle.webp" alt="">
+      <button class="avatar" id="profileBtn" aria-label="Switch player"><img id="avatarImg" src="" alt=""><span id="avatarName"></span></button>
       <div class="htitle"><div class="logo" id="logo"></div><h1>Word & Number Land</h1></div>
       <div class="hright"><div class="pill">⭐ <span id="homeStars">0</span></div><button class="icon small" id="settingsBtn" aria-label="Settings">⚙️</button></div>
     </header>
@@ -381,8 +420,6 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
     <div class="duo">
       <button class="mini pressable" id="spellOpen" style="--c:var(--coral)"><img src="assets/words/dog_idle.webp" alt=""><div><h2>Spell</h2><p id="spellSum"></p></div></button>
       <button class="mini pressable" id="mathOpen" style="--c:var(--blue)"><img src="assets/num/n3_idle.webp" alt=""><div><h2>Count</h2><p id="mathSum"></p></div></button>
-    </div>
-    <div class="duo">
       <button class="mini quest pressable" id="quest"></button>
       <button class="mini pressable" id="albumBtn" style="--c:var(--grape)"><span class="emoji">📒</span><div><h2>Stickers</h2><p id="albumCount"></p></div></button>
     </div>
@@ -396,11 +433,24 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
     <div class="row"><button class="quiet" id="sheetClose">Close</button></div>
   </div></div>
 
+  <div class="overlay" id="profiles"><div class="panel">
+    <h2>Who’s playing?</h2>
+    <div class="plist" id="plist"></div>
+    <div class="row"><button class="quiet" id="profilesClose">Close</button><button id="addProfile">＋ Add player</button></div>
+  </div></div>
+  <div class="overlay" id="newProfile"><div class="panel">
+    <h2>New player</h2>
+    <input class="namein" id="newName" maxlength="12" placeholder="Name">
+    <div class="avgrid" id="avgrid"></div>
+    <div class="row"><button class="quiet" id="newCancel">Cancel</button><button id="newOk">Let’s go!</button></div>
+  </div></div>
+
   <div class="overlay" id="settings"><div class="panel">
     <h2>Settings</h2>
     <div class="setrow"><span>🔊 Voice & sounds</span><button class="icon" id="soundBtn" aria-label="Voice and sounds">🔊</button></div>
     <div class="setrow"><span>🎵 Music</span><button class="icon" id="musicBtn" aria-label="Music">🎵</button></div>
-    <div class="setrow"><span>🗑️ Reset all progress</span><button class="icon" id="resetBtn" aria-label="Reset progress">↺</button></div>
+    <div class="setrow"><span>🗑️ Reset <b id="resetWho"></b>’s progress</span><button class="icon" id="resetBtn" aria-label="Reset progress">↺</button></div>
+    <div class="setrow" id="delRow"><span>👋 Remove <b id="delWho"></b> from this device</span><button class="icon" id="delBtn" aria-label="Remove player">✖</button></div>
     <p class="hint-text dark" id="syncBadge">📱 Progress saved on this device</p>
     <div class="setrow"><span>🔄 Version <span id="verNum"></span></span><button class="pressable chk" id="checkUpd">Check for updates</button></div>
     <div class="row"><button id="settingsClose">Done</button></div>
@@ -515,10 +565,22 @@ const ROUND=8;
 const PAL_COLORS=['#8a8fa8','#ff4f8b','#ff9a2e','#ffd43b','#38d47a','#3aa6ff','#5b6cff','#9b6bff','#f26fb0','#2fcfc0'];
 
 /* ============ storage ============ */
-const KEY='wnl_v2';
-let store={stars:0,sound:true,music:true,voice:null,words:{},lvl:{},album:{},daily:null,treasures:[],map:{}};
-try{Object.assign(store,JSON.parse(localStorage.getItem(KEY)||'{}'));}catch(e){}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}}
+const KEY='wnl_v3';
+const AVATARS=['dog','cat','fox','frog','bee','owl','lion','pig','duck','bear','cow','fish'];
+const freshProfile=(name,avatar)=>({id:'p'+Date.now().toString(36),name,avatar,stars:0,words:{},lvl:{},album:{},daily:null,treasures:[],map:{},sr:{},mr:{}});
+let root={settings:{sound:true,music:true},profiles:[],current:null};
+try{const r=JSON.parse(localStorage.getItem(KEY)||'null');if(r&&r.profiles&&r.profiles.length)root=r;}catch(e){}
+if(!root.profiles.length){
+  const pr=freshProfile('Player 1','dog');
+  try{const old=JSON.parse(localStorage.getItem('wnl_v2')||'null');if(old){['stars','words','lvl','album','daily','treasures','map'].forEach(k=>{if(old[k]!=null)pr[k]=old[k];});root.settings={sound:old.sound!==false,music:old.music!==false};}}catch(e){}
+  root.profiles=[pr];root.current=pr.id;
+}
+let store=root.profiles.find(x=>x.id===root.current)||root.profiles[0];root.current=store.id;
+['sr','mr','map','treasures'].forEach(k=>{if(store[k]==null)store[k]=k==='treasures'?[]:{};});
+Object.defineProperty(store,'sound',{get(){return root.settings.sound;},set(v){root.settings.sound=v;},enumerable:false,configurable:true});
+Object.defineProperty(store,'music',{get(){return root.settings.music;},set(v){root.settings.music=v;},enumerable:false,configurable:true});
+function save(){try{localStorage.setItem(KEY,JSON.stringify(root));}catch(e){}}
+function switchProfile(id){const pr=root.profiles.find(x=>x.id===id);if(!pr)return;root.current=id;save();location.reload();}
 
 /* ============ helpers ============ */
 const $=s=>document.querySelector(s);
@@ -591,8 +653,8 @@ const SYNC_TEXT={local:'📱 Progress saved on this device',synced:'☁️ Progr
 let lastSync='local';function setSync(s){lastSync=s;const b=$('#syncBadge');if(b)b.textContent=SYNC_TEXT[s]||SYNC_TEXT.local;}
 function progressDoc(){return{stars:store.stars,words:store.words,lvl:store.lvl,album:store.album,treasures:store.treasures,map:store.map,updatedAt:Date.now()};}
 function mergeCloud(d){let localMore=false;if((d.stars||0)>store.stars)store.stars=d.stars;else if(store.stars>(d.stars||0))localMore=true;['words','lvl','map'].forEach(k=>{const c=d[k]||{};for(const w in c)if((c[w]||0)>(store[k][w]||0))store[k][w]=c[w];for(const w in store[k])if((store[k][w]||0)>(c[w]||0))localMore=true;});const al=d.album||{};for(const w in al)store.album[w]=true;for(const w in store.album)if(!al[w])localMore=true;const ct=d.treasures||[];if(ct.length>store.treasures.length)store.treasures=ct;else if(store.treasures.length>ct.length)localMore=true;save();refreshStars();return localMore;}
-function pushCloud(){if(!db||!cloudCan)return;clearTimeout(pushTimer);pushTimer=setTimeout(async()=>{const doc=progressDoc();const key=JSON.stringify([doc.stars,doc.words,doc.lvl,doc.album]);if(key===lastCloud)return;setSync('saving');try{await db.doc('progress/main').set(doc);lastCloud=key;setSync('synced');}catch(e){if(e&&e.code==='invalid_argument'){cloudCan=false;setSync('readonly');}else setSync('error');}},900);}
-async function initCloud(){try{if(!window.claude||typeof claude.use!=='function'){setSync('local');return;}const [d,user]=await Promise.all([claude.use('db'),claude.use('user')]);if(!d){setSync('local');return;}db=d;let w=null;try{w=user?await user.can('data.write'):null;}catch(e){}cloudCan=(w!==false);let first=true;db.doc('progress/main').onSnapshot(snap=>{let localMore=true;if(snap.exists){const data=snap.data()||{};lastCloud=JSON.stringify([data.stars||0,data.words||{},data.lvl||{},data.album||{}]);localMore=mergeCloud(data);}if(first&&localMore)pushCloud();first=false;setSync(cloudCan?'synced':'readonly');if($('#home').classList.contains('on'))renderHome();},err=>{setSync('local');});}catch(e){setSync('local');}}
+function pushCloud(){if(!db||!cloudCan)return;clearTimeout(pushTimer);pushTimer=setTimeout(async()=>{const doc=progressDoc();const key=JSON.stringify([doc.stars,doc.words,doc.lvl,doc.album]);if(key===lastCloud)return;setSync('saving');try{await db.doc('progress/'+store.id).set(doc);lastCloud=key;setSync('synced');}catch(e){if(e&&e.code==='invalid_argument'){cloudCan=false;setSync('readonly');}else setSync('error');}},900);}
+async function initCloud(){try{if(!window.claude||typeof claude.use!=='function'){setSync('local');return;}const [d,user]=await Promise.all([claude.use('db'),claude.use('user')]);if(!d){setSync('local');return;}db=d;let w=null;try{w=user?await user.can('data.write'):null;}catch(e){}cloudCan=(w!==false);let first=true;db.doc('progress/'+store.id).onSnapshot(snap=>{let localMore=true;if(snap.exists){const data=snap.data()||{};lastCloud=JSON.stringify([data.stars||0,data.words||{},data.lvl||{},data.album||{}]);localMore=mergeCloud(data);}if(first&&localMore)pushCloud();first=false;setSync(cloudCan?'synced':'readonly');if($('#home').classList.contains('on'))renderHome();},err=>{setSync('local');});}catch(e){setSync('local');}}
 
 /* ============ scenes / particles / buddy ============ */
 function sceneFor(word,anim){if(SCENE_OVERRIDE[word])return SCENE_OVERRIDE[word];if(FOOD.includes(word))return 'room';return{swim:'sea',fly:'sky',drive:'road',float:'sky',flash:'night',hop:'meadow',grow:'meadow',spin:'room',wiggle:'meadow',ring:'room'}[anim]||'meadow';}
@@ -684,11 +746,26 @@ function renderMap(){
     m.appendChild(b);});
   setTimeout(()=>{const c=m.querySelector('.station.current');if(c)c.scrollIntoView({block:'center',behavior:'smooth'});},50);
 }
-function renderHome(){renderAdvCard();$('#homeStars').textContent=store.stars;renderLevels();renderQuest();renderGarden($('#homeGarden'));const c=Object.keys(store.album).length;$('#albumCount').textContent=c?c+' collected':'Spell to collect';$('#soundBtn').textContent=store.sound?'🔊':'🔇';$('#soundBtn').classList.toggle('off',!store.sound);$('#musicBtn').classList.toggle('off',!store.music);}
+function renderProfileBtn(){$('#avatarImg').src=wordArt(store.avatar||'dog','idle');$('#avatarName').textContent=store.name||'';}
+function renderProfiles(){const el=$('#plist');el.innerHTML='';root.profiles.forEach(pr=>{const b=document.createElement('button');b.className='prow'+(pr.id===store.id?' cur':'');b.innerHTML='<img src="'+wordArt(pr.avatar||'dog','idle')+'" alt=""><b>'+pr.name+'</b><small>⭐ '+pr.stars+'</small>';b.onclick=()=>{if(pr.id!==store.id){sfxWhoosh();switchProfile(pr.id);}else $('#profiles').classList.remove('on');};el.appendChild(b);});}
+let newAvatar='cat';
+function openNewProfile(){$('#profiles').classList.remove('on');$('#newName').value='';newAvatar=AVATARS[(root.profiles.length)%AVATARS.length];const g=$('#avgrid');g.innerHTML='';AVATARS.forEach(a=>{const b=document.createElement('button');b.className=a===newAvatar?'sel':'';b.innerHTML='<img src="'+wordArt(a,'idle')+'" alt="">';b.onclick=()=>{newAvatar=a;g.querySelectorAll('button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');sfxPop(2);};g.appendChild(b);});$('#newProfile').classList.add('on');setTimeout(()=>$('#newName').focus(),100);}
+function renderHome(){renderProfileBtn();renderAdvCard();$('#homeStars').textContent=store.stars;renderLevels();renderQuest();renderGarden($('#homeGarden'));const c=Object.keys(store.album).length;$('#albumCount').textContent=c?c+' collected':'Spell to collect';$('#soundBtn').textContent=store.sound?'🔊':'🔇';$('#soundBtn').classList.toggle('off',!store.sound);$('#musicBtn').classList.toggle('off',!store.music);}
 
 /* ============ spelling ============ */
 let S={};
-function pickWords(level){const list=shuffle(WORDS[level].slice());list.sort((a,b)=>(store.words[a[0]]||0)-(store.words[b[0]]||0));return list.slice(0,ROUND).map(([word,emoji,anim])=>({word,emoji,anim}));}
+const SR_DAYS=[0,1,3,7,14];
+function levelMastery(level){const ws=WORDS[level];let n=0,t=0;ws.forEach(([w])=>{const r=store.sr[w];if(r){n++;t+=r.box;}});return n>=10?t/n:0;}
+function pickWords(level){
+  const now=Date.now();const list=shuffle(WORDS[level].slice());
+  const score=w=>{const r=store.sr[w];if(!r)return 1;if(r.due<=now)return 0-(4-r.box)*.1;return 2+r.box;};
+  list.sort((a,b)=>score(a[0])-score(b[0]));
+  let picked=list.slice(0,ROUND);
+  // stretch: when this level is well known, slip in 1-2 words from the next level
+  if(level<4&&levelMastery(level)>=2){const nxt=shuffle(WORDS[level+1].slice()).sort((a,b)=>score(a[0])-score(b[0])).slice(0,levelMastery(level)>=3?2:1);picked=picked.slice(0,ROUND-nxt.length);nxt.forEach((w,i)=>picked.splice(2+i*3,0,w));}
+  return picked.map(([word,emoji,anim])=>({word,emoji,anim}));
+}
+function srUpdate(word,stars){const r=store.sr[word]||{box:0,due:0,seen:0,wrong:0};r.seen++;if(stars===3)r.box=Math.min(4,r.box+1);else if(stars===1){r.box=0;r.wrong++;}else r.wrong++;r.due=Date.now()+SR_DAYS[r.box]*86400000;store.sr[word]=r;}
 function startSpell(level,station){S={level,station:station==null?null:station,queue:pickWords(level),idx:0,total:0};$('#spellStars').textContent=store.stars;show('spell');renderWord();}
 function renderDots(el,idx,n){el.innerHTML='';for(let i=0;i<n;i++){const d=document.createElement('i');if(i<idx)d.className='done';else if(i===idx)d.className='now';el.appendChild(d);}}
 function renderWord(){
@@ -751,7 +828,7 @@ function wordDone(voiceOnly){
   if(voiceOnly){say(['s_'+w.word],spellOut(w.word));return;}
   const stars=S.mistakes===0?3:S.mistakes<=2?2:1;
   S.total+=stars;addStars(stars);
-  store.words[w.word]=Math.max(store.words[w.word]||0,stars);store.album[w.word]=true;save();questProgress('spelled');
+  store.words[w.word]=Math.max(store.words[w.word]||0,stars);store.album[w.word]=true;srUpdate(w.word,stars);save();questProgress('spelled');
   const stage=$('#stageWrap'),actor=$('#actor');let em=$('#stageEm');
   const fl=document.createElement('div');fl.className='flash';stage.appendChild(fl);setTimeout(()=>fl.remove(),700);
   if(ART[w.word]){const live=img(wordArt(w.word,'anim'),'em');live.id='stageEm';em.replaceWith(live);em=live;const mv={drive:'m-drive',swim:'m-swim',fly:'m-fly'}[ART[w.word]];if(mv)actor.classList.add(mv);}
@@ -765,16 +842,27 @@ function nextWord(){S.idx++;if(S.idx>=S.queue.length)return finishRound('spell')
 
 /* ============ math ============ */
 let M={};
+/* skill 0..1 from the last 12 results at this level (3 stars=1, 2=.5, 1=0) */
+function mathSkill(level){const h=(store.mr['L'+level]||[]);if(h.length<4)return .5;const r=h.slice(-12);return r.reduce((a,b)=>a+b,0)/r.length;}
+function mrRecord(level,stars){const k='L'+level;const h=store.mr[k]||[];h.push(stars===3?1:stars===2?.5:0);store.mr[k]=h.slice(-30);}
 function genProblem(level){
-  let a,b,op;
-  if(level===1){op=Math.random()<.6?'+':'-';if(op==='+'){a=rnd(1,9);b=rnd(1,10-a);}else{a=rnd(2,10);b=rnd(1,a);}return{a,b,op,ans:op==='+'?a+b:a-b,visual:'objects',input:'choices'};}
-  if(level===2){op=Math.random()<.6?'+':'-';if(op==='+'){a=rnd(2,15);b=rnd(1,20-a);}else{a=rnd(5,20);b=rnd(1,a);}return{a,b,op,ans:op==='+'?a+b:a-b,visual:'objects',input:'choices'};}
-  if(level===3){op=Math.random()<.6?'+':'-';if(op==='+'){a=rnd(10,89);b=rnd(1,100-a);}else{a=rnd(10,99);b=rnd(1,a);}return{a,b,op,ans:op==='+'?a+b:a-b,visual:'none',input:'keypad'};}
-  a=rnd(1,5);b=Math.random()<.5?2:rnd(1,5);op='×';return{a,b,op,ans:a*b,visual:'array',input:'choices'};
+  let a,b,op;const sk=mathSkill(level);const hard=Math.random()<sk;       // high skill -> more hard variants
+  const sub=Math.random()<(.25+sk*.35);                                    // subtraction share grows with skill
+  if(level===1){op=sub?'-':'+';const top=hard?10:6;if(op==='+'){a=rnd(1,top-1);b=rnd(1,top-a);}else{a=rnd(2,top);b=rnd(1,a);}}
+  else if(level===2){op=sub?'-':'+';
+    if(op==='+'){if(hard){a=rnd(5,15);b=rnd(20-a>0?Math.max(1,11-a):1,20-a);} else {a=rnd(10,15);b=rnd(1,20-a);if(Math.random()<.4){a=rnd(2,9);b=rnd(1,10-a);}}}
+    else{if(hard){a=rnd(11,20);b=rnd(a-9,9);} else {a=rnd(11,20);b=rnd(1,a-10);if(Math.random()<.3){a=rnd(5,10);b=rnd(1,a);}}}}
+  else if(level===3){op=sub?'-':'+';
+    if(op==='+'){if(sk<.35){a=rnd(1,9)*10;b=rnd(1,9);} else if(!hard){do{a=rnd(10,89);b=rnd(1,100-a);}while(a%10+b%10>=10);} else {do{a=rnd(10,89);b=rnd(1,100-a);}while(a%10+b%10<10);}}
+    else{if(sk<.35){a=rnd(1,9)*10+rnd(1,9);b=a%10;} else if(!hard){do{a=rnd(10,99);b=rnd(1,a);}while(a%10<b%10);} else {do{a=rnd(20,99);b=rnd(1,a);}while(a%10>=b%10);}}}
+  else{op='×';if(sk<.35){a=rnd(1,5);b=Math.random()<.7?2:1;} else if(!hard){a=rnd(1,5);b=pick([2,2,3,1]);} else {a=rnd(2,5);b=rnd(2,5);}}
+  const ans=op==='+'?a+b:op==='-'?a-b:a*b;
+  return{a,b,op,ans,visual:level===3?'none':'objects',input:level===3?'keypad':'choices'};
 }
 const opWord=op=>op==='+'?'plus':op==='-'?'minus':'times';
 function startMath(level,station){M={level,station:station==null?null:station,idx:0,total:0,mistakes:0};$('#mathStars').textContent=store.stars;show('math');renderProblem();}
-function pal(n,i,jump){const d=document.createElement('div');d.className='pal';d.style.setProperty('--i',i||0);
+const HEADROOM={"0": 0.37, "1": 0.42, "2": 0.32, "3": 0.26, "4": 0.3, "5": 0.23, "6": 0.25, "7": 0.21, "8": 0.23, "9": 0.24, "10": 0.21, "q": 0.32};
+function pal(n,i,jump){const d=document.createElement('div');d.className='pal';d.style.setProperty('--i',i||0);const parts=n==='?'?['q']:String(n)==='10'?['10']:String(n).split('');const hr=Math.min(...parts.map(x=>HEADROOM[x]??.25));d.style.setProperty('--hr',hr);
   const lbl=document.createElement('span');lbl.className='lbl'+(n==='?'?' q':'');lbl.textContent=n;d.appendChild(lbl);
   const digits=document.createElement('div');digits.className='digits';d.appendChild(digits);
   if(n==='?')digits.appendChild(img(numArt('q','idle')));else if(String(n)==='10')digits.appendChild(img(numArt('10',jump?'jump':'idle')));else String(n).split('').forEach(dg=>digits.appendChild(img(numArt(dg,(jump&&HAS_JUMP(dg))?'jump':'idle'))));return d;}
@@ -810,7 +898,7 @@ function sayProblem(){const p=M.p;say(['n_'+p.a,OPKEY[p.op],'n_'+p.b],p.a+' '+op
 function answer(n,el){
   if(M.done)return;const p=M.p;
   if(n===p.ans){
-    M.done=true;const stars=M.mistakes===0?3:M.mistakes<=2?2:1;M.total+=stars;addStars(stars);questProgress('solved');
+    M.done=true;const stars=M.mistakes===0?3:M.mistakes<=2?2:1;M.total+=stars;mrRecord(M.level,stars);addStars(stars);questProgress('solved');
     el.classList.remove('no');el.classList.add('ok');
     const old=$('#palQ');const q=pal(p.ans,2,true);q.id='palQ';q.classList.add('big');old.replaceWith(q);
     [...document.querySelectorAll('#visual .pal')].slice(0,2).forEach(x=>x.classList.add('dance'));
@@ -881,7 +969,13 @@ $('#playBtn').onclick=()=>{
 document.querySelectorAll('[data-home]').forEach(b=>b.onclick=()=>{sfxPop(3);renderHome();show('home');});
 $('#albumBtn').onclick=()=>{sfxWhoosh();renderAlbum();show('album');};
 $('#spellOpen').onclick=()=>openSheet('spell');$('#mathOpen').onclick=()=>openSheet('math');$('#sheetClose').onclick=()=>$('#levelSheet').classList.remove('on');
-$('#settingsBtn').onclick=()=>{sfxPop(1);$('#settings').classList.add('on');};$('#settingsClose').onclick=()=>$('#settings').classList.remove('on');
+$('#profileBtn').onclick=()=>{sfxPop(2);renderProfiles();$('#profiles').classList.add('on');};
+$('#profilesClose').onclick=()=>$('#profiles').classList.remove('on');
+$('#addProfile').onclick=openNewProfile;
+$('#newCancel').onclick=()=>$('#newProfile').classList.remove('on');
+$('#newOk').onclick=()=>{const name=($('#newName').value||'').trim()||('Player '+(root.profiles.length+1));const pr=freshProfile(name,newAvatar);root.profiles.push(pr);root.current=pr.id;save();sfxWin();location.reload();};
+$('#settingsBtn').onclick=()=>{sfxPop(1);$('#resetWho').textContent=store.name;$('#delWho').textContent=store.name;$('#delRow').style.display=root.profiles.length>1?'':'none';$('#settings').classList.add('on');};
+$('#delBtn').onclick=()=>{if(root.profiles.length<2)return;if(!confirm('Remove '+store.name+' and all their progress from this device?'))return;root.profiles=root.profiles.filter(x=>x.id!==store.id);root.current=root.profiles[0].id;save();location.reload();};$('#settingsClose').onclick=()=>$('#settings').classList.remove('on');
 $('#quest').onclick=()=>{sfxPop(3);const d=daily();say([d.done?'p_greatjob':'p_hi'],d.done?'Great job!':'Let’s play!');};
 $('#soundBtn').onclick=()=>{store.sound=!store.sound;save();renderHome();if(store.sound){sfxPop(4);say(['p_soundon'],'Sound on!');}};
 $('#resetBtn').onclick=()=>{sfxPop(1);$('#settings').classList.remove('on');$('#resetDlg').classList.add('on');};
@@ -889,8 +983,8 @@ $('#treasureOk').onclick=()=>{$('#treasure').classList.remove('on');if($('#home'
 $('#resetNo').onclick=()=>$('#resetDlg').classList.remove('on');
 $('#resetYes').onclick=async()=>{
   $('#resetDlg').classList.remove('on');
-  store.stars=0;store.words={};store.lvl={};store.album={};store.daily=null;store.treasures=[];store.map={};save();refreshStars();renderHome();
-  if(db&&cloudCan){try{setSync('saving');const doc=progressDoc();await db.doc('progress/main').set(doc);lastCloud=JSON.stringify([doc.stars,doc.words,doc.lvl,doc.album]);setSync('synced');}catch(e){setSync('error');}}
+  store.stars=0;store.words={};store.lvl={};store.album={};store.daily=null;store.treasures=[];store.map={};store.sr={};store.mr={};save();refreshStars();renderHome();
+  if(db&&cloudCan){try{setSync('saving');const doc=progressDoc();await db.doc('progress/'+store.id).set(doc);lastCloud=JSON.stringify([doc.stars,doc.words,doc.lvl,doc.album]);setSync('synced');}catch(e){setSync('error');}}
   sfxWhoosh();say(['p_allclear'],'All clear! Let’s start again!');
 };
 $('#musicBtn').onclick=()=>{store.music=!store.music;save();renderHome();store.music?startMusic():stopMusic();};
@@ -909,9 +1003,10 @@ if('serviceWorker' in navigator){
     reg.addEventListener('updatefound',()=>{if(reg.installing)onNew(reg.installing);});
     setInterval(()=>reg.update().catch(()=>{}),60*60*1000);
   }catch(e){}});
-  let refreshing=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(refreshing)return;refreshing=true;location.reload();});
+  const hadController=!!navigator.serviceWorker.controller;let refreshing=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!hadController||refreshing)return;refreshing=true;location.reload();});
 }
-$('#updBtn').onclick=()=>location.reload();
+$('#updBar').onclick=async()=>{try{const reg=await navigator.serviceWorker.getRegistration();if(reg&&reg.waiting){reg.waiting.postMessage({type:'SKIP_WAITING'});return;}}catch(e){}location.reload();};
 $('#checkUpd').onclick=async()=>{const b=$('#checkUpd');b.textContent='Checking…';try{const reg=await navigator.serviceWorker.getRegistration();if(reg){await reg.update();}await new Promise(r=>setTimeout(r,1500));b.textContent=$('#updBar').classList.contains('on')?'Update ready — tap the green bar':'You have the latest version';}catch(e){b.textContent='Could not check';}setTimeout(()=>b.textContent='Check for updates',4000);};
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stopMusic();else if(store.music&&ac&&!$('#start').classList.contains('on'))startMusic();});
 </script>
