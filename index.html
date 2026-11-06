@@ -276,6 +276,7 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
       <div class="pill">⭐ <span id="homeStars">0</span></div>
       <button class="icon" id="soundBtn" aria-label="Voice and sounds">🔊</button>
       <button class="icon" id="musicBtn" aria-label="Music">🎵</button>
+      <button class="icon" id="voiceBtn" aria-label="Change voice">🗣️</button>
       <button class="icon" id="resetBtn" aria-label="Reset progress">↺</button>
     </div>
     <p class="hint-text" id="syncBadge">📱 Progress saved on this device</p>
@@ -386,7 +387,7 @@ const PAL_COLORS=['#8a8fa8','#ff4f8b','#ff9a2e','#ffd43b','#38d47a','#3aa6ff','#
 
 /* ============ storage ============ */
 const KEY='wnl_v2';
-let store={stars:0,sound:true,music:true,words:{},lvl:{},album:{}};
+let store={stars:0,sound:true,music:true,voice:null,words:{},lvl:{},album:{}};
 try{Object.assign(store,JSON.parse(localStorage.getItem(KEY)||'{}'));}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}}
 
@@ -402,9 +403,17 @@ function starsText(n){let s='<span>';for(let i=0;i<n;i++)s+='<span style="--i:'+
 
 /* ---- speech ---- */
 let voice=null;
-function pickVoice(){if(!('speechSynthesis' in window))return;const vs=speechSynthesis.getVoices();voice=vs.find(v=>/en[-_]US/i.test(v.lang)&&/Samantha|Google US|Aria|Jenny|Zira|Ava|Allison|Nicky/i.test(v.name))||vs.find(v=>/en[-_]US/i.test(v.lang))||vs.find(v=>/^en/i.test(v.lang))||null;}
+const BRIGHT=/Ana\b|Aria|Jenny|Google US English|Zira|Samantha|Ava|Allison|Nicky|Karen|Moira|Tessa|Emma|Michelle|Sonia|Libby|Natasha|Joanna|Salli|Kendra/i;
+const DEEP=/David|Mark|Guy|Daniel|Alex|Fred|Tom|Christopher|Eric|Roger|Steffan|Ryan|Thomas|Brian|Matthew|Male/i;
+function englishVoices(){if(!('speechSynthesis' in window))return[];return speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));}
+function pickVoice(){
+  const vs=englishVoices();if(!vs.length)return;
+  if(store.voice){const f=vs.find(v=>v.name===store.voice);if(f){voice=f;return;}}
+  const score=v=>(BRIGHT.test(v.name)?10:0)+(/Natural|Online|Google/i.test(v.name)?4:0)+(/en[-_]US/i.test(v.lang)?3:/en[-_]GB/i.test(v.lang)?2:1)-(DEEP.test(v.name)?20:0);
+  voice=vs.slice().sort((a,b)=>score(b)-score(a))[0]||null;
+}
 if('speechSynthesis' in window){speechSynthesis.onvoiceschanged=pickVoice;pickVoice();}
-function speak(text,rate=0.9,pitch=1.15){if(!store.sound||!('speechSynthesis' in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='en-US';if(voice)u.voice=voice;u.rate=rate;u.pitch=pitch;speechSynthesis.speak(u);}catch(e){}}
+function speak(text,rate=0.95,pitch=1.35){if(!store.sound||!('speechSynthesis' in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang=voice?voice.lang:'en-US';if(voice)u.voice=voice;u.rate=rate;u.pitch=pitch;speechSynthesis.speak(u);}catch(e){}}
 
 /* ---- audio ---- */
 let ac=null,musicGain=null,musicTimer=null,musicStep=0;
@@ -432,7 +441,7 @@ function roundStars(total,count){const r=total/(3*count);return r>=.9?3:r>=.6?2:
 /* ============ cloud sync (works on claude.ai only; local fallback) ============ */
 let db=null,cloudCan=false,lastCloud='',pushTimer=null;
 const SYNC_TEXT={local:'📱 Progress saved on this device',synced:'☁️ Progress synced for the whole family',saving:'☁️ Saving…',readonly:'☁️ Family progress loaded (this account can only view)',error:'☁️ Could not save to the cloud right now'};
-function setSync(s){const b=$('#syncBadge');if(b)b.textContent=SYNC_TEXT[s]||SYNC_TEXT.local;}
+let lastSync='local';function setSync(s){lastSync=s;const b=$('#syncBadge');if(b)b.textContent=SYNC_TEXT[s]||SYNC_TEXT.local;}
 function progressDoc(){return{stars:store.stars,words:store.words,lvl:store.lvl,album:store.album,updatedAt:Date.now()};}
 function mergeCloud(d){let localMore=false;if((d.stars||0)>store.stars)store.stars=d.stars;else if(store.stars>(d.stars||0))localMore=true;['words','lvl'].forEach(k=>{const c=d[k]||{};for(const w in c)if((c[w]||0)>(store[k][w]||0))store[k][w]=c[w];for(const w in store[k])if((store[k][w]||0)>(c[w]||0))localMore=true;});const al=d.album||{};for(const w in al)store.album[w]=true;for(const w in store.album)if(!al[w])localMore=true;save();refreshStars();return localMore;}
 function pushCloud(){if(!db||!cloudCan)return;clearTimeout(pushTimer);pushTimer=setTimeout(async()=>{const doc=progressDoc();const key=JSON.stringify([doc.stars,doc.words,doc.lvl,doc.album]);if(key===lastCloud)return;setSync('saving');try{await db.doc('progress/main').set(doc);lastCloud=key;setSync('synced');}catch(e){if(e&&e.code==='invalid_argument'){cloudCan=false;setSync('readonly');}else setSync('error');}},900);}
@@ -660,7 +669,7 @@ function renderAlbum(){
 renderLogo();renderHome();initCloud();
 $('#playBtn').onclick=()=>{
   try{audio();}catch(e){}
-  try{if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance('Welcome to Word and Number Land!');u.lang='en-US';u.rate=.95;u.pitch=1.15;if(voice)u.voice=voice;speechSynthesis.speak(u);}}catch(e){}
+  try{if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance('Welcome to Word and Number Land!');if(!voice)pickVoice();u.lang=voice?voice.lang:'en-US';u.rate=.95;u.pitch=1.35;if(voice)u.voice=voice;speechSynthesis.speak(u);}}catch(e){}
   sfxWin();confetti();if(store.music)startMusic();
   $('#start').classList.remove('on');
   ['abcdefghijklmnopqrstuvwxyz'.split('').map(l=>letterArt(l,'idle')),['0','1','2','3','4','5','6','7','8','9','q'].map(d=>numArt(d,'idle'))].flat().forEach(preload);
@@ -668,6 +677,14 @@ $('#playBtn').onclick=()=>{
 document.querySelectorAll('[data-home]').forEach(b=>b.onclick=()=>{sfxPop(3);renderHome();show('home');});
 $('#albumBtn').onclick=()=>{sfxWhoosh();renderAlbum();show('album');};
 $('#soundBtn').onclick=()=>{store.sound=!store.sound;save();renderHome();if(store.sound){sfxPop(4);speak('Sound on!');}};
+$('#voiceBtn').onclick=()=>{
+  const vs=englishVoices().filter(v=>!DEEP.test(v.name));
+  if(!vs.length){speak('Hello!');return;}
+  const i=vs.findIndex(v=>voice&&v.name===voice.name);voice=vs[(i+1)%vs.length];store.voice=voice.name;save();
+  const b=$('#syncBadge');b.textContent='🗣️ Voice: '+voice.name.replace(/Microsoft |Google |Online|\(Natural\)|- English.*$/g,'').trim();
+  setTimeout(()=>setSync(lastSync),4000);
+  speak('Hi! Let’s spell and count!');
+};
 $('#resetBtn').onclick=()=>{sfxPop(1);$('#resetDlg').classList.add('on');};
 $('#resetNo').onclick=()=>$('#resetDlg').classList.remove('on');
 $('#resetYes').onclick=async()=>{
