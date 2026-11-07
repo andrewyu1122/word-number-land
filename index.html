@@ -154,13 +154,14 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 .advcard .qbar{height:16px}
 .advcard .go{position:absolute;right:14px;top:14px;font-size:26px}
 .map{position:relative;border-radius:28px;overflow:hidden;box-shadow:0 10px 0 rgba(0,0,0,.12),inset 0 0 0 5px #fff}
-.map .band{height:260px;background-size:cover;background-position:center bottom;position:relative}
+.map .band{height:380px;background-size:cover;background-position:center bottom;position:relative}
 .map .band::after{content:"";position:absolute;inset:auto 0 0 0;height:40px;background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,.35))}
 .map .band .bname{position:absolute;left:14px;top:12px;background:rgba(255,255,255,.85);color:var(--ink);font-weight:700;padding:4px 12px;border-radius:999px;font-size:14px}
 .map svg.path{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .station{position:absolute;width:72px;height:72px;margin:-36px 0 0 -36px;border-radius:50%;background:#fff;box-shadow:0 6px 0 rgba(0,0,0,.18);display:grid;place-items:center;transition:transform .15s}
 .station img{height:52px}
 .station .num{position:absolute;left:-6px;top:-6px;width:26px;height:26px;border-radius:50%;background:var(--coral);color:#fff;font-weight:700;font-size:14px;display:grid;place-items:center;box-shadow:0 2px 0 rgba(0,0,0,.2)}
+.station .tier{position:absolute;right:-8px;top:-8px;font-size:14px;filter:drop-shadow(0 1px 0 rgba(0,0,0,.3))}
 .station .st{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);font-size:14px;letter-spacing:1px;color:var(--sun);text-shadow:0 1px 0 rgba(0,0,0,.3);white-space:nowrap}
 .station .st .off{opacity:.3}
 .station.locked{background:rgba(255,255,255,.55);box-shadow:none}
@@ -175,7 +176,7 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 .boss .zz{position:absolute;right:10px;top:0;font-size:26px;animation:zz 2.2s ease-in-out infinite}
 .boss .bname{position:absolute;left:50%;bottom:-20px;transform:translateX(-50%);background:rgba(255,255,255,.9);color:var(--ink);font-size:12px;font-weight:700;padding:2px 10px;border-radius:999px;white-space:nowrap}
 @media (min-width:760px){.boss{width:200px;height:180px;margin:-180px 0 0 -100px}.boss img{height:166px}}
-@media (min-width:760px){.map .band{height:340px}.boss{width:200px;height:180px;margin:-180px 0 0 -100px}.boss img{height:166px}.station{width:96px;height:96px;margin:-48px 0 0 -48px}.station img{height:70px}.station .me{height:100px;bottom:80px}.advcard h2{font-size:28px}}
+@media (min-width:760px){.map .band{height:480px}.boss{width:200px;height:180px;margin:-180px 0 0 -100px}.boss img{height:166px}.station{width:96px;height:96px;margin:-48px 0 0 -48px}.station img{height:70px}.station .me{height:100px;bottom:80px}.advcard h2{font-size:28px}}
 /* quest */
 .quest{--c:var(--mint);flex-direction:column;align-items:stretch;gap:6px}
 .quest .qrows{flex:1;display:flex;flex-direction:column;gap:8px}
@@ -562,8 +563,8 @@ const HAS_JUMP=d=>/^([0-9]|10|q)$/.test(String(d));
 
 /* ============ data ============ */
 const WORDS={
-  1:[['cat','🐱','hop'],['dog','🐶','hop'],['sun','☀️','spin'],['box','📦','wiggle'],['bat','🦇','fly'],['fox','🦊','hop'],['pig','🐷','hop'],['cow','🐮','hop'],['hen','🐔','hop'],['bug','🐛','wiggle'],['bee','🐝','fly'],['ant','🐜','drive'],['car','🚗','drive'],['bus','🚌','drive'],['hat','🎩','wiggle'],['egg','🥚','wiggle'],['bed','🛏️','float'],['pen','🖊️','wiggle'],['key','🔑','spin'],['owl','🦉','fly'],['rat','🐀','drive'],['bag','👜','wiggle'],['cap','🧢','wiggle'],['jet','✈️','fly'],['ice','🧊','wiggle'],['pie','🥧','wiggle'],['nut','🥜','spin'],['cup','☕','wiggle'],['map','🗺️','wiggle'],['web','🕸️','spin'],['toy','🧸','hop'],['fan','🪭','wiggle']],
-  2:[['frog','🐸','hop'],['fish','🐟','swim'],['crab','🦀','swim'],['duck','🦆','swim'],['ship','🚢','swim'],['boat','⛵','swim'],['star','⭐','spin'],['moon','🌙','float'],['tree','🌳','grow'],['leaf','🍃','float'],['milk','🥛','wiggle'],['cake','🎂','wiggle'],['bell','🔔','ring'],['drum','🥁','wiggle'],['kite','🪁','fly'],['ball','⚽','hop'],['book','📖','wiggle'],['bird','🐦','fly'],['lion','🦁','hop'],['bear','🐻','hop'],['wolf','🐺','hop'],['deer','🦌','hop'],['goat','🐐','hop'],['swan','🦢','swim'],['snow','❄️','float'],['rain','🌧️','float'],['fire','🔥','flash'],['ring','💍','spin'],['corn','🌽','grow'],['rose','🌹','grow'],['taxi','🚕','drive'],['bike','🚲','drive'],['tent','⛺','wiggle'],['gift','🎁','wiggle'],['coin','🪙','spin'],['worm','🪱','wiggle'],['seal','🦭','swim']],
+  1:[['cat','🐱','hop'],['dog','🐶','hop'],['sun','☀️','spin'],['box','📦','wiggle'],['bat','🦇','fly'],['fox','🦊','hop'],['pig','🐷','hop'],['cow','🐮','hop'],['hen','🐔','hop'],['bug','🐛','wiggle'],['bee','🐝','fly'],['ant','🐜','drive'],['car','🚗','drive'],['bus','🚌','drive'],['hat','🎩','wiggle'],['egg','🥚','wiggle'],['bed','🛏️','float'],['pen','🖊️','wiggle'],['key','🔑','spin'],['owl','🦉','fly'],['rat','🐀','drive'],['bag','👜','wiggle'],['cap','🧢','wiggle'],['jet','✈️','fly'],['ice','🧊','wiggle'],['pie','🥧','wiggle'],['nut','🥜','spin'],['cup','☕','wiggle'],['map','🗺️','wiggle'],['web','🕸️','spin'],['toy','🧸','hop'],['fan','🪭','wiggle'],['van','🚐','drive'],['log','🪵','wiggle'],['gem','💎','spin'],['pot','🍲','wiggle'],['pan','🍳','wiggle'],['net','🥅','wiggle'],['tub','🛁','wiggle'],['jar','🫙','wiggle'],['axe','🪓','wiggle'],['bow','🏹','wiggle'],['saw','🪚','wiggle'],['jam','🍯','wiggle'],['ham','🍖','wiggle'],['bun','🥯','hop'],['mug','☕','wiggle'],['pin','📌','spin'],['elf','🧝','hop'],['ape','🦍','hop'],['emu','🦤','hop'],['yak','🦬','hop']],
+  2:[['frog','🐸','hop'],['fish','🐟','swim'],['crab','🦀','swim'],['duck','🦆','swim'],['ship','🚢','swim'],['boat','⛵','swim'],['star','⭐','spin'],['moon','🌙','float'],['tree','🌳','grow'],['leaf','🍃','float'],['milk','🥛','wiggle'],['cake','🎂','wiggle'],['bell','🔔','ring'],['drum','🥁','wiggle'],['kite','🪁','fly'],['ball','⚽','hop'],['book','📖','wiggle'],['bird','🐦','fly'],['lion','🦁','hop'],['bear','🐻','hop'],['wolf','🐺','hop'],['deer','🦌','hop'],['goat','🐐','hop'],['swan','🦢','swim'],['snow','❄️','float'],['rain','🌧️','float'],['fire','🔥','flash'],['ring','💍','spin'],['corn','🌽','grow'],['rose','🌹','grow'],['taxi','🚕','drive'],['bike','🚲','drive'],['tent','⛺','wiggle'],['gift','🎁','wiggle'],['coin','🪙','spin'],['worm','🪱','wiggle'],['seal','🦭','swim'],['sock','🧦','wiggle'],['lamp','🪔','flash'],['door','🚪','wiggle'],['lock','🔒','wiggle'],['nest','🪹','wiggle'],['shoe','👟','hop'],['boot','🥾','hop'],['coat','🧥','wiggle'],['hand','🤚','wiggle'],['foot','🦶','hop'],['nose','👃','wiggle'],['wave','🌊','swim'],['road','🛣️','drive'],['bone','🦴','spin'],['soap','🧼','float'],['salt','🧂','wiggle'],['rice','🍚','wiggle'],['soup','🍜','wiggle'],['pear','🍐','wiggle'],['kiwi','🥝','spin'],['taco','🌮','wiggle'],['crow','🐦‍⬛','fly'],['dove','🕊️','fly'],['bull','🐂','hop'],['lamb','🐑','hop'],['pony','🐴','drive'],['toad','🐸','hop'],['hawk','🦅','fly'],['moth','🦋','fly']],
   3:[['apple','🍎','wiggle'],['tiger','🐯','hop'],['zebra','🦓','hop'],['horse','🐴','drive'],['sheep','🐑','hop'],['snake','🐍','swim'],['whale','🐳','swim'],['shark','🦈','swim'],['mouse','🐭','hop'],['robot','🤖','wiggle'],['train','🚂','drive'],['truck','🚚','drive'],['pizza','🍕','spin'],['bread','🍞','wiggle'],['grape','🍇','wiggle'],['lemon','🍋','wiggle'],['peach','🍑','wiggle'],['cloud','☁️','float'],['house','🏠','wiggle'],['clock','⏰','ring'],['piano','🎹','wiggle'],['ghost','👻','float'],['crown','👑','spin'],['camel','🐫','drive'],['panda','🐼','hop'],['koala','🐨','hop'],['eagle','🦅','fly'],['candy','🍬','spin'],['monkey','🐵','hop'],['rabbit','🐰','hop'],['turtle','🐢','drive'],['rocket','🚀','fly'],['flower','🌸','grow'],['carrot','🥕','wiggle'],['banana','🍌','wiggle'],['cherry','🍒','wiggle'],['tomato','🍅','hop'],['donut','🍩','spin'],['cookie','🍪','spin'],['pencil','✏️','wiggle'],['guitar','🎸','wiggle'],['dragon','🐉','fly'],['castle','🏰','grow'],['planet','🪐','spin'],['spider','🕷️','float'],['parrot','🦜','fly'],['pirate','🏴‍☠️','wiggle']],
   4:[['elephant','🐘','hop'],['giraffe','🦒','hop'],['penguin','🐧','wiggle'],['dolphin','🐬','swim'],['octopus','🐙','swim'],['unicorn','🦄','hop'],['dinosaur','🦖','hop'],['hamster','🐹','hop'],['chicken','🐔','hop'],['tractor','🚜','drive'],['volcano','🌋','flash'],['rainbow','🌈','grow'],['umbrella','☂️','float'],['sandwich','🥪','wiggle'],['popcorn','🍿','hop'],['pumpkin','🎃','wiggle'],['strawberry','🍓','wiggle'],['pineapple','🍍','wiggle'],['broccoli','🥦','grow'],['butterfly','🦋','fly'],['kangaroo','🦘','hop'],['hedgehog','🦔','drive'],['flamingo','🦩','wiggle'],['crocodile','🐊','swim'],['airplane','✈️','fly'],['computer','💻','wiggle'],['telephone','☎️','ring'],['athlete','🏃','drive'],['compete','🏆','spin'],['balloon','🎈','float'],['trumpet','🎺','wiggle'],['mountain','⛰️','grow'],['tornado','🌪️','spin'],['scissors','✂️','wiggle'],['backpack','🎒','hop'],['calendar','📅','wiggle'],['football','🏈','spin'],['basketball','🏀','hop'],['helicopter','🚁','fly'],['snowman','⛄','wiggle'],['ambulance','🚑','drive'],['lollipop','🍭','spin'],['squirrel','🐿️','hop'],['lobster','🦞','swim']]
 };
@@ -590,6 +591,7 @@ if(!root.profiles.length){
   root.profiles=[pr,pr2];root.current=pr.id;
 }
 if(!root.seeded){root.seeded=true;root.profiles.forEach(x=>{if(x.name==='Player 1')x.name='Jaron';});if(!root.profiles.some(x=>x.name==='Jaden')){const pr2=freshProfile('Jaden','horse');root.profiles.push(pr2);}}
+if(!root.mapV2){root.mapV2=true;root.profiles.forEach(x=>{const old=x.map||{};const nm={};Object.keys(old).forEach(k=>{const i=+k;nm[Math.floor(i/2)*4+(i%2)]=old[k];});x.map=nm;x.bossSeen={};});}
 if(!root.seeded2){root.seeded2=true;root.profiles.forEach(x=>{if(x.name==='Jaron'&&x.avatar==='dog')x.avatar='train';if(x.name==='Jaden'&&x.avatar==='cat')x.avatar='horse';});}
 let store=root.profiles.find(x=>x.id===root.current)||root.profiles[0];root.current=store.id;
 ['sr','mr','map','treasures'].forEach(k=>{if(store[k]==null)store[k]=k==='treasures'?[]:{};});
@@ -748,9 +750,10 @@ function renderGarden(el){
 const BANDS=[['meadow','Meadow'],['road','Town'],['sky','Sky'],['sea','Ocean'],['room','Cozy Room'],['night','Night'],['space','Space']];
 const BOSS_NAMES=['Treebert','Bus-Bot','Cloud King','Octo Queen','Teddy','Grandpa Owl','Zib the Alien'];
 const bossArt=(sc,k)=>A+'bosses/'+sc+'_'+k+'.webp';
-function bandDone(bi){return (store.map[bi*2]||0)>=2&&(store.map[bi*2+1]||0)>=2;}
+function bandDone(bi){for(let k=0;k<PER_BAND;k++)if((store.map[bi*PER_BAND+k]||0)<2)return false;return true;}
 function bossDance(el,bi){if(!el)return;const im=el.querySelector('img');im.src=bossArt(BANDS[bi][0],'dance');el.classList.add('dancing');setTimeout(()=>{if(im.isConnected){im.src=bossArt(BANDS[bi][0],'idle');el.classList.remove('dancing');}},2600);}
-const STATIONS=[];BANDS.forEach((b,bi)=>{const lvl=bi<2?1:bi<4?2:bi<6?3:4;STATIONS.push({band:bi,game:'spell',level:lvl});STATIONS.push({band:bi,game:'math',level:lvl});});
+const STATIONS=[];BANDS.forEach((b,bi)=>{const lvl=bi<2?1:bi<4?2:bi<6?3:4;const t0=bi%2;STATIONS.push({band:bi,game:'spell',level:lvl,tier:t0},{band:bi,game:'math',level:lvl,tier:t0},{band:bi,game:'spell',level:lvl,tier:t0+1},{band:bi,game:'math',level:lvl,tier:t0+1});});
+const PER_BAND=4;
 function currentStation(){for(let i=0;i<STATIONS.length;i++)if((store.map[i]||0)<2)return i;return STATIONS.length;}
 function renderAdvCard(){const cur=currentStation();const el=$('#advBtn');const done=cur>=STATIONS.length;const st=STATIONS[Math.min(cur,STATIONS.length-1)];
   el.style.backgroundImage='url('+A+'scenes/'+BANDS[st.band][0]+'.webp)';
@@ -759,22 +762,22 @@ function renderMap(){
   const cur=currentStation();$('#mapStars').textContent=store.stars;
   const m=$('#map');m.innerHTML='';
   BANDS.forEach((b,i)=>{const d=document.createElement('div');d.className='band';d.style.backgroundImage='url('+A+'scenes/'+b[0]+'.webp)';d.innerHTML='<span class="bname">'+(i+1)+'. '+b[1]+'</span>';m.appendChild(d);});
-  const W=m.clientWidth||400,BH=window.innerWidth>=760?340:260;
-  const pts=STATIONS.map((st,i)=>({x:(i%2?0.72:0.28)*W,y:st.band*BH+(i%2?BH*0.72:BH*0.30)}));
+  const W=m.clientWidth||400,BH=window.innerWidth>=760?480:380;
+  const pts=STATIONS.map((st,i)=>{const k=i%PER_BAND;return{x:[0.34,0.72,0.28,0.72][k]*W,y:st.band*BH+[0.21,0.41,0.63,0.83][k]*BH};});
   let dpath='M'+pts[0].x+' '+pts[0].y;for(let i=1;i<pts.length;i++){const a=pts[i-1],b=pts[i];const my=(a.y+b.y)/2;dpath+=' C'+a.x+' '+my+' '+b.x+' '+my+' '+b.x+' '+b.y;}
   const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('class','path');svg.setAttribute('viewBox','0 0 '+W+' '+(BH*BANDS.length));svg.setAttribute('preserveAspectRatio','none');
   svg.innerHTML='<path d="'+dpath+'" fill="none" stroke="rgba(0,0,0,.18)" stroke-width="16" stroke-linecap="round"/><path d="'+dpath+'" fill="none" stroke="#fff" stroke-width="8" stroke-dasharray="16 14" stroke-linecap="round"/>';
   m.appendChild(svg);
   STATIONS.forEach((st,i)=>{const b=document.createElement('button');const best=store.map[i]||0;const state=i<cur?'done':i===cur?'current':'locked';b.className='station '+state;
     b.style.left=pts[i].x+'px';b.style.top=pts[i].y+'px';
-    const icon=st.game==='spell'?letterArt('abcdefghijklmnopqrstuvwxyz'[(i*3)%26],'idle'):numArt(String(st.level+(i%2?2:0)),'idle');
-    b.innerHTML='<span class="num">'+(i+1)+'</span><img src="'+icon+'" alt="">'+(best?'<span class="st">'+starsText(best)+'</span>':'')+(state==='current'?'<img class="me" src="'+A+'mascot/mascot_idle.webp" alt="">':'');
+    const icon=st.game==='spell'?letterArt('abcdefghijklmnopqrstuvwxyz'[(i*3)%26],'idle'):numArt(String(Math.min(10,st.level*2+st.tier)),'idle');
+    b.innerHTML='<span class="num">'+(i+1)+'</span>'+(st.tier>=2?'<span class="tier">⚡⚡</span>':st.tier===1?'<span class="tier">⚡</span>':'')+'<img src="'+icon+'" alt="">'+(best?'<span class="st">'+starsText(best)+'</span>':'')+(state==='current'?'<img class="me" src="'+A+'mascot/mascot_idle.webp" alt="">':'');
     b.setAttribute('aria-label',(st.game==='spell'?'Spell':'Count')+' station '+(i+1));
-    b.onclick=()=>{if(state==='locked'){sfxWrong();b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');return;}sfxWhoosh();st.game==='spell'?startSpell(st.level,i):startMath(st.level,i);};
+    b.onclick=()=>{if(state==='locked'){sfxWrong();b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');return;}sfxWhoosh();st.game==='spell'?startSpell(st.level,i,st.tier):startMath(st.level,i,st.tier);};
     m.appendChild(b);});
   if(!store.bossSeen)store.bossSeen={};
   BANDS.forEach((b,bi)=>{const done=bandDone(bi);const el=document.createElement('button');el.className='boss'+(done?'':' asleep');
-    el.style.left=(0.24*W)+'px';el.style.top=(bi*BH+BH*0.93)+'px';
+    el.style.left=(0.26*W)+'px';el.style.top=(bi*BH+BH*0.97)+'px';
     el.appendChild(img(bossArt(b[0],done?'idle':'sleep')));
     if(!done){const z=document.createElement('span');z.className='zz';z.textContent='💤';el.appendChild(z);}
     const nm=document.createElement('span');nm.className='bname';nm.textContent=done?BOSS_NAMES[bi]:'zzz…';el.appendChild(nm);
@@ -794,17 +797,18 @@ function renderHome(){renderProfileBtn();renderAdvCard();$('#homeStars').textCon
 let S={};
 const SR_DAYS=[0,1,3,7,14];
 function levelMastery(level){const ws=WORDS[level];let n=0,t=0;ws.forEach(([w])=>{const r=store.sr[w];if(r){n++;t+=r.box;}});return n>=10?t/n:0;}
-function pickWords(level){
-  const now=Date.now();const list=shuffle(WORDS[level].slice());
-  const score=w=>{const r=store.sr[w];if(!r)return 1;if(r.due<=now)return 0-(4-r.box)*.1;return 2+r.box;};
-  list.sort((a,b)=>score(a[0])-score(b[0]));
-  let picked=list.slice(0,ROUND);
-  // stretch: when this level is well known, slip in 1-2 words from the next level
-  if(level<4&&levelMastery(level)>=2){const nxt=shuffle(WORDS[level+1].slice()).sort((a,b)=>score(a[0])-score(b[0])).slice(0,levelMastery(level)>=3?2:1);picked=picked.slice(0,ROUND-nxt.length);nxt.forEach((w,i)=>picked.splice(2+i*3,0,w));}
+function pickWords(level,tier){
+  tier=tier||0;const now=Date.now();const recent=new Set(store.recent||[]);
+  const score=w=>{const r=store.sr[w];let sc;if(!r)sc=1;else if(r.due<=now)sc=0-(4-r.box)*.1;else sc=2+r.box;if(recent.has(w))sc+=10;return sc;};
+  const sorted=lv=>shuffle(WORDS[lv].slice()).sort((a,b)=>score(a[0])-score(b[0]));
+  // stretch words from the next level: by mastery (free play) or by station tier (adventure)
+  let nStretch=0;if(level<4){if(tier>=2)nStretch=4;else if(tier===1)nStretch=2;else if(levelMastery(level)>=3)nStretch=2;else if(levelMastery(level)>=2)nStretch=1;}
+  const base=sorted(level).slice(0,ROUND-nStretch);const nxt=nStretch?sorted(level+1).slice(0,nStretch):[];
+  const picked=base.slice();nxt.forEach((w,i)=>picked.splice(Math.min(picked.length,1+i*2),0,w));
   return picked.map(([word,emoji,anim])=>({word,emoji,anim}));
 }
-function srUpdate(word,stars){const r=store.sr[word]||{box:0,due:0,seen:0,wrong:0};r.seen++;if(stars===3)r.box=Math.min(4,r.box+1);else if(stars===1){r.box=0;r.wrong++;}else r.wrong++;r.due=Date.now()+SR_DAYS[r.box]*86400000;store.sr[word]=r;}
-function startSpell(level,station){STREAK.spell=0;S={level,station:station==null?null:station,queue:pickWords(level),idx:0,total:0};$('#spellStars').textContent=store.stars;show('spell');renderWord();}
+function srUpdate(word,stars){const r=store.sr[word]||{box:0,due:0,seen:0,wrong:0};r.seen++;if(stars===3)r.box=Math.min(4,r.box+1);else if(stars===1){r.box=0;r.wrong++;}else r.wrong++;r.due=Date.now()+Math.max(1,SR_DAYS[r.box])*86400000;store.sr[word]=r;store.recent=(store.recent||[]).filter(w=>w!==word).concat([word]).slice(-30);}
+function startSpell(level,station,tier){STREAK.spell=0;S={level,tier:tier||0,station:station==null?null:station,queue:pickWords(level,tier),idx:0,total:0};$('#spellStars').textContent=store.stars;show('spell');renderWord();}
 function renderDots(el,idx,n){el.innerHTML='';for(let i=0;i<n;i++){const d=document.createElement('i');if(i<idx)d.className='done';else if(i===idx)d.className='now';el.appendChild(d);}}
 function renderWord(){
   const w=S.queue[S.idx];S.word=w;S.pos=0;S.mistakes=0;S.slotMiss=0;S.done=false;
@@ -824,7 +828,7 @@ function renderWord(){
   [...w.word].forEach((ch,i)=>{const s=document.createElement('div');s.className='slot'+(i===0?' now':'');s.dataset.i=i;slots.appendChild(s);});
   const letters=[...w.word];
   const pool=shuffle('abcdefghijklmnopqrstuvwxyz'.split('').filter(c=>!letters.includes(c)));
-  const all=shuffle(letters.concat(pool.slice(0,DISTRACTORS[S.level])));
+  const all=shuffle(letters.concat(pool.slice(0,DISTRACTORS[S.level]+(S.tier||0))));
   const tiles=$('#tiles');tiles.innerHTML='';
   all.forEach((ch,i)=>{const b=document.createElement('button');b.className='tile';b.dataset.ch=ch;b.setAttribute('aria-label',ch);b.style.setProperty('--i',i);b.appendChild(img(letterArt(ch,'idle')));b.onclick=()=>tapTile(b);tiles.appendChild(b);});
   say(['w_'+w.word],w.word);
@@ -881,10 +885,13 @@ function nextWord(){S.idx++;if(S.idx>=S.queue.length)return finishRound('spell')
 /* ============ math ============ */
 let M={};
 /* skill 0..1 from the last 12 results at this level (3 stars=1, 2=.5, 1=0) */
-function mathSkill(level){const h=(store.mr['L'+level]||[]);if(h.length<4)return .5;const r=h.slice(-12);return r.reduce((a,b)=>a+b,0)/r.length;}
+function mathSkill(level){const h=(store.mr['L'+level]||[]);if(h.length<3)return .65;const r=h.slice(-8);return r.reduce((a,b)=>a+b,0)/r.length;}
 function mrRecord(level,stars){const k='L'+level;const h=store.mr[k]||[];h.push(stars===3?1:stars===2?.5:0);store.mr[k]=h.slice(-30);}
-function genProblem(level){
-  let a,b,op;const sk=mathSkill(level);const hard=Math.random()<sk;       // high skill -> more hard variants
+function genProblem(level,tier){
+  tier=tier||0;let sk=Math.max(mathSkill(level),tier*0.45);
+  // stretch: strong skill or a high-tier station mixes in problems from the next level
+  if(level<4&&(tier>=2||sk>=.9)&&Math.random()<(tier>=2?.45:.3))return genProblem(level+1,0);
+  let a,b,op;const hard=Math.random()<sk;
   const sub=Math.random()<(.25+sk*.35);                                    // subtraction share grows with skill
   if(level===1){op=sub?'-':'+';const top=hard?10:6;if(op==='+'){a=rnd(1,top-1);b=rnd(1,top-a);}else{a=rnd(2,top);b=rnd(1,a);}}
   else if(level===2){op=sub?'-':'+';
@@ -894,11 +901,12 @@ function genProblem(level){
     if(op==='+'){if(sk<.35){a=rnd(1,9)*10;b=rnd(1,9);} else if(!hard){do{a=rnd(10,89);b=rnd(1,100-a);}while(a%10+b%10>=10);} else {do{a=rnd(10,89);b=rnd(1,100-a);}while(a%10+b%10<10);}}
     else{if(sk<.35){a=rnd(1,9)*10+rnd(1,9);b=a%10;} else if(!hard){do{a=rnd(10,99);b=rnd(1,a);}while(a%10<b%10);} else {do{a=rnd(20,99);b=rnd(1,a);}while(a%10>=b%10);}}}
   else{op='×';if(sk<.35){a=rnd(1,5);b=Math.random()<.7?2:1;} else if(!hard){a=rnd(1,5);b=pick([2,2,3,1]);} else {a=rnd(2,5);b=rnd(2,5);}}
+  if(sk>=.5&&op!=='×'&&(b===1||a===1)&&Math.random()<.8)return genProblem(level,tier);
   const ans=op==='+'?a+b:op==='-'?a-b:a*b;
-  return{a,b,op,ans,visual:level===3?'none':'objects',input:level===3?'keypad':'choices'};
+  return{a,b,op,ans,visual:level===3?'none':'objects',input:(level===3||ans>20)?'keypad':'choices'};
 }
 const opWord=op=>op==='+'?'plus':op==='-'?'minus':'times';
-function startMath(level,station){STREAK.math=0;M={level,station:station==null?null:station,idx:0,total:0,mistakes:0};$('#mathStars').textContent=store.stars;show('math');renderProblem();}
+function startMath(level,station,tier){STREAK.math=0;M={level,tier:tier||0,station:station==null?null:station,idx:0,total:0,mistakes:0};$('#mathStars').textContent=store.stars;show('math');renderProblem();}
 const HEADROOM={"0": 0.37, "1": 0.42, "2": 0.32, "3": 0.26, "4": 0.3, "5": 0.23, "6": 0.25, "7": 0.21, "8": 0.23, "9": 0.24, "10": 0.21, "q": 0.32};
 function pal(n,i,jump){const d=document.createElement('div');d.className='pal';d.style.setProperty('--i',i||0);const parts=n==='?'?['q']:String(n)==='10'?['10']:String(n).split('');const hr=Math.min(...parts.map(x=>HEADROOM[x]??.25));d.style.setProperty('--hr',hr);
   const lbl=document.createElement('span');lbl.className='lbl'+(n==='?'?' q':'');lbl.textContent=n;d.appendChild(lbl);
@@ -914,7 +922,7 @@ function pal(n,i,jump){const d=document.createElement('div');d.className='pal';d
   return d;}
 const NUM_MISSING={},NUM_NOJUMP={};
 function renderProblem(){
-  const p=genProblem(M.level);M.p=p;M.mistakes=0;M.done=false;M.typed='';
+  const p=genProblem(M.level,M.tier);M.p=p;M.mistakes=0;M.done=false;M.typed='';
   renderDots($('#mathDots'),M.idx,ROUND);$('#nextBtn2').classList.remove('show');
   const v=$('#visual');v.className='stage mathstage';v.innerHTML='';
   v.appendChild(img(A+'scenes/'+pick(['meadow','sky','room','road','space'])+'.webp','bg'));buddy(v);
