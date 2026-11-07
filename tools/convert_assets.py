@@ -10,6 +10,7 @@ Usage examples (run from the repo root):
   python tools/convert_assets.py garden  ./incoming/garden
   python tools/convert_assets.py mascot  ./incoming/mascot
   python tools/convert_assets.py bosses  ./incoming/bosses
+  python tools/convert_assets.py dino    ./incoming/dino           # dinos: {name}_idle/_walk_###/_roar_###, egg_s0..s3, egg_hatch_###
   python tools/convert_assets.py scenes  ./incoming/scenes
 
 Input naming: {name}_idle.png, {name}_sleep.png, {name}_{action}_001.png ... (24 or 12 frames).
@@ -23,8 +24,8 @@ from concurrent.futures import ProcessPoolExecutor
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT  = os.path.join(ROOT, 'assets')
-HEIGHT = {'words':384,'letters':176,'upper':176,'num':224,'objects':160,'garden':128,'mascot':288,'bosses':512}
-DEST   = {'words':'words','letters':'letters','upper':'letters_upper','num':'num','objects':'objects','garden':'garden','mascot':'mascot','bosses':'bosses'}
+HEIGHT = {'words':384,'letters':176,'upper':176,'num':224,'objects':160,'garden':128,'mascot':288,'bosses':512,'dino':384}
+DEST   = {'words':'words','letters':'letters','upper':'letters_upper','num':'num','objects':'objects','garden':'garden','mascot':'mascot','bosses':'bosses','dino':'dino'}
 PAD = 6
 
 def bbox(paths):

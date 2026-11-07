@@ -36,6 +36,8 @@ Everything is one static page: `index.html` + `sw.js` + `manifest.webmanifest` +
 - Numbers `n0…n10, nq` (`nq` = the "?" character). Letters: lowercase `a…z`, uppercase `A…Z` (`assets/letters_upper/`).
 - Mascot states: idle, sleep, happy, cheer, wave, think.
 - Garden: plants `{name}_s1/s2/s3.png` (3 growth stages), animals `{name}_idle.png` + `{name}_fly|walk_###.png`.
+- Dino Island (`assets/dino/`): 16 dinos `{name}_idle.png`, `{name}_walk_###`, `{name}_roar_###`; egg `egg_s0..s3.png`, `egg_hatch_###`; scene `island`.
+  Names are in `DINOS` in index.html. Until a dino's files exist the game shows an emoji (`DINO_MISSING` fallback).
 - Scenes: 1200×750 opaque, bottom quarter is ground, nothing busy in the centre: meadow sea sky road space room night.
 
 ## Converting & publishing new art
@@ -50,6 +52,7 @@ and writes animated WebP. Then:
    "New version ready" bar.
 
 ## Voice
+To add voice lines run `python tools/make_audio3.py` (needs `pip install edge-tts`, internet) — it writes into `assets/audio/` and skips files that exist.
 Pre-recorded with Edge TTS voice `en-US-AnaNeural` (scripts in the chat history: `make_audio.py`, `make_audio2.py`).
 Keys: `w_{word}` (word), `s_{word}` (spelled celebration), `l_{letter}` (name), `f_{letter}` (phonics sound),
 `n_{0-100}`, `x_{0-100}` (excited), `q_{a}p{b}` / `a_{a}p{b}` (whole addition question/answer ≤20; `m` for minus),
