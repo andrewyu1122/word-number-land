@@ -154,7 +154,7 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 .advcard .qbar{height:16px}
 .advcard .go{position:absolute;right:14px;top:14px;font-size:26px}
 .map{position:relative;border-radius:28px;overflow:hidden;box-shadow:0 10px 0 rgba(0,0,0,.12),inset 0 0 0 5px #fff}
-.map .band{height:380px;background-size:cover;background-position:center bottom;position:relative}
+.map .band{height:440px;background-size:cover;background-position:center bottom;position:relative}
 .map .band::after{content:"";position:absolute;inset:auto 0 0 0;height:40px;background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,.35))}
 .map .band .bname{position:absolute;left:14px;top:12px;background:rgba(255,255,255,.85);color:var(--ink);font-weight:700;padding:4px 12px;border-radius:999px;font-size:14px}
 .map svg.path{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
@@ -176,7 +176,7 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 .boss .zz{position:absolute;right:10px;top:0;font-size:26px;animation:zz 2.2s ease-in-out infinite}
 .boss .bname{position:absolute;left:50%;bottom:-20px;transform:translateX(-50%);background:rgba(255,255,255,.9);color:var(--ink);font-size:12px;font-weight:700;padding:2px 10px;border-radius:999px;white-space:nowrap}
 @media (min-width:760px){.boss{width:200px;height:180px;margin:-180px 0 0 -100px}.boss img{height:166px}}
-@media (min-width:760px){.map .band{height:480px}.boss{width:200px;height:180px;margin:-180px 0 0 -100px}.boss img{height:166px}.station{width:96px;height:96px;margin:-48px 0 0 -48px}.station img{height:70px}.station .me{height:100px;bottom:80px}.advcard h2{font-size:28px}}
+@media (min-width:760px){.map .band{height:560px}.boss{width:200px;height:180px;margin:-180px 0 0 -100px}.boss img{height:166px}.station{width:96px;height:96px;margin:-48px 0 0 -48px}.station img{height:70px}.station .me{height:100px;bottom:80px}.advcard h2{font-size:28px}}
 /* quest */
 .quest{--c:var(--mint);flex-direction:column;align-items:stretch;gap:6px}
 .quest .qrows{flex:1;display:flex;flex-direction:column;gap:8px}
@@ -278,6 +278,28 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-9px) rotate(-7deg)}75%{transform:translateX(9px) rotate(7deg)}}
 @keyframes glow{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px) scale(1.1)}}
 
+/* letter hunt */
+.duo .mini.hunt-tile{}
+.huntbar{display:flex;align-items:center;gap:14px;background:var(--card);border-radius:24px;padding:10px 16px;box-shadow:var(--shadow)}
+.huntbar img{height:84px;filter:drop-shadow(0 4px 0 rgba(0,0,0,.18));animation:bob 2.4s ease-in-out infinite}
+.huntbar .txt{flex:1}
+.huntbar h2{margin:0;font-size:22px}
+.huntbar p{margin:2px 0 0;color:var(--ink2);font-size:15px;font-weight:600}
+.huntbar .found{font-size:22px;letter-spacing:2px}
+.huntgrid{display:grid;grid-template-columns:repeat(var(--cols,2),1fr);gap:10px}
+.hcard{position:relative;background:var(--card);border-radius:22px;aspect-ratio:1;display:grid;place-items:center;box-shadow:var(--shadow);transition:transform .15s;overflow:hidden}
+.hcard img{height:72%;max-width:85%;object-fit:contain;filter:grayscale(.85) brightness(1.05) drop-shadow(0 4px 0 rgba(0,0,0,.15));transition:filter .3s}
+.hcard .emoji{font-size:56px;filter:grayscale(.85)}
+.hcard.ok{background:#e8ffee;box-shadow:0 7px 0 #22a85a}
+.hcard.ok img,.hcard.ok .emoji{filter:none}
+.hcard.ok::after{content:"✓";position:absolute;right:8px;top:6px;width:30px;height:30px;border-radius:50%;background:var(--mint);color:#fff;font-weight:700;display:grid;place-items:center;font-size:18px;animation:popin .3s cubic-bezier(.3,1.7,.5,1)}
+.hcard.no{animation:shake .4s;background:#ffe3ea}
+.hcard.glow{animation:glow .8s ease-in-out infinite;box-shadow:0 0 0 5px var(--sun),var(--shadow)}
+.hcard .wlabel{position:absolute;left:0;right:0;bottom:6px;text-align:center;font-weight:700;font-size:15px;color:var(--ink2);text-transform:var(--case,none);opacity:0;transition:opacity .3s}
+.hcard.ok .wlabel,.hcard.no .wlabel{opacity:1}
+.hcard.ok .wlabel{color:#1d8a46}
+@media (min-width:760px){.huntbar img{height:120px}.huntbar h2{font-size:30px}.hcard .emoji{font-size:80px}.hcard .wlabel{font-size:18px}}
+@media (min-width:900px) and (orientation:landscape){#hunt.on{display:grid;grid-template-columns:1fr 2fr;grid-template-rows:auto 1fr auto;column-gap:22px}#hunt .topbar{grid-column:1/-1}#hunt .huntbar{flex-direction:column;text-align:center;align-self:start}#hunt .huntbar img{height:200px}#hunt .huntgrid{grid-column:2;grid-row:2/4}#hunt .actions{grid-column:1;grid-row:3}}
 /* math */
 .eq{display:flex;justify-content:center;align-items:flex-end;gap:6px;flex-wrap:wrap;padding:4px 0;min-height:100px}
 .pal{display:flex;align-items:flex-end;gap:2px;animation:bob 2.4s ease-in-out infinite;animation-delay:calc(var(--i)*.3s)}
@@ -431,6 +453,7 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
     <div class="duo">
       <button class="mini pressable" id="spellOpen" style="--c:var(--coral)"><img src="assets/words/dog_idle.webp" alt=""><div><h2>Spell</h2><p id="spellSum"></p></div></button>
       <button class="mini pressable" id="mathOpen" style="--c:var(--blue)"><img src="assets/num/n3_idle.webp" alt=""><div><h2>Count</h2><p id="mathSum"></p></div></button>
+      <button class="mini pressable" id="huntOpen" style="--c:var(--grape)"><img src="assets/letters/b_idle.webp" alt=""><div><h2>Hunt</h2><p id="huntSum"></p></div></button>
       <button class="mini quest pressable" id="quest"></button>
       <button class="mini pressable" id="albumBtn" style="--c:var(--grape)"><span class="emoji">📒</span><div><h2>Stickers</h2><p id="albumCount"></p></div></button>
     </div>
@@ -505,6 +528,21 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
     <div class="actions">
       <button class="icon" id="sayBtn2" aria-label="Read the problem">🔊</button>
       <button class="next" id="nextBtn2">Next</button>
+    </div>
+  </section>
+
+  <section class="screen" id="hunt">
+    <div class="topbar">
+      <button class="icon" data-home aria-label="Home">🏠</button>
+      <div class="dots" id="huntDots"></div>
+      <div class="pill">⭐ <span id="huntStars">0</span></div>
+    </div>
+    <div class="huntbar" id="huntBar"></div>
+    <div class="huntgrid" id="huntGrid"></div>
+    <div class="actions">
+      <button class="icon" id="sayBtn3" aria-label="Say the letter">🔊</button>
+      <button class="icon" id="hintBtn3" aria-label="Hint">💡</button>
+      <button class="next" id="nextBtn3">Next</button>
     </div>
   </section>
 
@@ -592,6 +630,7 @@ if(!root.profiles.length){
 }
 if(!root.seeded){root.seeded=true;root.profiles.forEach(x=>{if(x.name==='Player 1')x.name='Jaron';});if(!root.profiles.some(x=>x.name==='Jaden')){const pr2=freshProfile('Jaden','horse');root.profiles.push(pr2);}}
 if(!root.mapV2){root.mapV2=true;root.profiles.forEach(x=>{const old=x.map||{};const nm={};Object.keys(old).forEach(k=>{const i=+k;nm[Math.floor(i/2)*4+(i%2)]=old[k];});x.map=nm;x.bossSeen={};});}
+if(!root.mapV3){root.mapV3=true;root.profiles.forEach(x=>{const old=x.map||{};const nm={};Object.keys(old).forEach(k=>{const i=+k;const b=Math.floor(i/4),j=i%4;nm[b*5+(j<2?j:j+1)]=old[k];});x.map=nm;x.bossSeen={};});}
 if(!root.seeded2){root.seeded2=true;root.profiles.forEach(x=>{if(x.name==='Jaron'&&x.avatar==='dog')x.avatar='train';if(x.name==='Jaden'&&x.avatar==='cat')x.avatar='horse';});}
 let store=root.profiles.find(x=>x.id===root.current)||root.profiles[0];root.current=store.id;
 ['sr','mr','map','treasures'].forEach(k=>{if(store[k]==null)store[k]=k==='treasures'?[]:{};});
@@ -665,12 +704,12 @@ function stopMusic(){if(musicTimer){clearInterval(musicTimer);musicTimer=null;}}
 function confetti(){const colors=['#ff6b4a','#3aa6ff','#38d47a','#ffc93c','#9b6bff','#ff4f8b'];for(let i=0;i<40;i++){const d=document.createElement('div');d.className='confetti';d.style.left=Math.random()*100+'vw';d.style.background=pick(colors);d.style.animationDelay=(Math.random()*.4)+'s';d.style.transform='rotate('+Math.random()*360+'deg)';document.body.appendChild(d);setTimeout(()=>d.remove(),2500);}}
 function burstAt(x,y,chars){for(let i=0;i<8;i++){const s=document.createElement('span');s.className='burst';s.textContent=pick(chars);s.style.left=x+'px';s.style.top=y+'px';const a=i/8*Math.PI*2,r=40+Math.random()*30;s.style.setProperty('--dx',Math.cos(a)*r+'px');s.style.setProperty('--dy',Math.sin(a)*r+'px');document.body.appendChild(s);setTimeout(()=>s.remove(),700);}}
 function addStars(n){store.stars+=n;save();refreshStars();pushCloud();}
-function refreshStars(){document.querySelectorAll('#homeStars,#spellStars,#mathStars,#albumStars,#mapStars').forEach(e=>e.textContent=store.stars);}
+function refreshStars(){document.querySelectorAll('#homeStars,#spellStars,#mathStars,#albumStars,#mapStars,#huntStars').forEach(e=>e.textContent=store.stars);}
 function roundStars(total,count){const r=total/(3*count);return r>=.9?3:r>=.6?2:r>0?1:0;}
 
 /* ---- streaks ---- */
-const STREAK={spell:0,math:0};
-function streakUp(game){const m=game==='spell'?S.mistakes:M.mistakes;if(m===0)STREAK[game]++;else STREAK[game]=0;const n=STREAK[game];if(n===3||n===5||n===8){setTimeout(()=>{sfxCombo(n);},150);return n===3?'p_combo3':n===5?'p_combo5':'p_combo8';}return null;}
+const STREAK={spell:0,math:0,hunt:0};
+function streakUp(game){const m=game==='spell'?S.mistakes:game==='hunt'?H.mistakes:M.mistakes;if(m===0)STREAK[game]++;else STREAK[game]=0;const n=STREAK[game];if(n===3||n===5||n===8){setTimeout(()=>{sfxCombo(n);},150);return n===3?'p_combo3':n===5?'p_combo5':'p_combo8';}return null;}
 const sfxCombo=n=>{const base=[659,784,988,1175,1319];for(let i=0;i<Math.min(n,5);i++)tone(base[i],.18,'triangle',.2,i*.07);};
 /* ============ cloud sync (works on claude.ai only; local fallback) ============ */
 let db=null,cloudCan=false,lastCloud='',pushTimer=null;
@@ -709,13 +748,14 @@ function buddyPlay(kind){const b=$('#buddy');if(!b)return;clearTimeout(buddyTime
 
 /* ============ home ============ */
 function renderLogo(){const el=$('#logo');el.innerHTML='';[['w','letters/w'],['o','letters/o'],['r','letters/r'],['d','letters/d'],['1','num/n1'],['2','num/n2'],['3','num/n3']].forEach(([t,p],i)=>{const im=img(A+p+'_idle.webp');im.style.setProperty('--i',i);el.appendChild(im);});}
-const LEVEL_COLORS={spell:['#ff6b4a','#ff8a3d','#ff4f8b','#9b6bff'],math:['#3aa6ff','#2fcfc0','#38d47a','#9b6bff']};
+const LEVEL_COLORS={spell:['#ff6b4a','#ff8a3d','#ff4f8b','#9b6bff'],math:['#3aa6ff','#2fcfc0','#38d47a','#9b6bff'],hunt:['#9b6bff','#c06bff','#ff4f8b','#ff6b4a']};
 function levelSum(game){let t=0;for(let l=1;l<=4;l++)t+=store.lvl[game+l]||0;return '<span class="st">★</span> '+t+'/12';}
-function renderLevels(){$('#spellSum').innerHTML=levelSum('spell');$('#mathSum').innerHTML=levelSum('math');}
+function renderLevels(){$('#spellSum').innerHTML=levelSum('spell');$('#mathSum').innerHTML=levelSum('math');$('#huntSum').innerHTML=levelSum('hunt');}
+const HUNT_LEVEL_NAMES=['Letter · 1 of 3','Letter · 1–2 of 4','Picture · 2–3 of 6','Picture · 2–4 of 8'];
 function openSheet(game){
-  $('#sheetTitle').textContent=game==='spell'?'Spell':'Count';$('#sheetSub').textContent=game==='spell'?'Tap letters to wake the picture':'Add, take away, and times';
-  const names=game==='spell'?SPELL_LEVEL_NAMES:MATH_LEVEL_NAMES;const el=$('#sheetLevels');el.innerHTML='';
-  for(let l=1;l<=4;l++){const b=document.createElement('button');b.className='lvl';b.style.setProperty('--c',LEVEL_COLORS[game][l-1]);const best=store.lvl[game+l]||0;b.innerHTML='<b>'+l+'</b><small>'+names[l-1]+'</small><div class="st">'+starsText(best)+'</div>';b.onclick=()=>{$('#levelSheet').classList.remove('on');sfxWhoosh();game==='spell'?startSpell(l):startMath(l);};el.appendChild(b);}
+  $('#sheetTitle').textContent=game==='spell'?'Spell':game==='hunt'?'Letter Hunt':'Count';$('#sheetSub').textContent=game==='spell'?'Tap letters to wake the picture':game==='hunt'?'Find the pictures that start with the letter':'Add, take away, and times';
+  const names=game==='spell'?SPELL_LEVEL_NAMES:game==='hunt'?HUNT_LEVEL_NAMES:MATH_LEVEL_NAMES;const el=$('#sheetLevels');el.innerHTML='';
+  for(let l=1;l<=4;l++){const b=document.createElement('button');b.className='lvl';b.style.setProperty('--c',LEVEL_COLORS[game][l-1]);const best=store.lvl[game+l]||0;b.innerHTML='<b>'+l+'</b><small>'+names[l-1]+'</small><div class="st">'+starsText(best)+'</div>';b.onclick=()=>{$('#levelSheet').classList.remove('on');sfxWhoosh();game==='spell'?startSpell(l):game==='hunt'?startHunt(l):startMath(l);};el.appendChild(b);}
   sfxPop(2);$('#levelSheet').classList.add('on');
 }
 const PLANTS=['tulip','sunflower','mushroom','blossom','daisy','cactus','palm','tree','clover','rose','watermelon','hibiscus'];
@@ -752,8 +792,8 @@ const BOSS_NAMES=['Treebert','Bus-Bot','Cloud King','Octo Queen','Teddy','Grandp
 const bossArt=(sc,k)=>A+'bosses/'+sc+'_'+k+'.webp';
 function bandDone(bi){for(let k=0;k<PER_BAND;k++)if((store.map[bi*PER_BAND+k]||0)<2)return false;return true;}
 function bossDance(el,bi){if(!el)return;const im=el.querySelector('img');im.src=bossArt(BANDS[bi][0],'dance');el.classList.add('dancing');setTimeout(()=>{if(im.isConnected){im.src=bossArt(BANDS[bi][0],'idle');el.classList.remove('dancing');}},2600);}
-const STATIONS=[];BANDS.forEach((b,bi)=>{const lvl=bi<2?1:bi<4?2:bi<6?3:4;const t0=bi%2;STATIONS.push({band:bi,game:'spell',level:lvl,tier:t0},{band:bi,game:'math',level:lvl,tier:t0},{band:bi,game:'spell',level:lvl,tier:t0+1},{band:bi,game:'math',level:lvl,tier:t0+1});});
-const PER_BAND=4;
+const STATIONS=[];BANDS.forEach((b,bi)=>{const lvl=bi<2?1:bi<4?2:bi<6?3:4;const t0=bi%2;STATIONS.push({band:bi,game:'spell',level:lvl,tier:t0},{band:bi,game:'math',level:lvl,tier:t0},{band:bi,game:'hunt',level:lvl,tier:t0},{band:bi,game:'spell',level:lvl,tier:t0+1},{band:bi,game:'math',level:lvl,tier:t0+1});});
+const PER_BAND=5;
 function currentStation(){for(let i=0;i<STATIONS.length;i++)if((store.map[i]||0)<2)return i;return STATIONS.length;}
 function renderAdvCard(){const cur=currentStation();const el=$('#advBtn');const done=cur>=STATIONS.length;const st=STATIONS[Math.min(cur,STATIONS.length-1)];
   el.style.backgroundImage='url('+A+'scenes/'+BANDS[st.band][0]+'.webp)';
@@ -762,22 +802,22 @@ function renderMap(){
   const cur=currentStation();$('#mapStars').textContent=store.stars;
   const m=$('#map');m.innerHTML='';
   BANDS.forEach((b,i)=>{const d=document.createElement('div');d.className='band';d.style.backgroundImage='url('+A+'scenes/'+b[0]+'.webp)';d.innerHTML='<span class="bname">'+(i+1)+'. '+b[1]+'</span>';m.appendChild(d);});
-  const W=m.clientWidth||400,BH=window.innerWidth>=760?480:380;
-  const pts=STATIONS.map((st,i)=>{const k=i%PER_BAND;return{x:[0.34,0.72,0.28,0.72][k]*W,y:st.band*BH+[0.21,0.41,0.63,0.83][k]*BH};});
+  const W=m.clientWidth||400,BH=window.innerWidth>=760?560:440;
+  const pts=STATIONS.map((st,i)=>{const k=i%PER_BAND;return{x:[0.34,0.72,0.50,0.26,0.72][k]*W,y:st.band*BH+[0.18,0.34,0.52,0.70,0.86][k]*BH};});
   let dpath='M'+pts[0].x+' '+pts[0].y;for(let i=1;i<pts.length;i++){const a=pts[i-1],b=pts[i];const my=(a.y+b.y)/2;dpath+=' C'+a.x+' '+my+' '+b.x+' '+my+' '+b.x+' '+b.y;}
   const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('class','path');svg.setAttribute('viewBox','0 0 '+W+' '+(BH*BANDS.length));svg.setAttribute('preserveAspectRatio','none');
   svg.innerHTML='<path d="'+dpath+'" fill="none" stroke="rgba(0,0,0,.18)" stroke-width="16" stroke-linecap="round"/><path d="'+dpath+'" fill="none" stroke="#fff" stroke-width="8" stroke-dasharray="16 14" stroke-linecap="round"/>';
   m.appendChild(svg);
   STATIONS.forEach((st,i)=>{const b=document.createElement('button');const best=store.map[i]||0;const state=i<cur?'done':i===cur?'current':'locked';b.className='station '+state;
     b.style.left=pts[i].x+'px';b.style.top=pts[i].y+'px';
-    const icon=st.game==='spell'?letterArt('abcdefghijklmnopqrstuvwxyz'[(i*3)%26],'idle'):numArt(String(Math.min(10,st.level*2+st.tier)),'idle');
+    const icon=st.game==='spell'?letterArt('abcdefghijklmnopqrstuvwxyz'[(i*3)%26],'idle'):st.game==='hunt'?wordArt(['dog','fish','bee','frog','owl','cat','fox'][st.band],'idle'):numArt(String(Math.min(10,st.level*2+st.tier)),'idle');
     b.innerHTML='<span class="num">'+(i+1)+'</span>'+(st.tier>=2?'<span class="tier">⚡⚡</span>':st.tier===1?'<span class="tier">⚡</span>':'')+'<img src="'+icon+'" alt="">'+(best?'<span class="st">'+starsText(best)+'</span>':'')+(state==='current'?'<img class="me" src="'+A+'mascot/mascot_idle.webp" alt="">':'');
-    b.setAttribute('aria-label',(st.game==='spell'?'Spell':'Count')+' station '+(i+1));
-    b.onclick=()=>{if(state==='locked'){sfxWrong();b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');return;}sfxWhoosh();st.game==='spell'?startSpell(st.level,i,st.tier):startMath(st.level,i,st.tier);};
+    b.setAttribute('aria-label',st.game+' station '+(i+1));
+    b.onclick=()=>{if(state==='locked'){sfxWrong();b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');return;}sfxWhoosh();st.game==='spell'?startSpell(st.level,i,st.tier):st.game==='hunt'?startHunt(st.level,i,st.tier):startMath(st.level,i,st.tier);};
     m.appendChild(b);});
   if(!store.bossSeen)store.bossSeen={};
   BANDS.forEach((b,bi)=>{const done=bandDone(bi);const el=document.createElement('button');el.className='boss'+(done?'':' asleep');
-    el.style.left=(0.26*W)+'px';el.style.top=(bi*BH+BH*0.97)+'px';
+    el.style.left=(0.30*W)+'px';el.style.top=(bi*BH+BH*0.99)+'px';
     el.appendChild(img(bossArt(b[0],done?'idle':'sleep')));
     if(!done){const z=document.createElement('span');z.className='zz';z.textContent='💤';el.appendChild(z);}
     const nm=document.createElement('span');nm.className='bname';nm.textContent=done?BOSS_NAMES[bi]:'zzz…';el.appendChild(nm);
@@ -882,6 +922,69 @@ function wordDone(voiceOnly){
 }
 function nextWord(){S.idx++;if(S.idx>=S.queue.length)return finishRound('spell');renderWord();}
 
+/* ============ letter hunt ============ */
+let H={};
+const HUNT_CFG={1:{n:3,k:[1,1]},2:{n:4,k:[1,2]},3:{n:6,k:[2,3]},4:{n:8,k:[2,4]}};
+const ALL_WORDS=Object.values(WORDS).flat().map(w=>w[0]);
+function huntLevelWords(level){const lv=level<=2?[1,2]:level===3?[1,2,3]:[1,2,3,4];return lv.flatMap(l=>WORDS[l].map(w=>w[0]));}
+function genHunt(level,tier){
+  const cfg=HUNT_CFG[level];const n=cfg.n+(tier?tier:0);const pool=huntLevelWords(level);
+  const byLetter={};pool.forEach(w=>{(byLetter[w[0]]=byLetter[w[0]]||[]).push(w);});
+  const letters=Object.keys(byLetter).filter(l=>byLetter[l].length>=cfg.k[1]&&!(H.lastLetters||[]).includes(l));
+  const L=pick(letters.length?letters:Object.keys(byLetter));
+  const picMode=level>=3||tier>=1;
+  const k=rnd(cfg.k[0],Math.min(cfg.k[1],byLetter[L].length-(picMode?1:0)));
+  const all=shuffle(byLetter[L].slice());const promptWord=picMode?all.shift():null;
+  const good=all.slice(0,k);
+  // distractors: at higher tiers prefer words with the same second letter (sound-alike) to make it trickier
+  let others=shuffle(pool.filter(w=>w[0]!==L));
+  if(tier>=1){const tricky=others.filter(w=>good.some(g=>w[1]===g[1]));others=tricky.concat(others.filter(w=>!tricky.includes(w)));}
+  const bad=[];for(const w of others){if(bad.length>=n-k)break;if(!bad.includes(w))bad.push(w);}
+  H.lastLetters=((H.lastLetters||[]).concat([L])).slice(-5);
+  return {L,good,promptWord,cards:shuffle(good.concat(bad))};
+}
+function startHunt(level,station,tier){H={level,tier:tier||0,station:station==null?null:station,idx:0,total:0,lastLetters:[]};$('#huntStars').textContent=store.stars;show('hunt');renderHunt();}
+function renderHunt(){
+  const q=genHunt(H.level,H.tier);H.q=q;H.found=0;H.mistakes=0;H.done=false;
+  renderDots($('#huntDots'),H.idx,ROUND);$('#nextBtn3').classList.remove('show');
+  const bar=$('#huntBar');bar.innerHTML='';
+  if(q.promptWord){if(ART[q.promptWord])bar.appendChild(img(wordArt(q.promptWord,'anim')));else{const e=document.createElement('span');e.className='emoji';e.style.fontSize='64px';e.textContent=EMOJI_BY_WORD[q.promptWord].e;bar.appendChild(e);}}
+  else bar.appendChild(img(letterArt(q.L,'jump')));
+  const t=document.createElement('div');t.className='txt';
+  t.innerHTML=q.promptWord?'<h2>Which ones start like <b>'+q.promptWord+'</b>?</h2><p>Find '+q.good.length+(q.good.length>1?' pictures':' picture')+' · <span id="huntLetter" style="text-transform:var(--case,none)">?</span></p>':'<h2>Which ones start with <span style="text-transform:var(--case,none)">'+q.L+'</span>?</h2><p>Find '+q.good.length+(q.good.length>1?' pictures':' picture')+'</p>';
+  bar.appendChild(t);
+  const f=document.createElement('div');f.className='found';f.id='huntFound';f.textContent='○'.repeat(q.good.length);bar.appendChild(f);
+  const g=$('#huntGrid');g.innerHTML='';g.style.setProperty('--cols',q.cards.length<=4?2:q.cards.length<=6?3:4);
+  q.cards.forEach(w=>{const c=document.createElement('button');c.className='hcard';c.dataset.w=w;
+    if(ART[w])c.appendChild(img(wordArt(w,'idle')));else{const e=document.createElement('span');e.className='emoji';e.textContent=EMOJI_BY_WORD[w].e;c.appendChild(e);}
+    const lb=document.createElement('span');lb.className='wlabel';lb.textContent=w;c.appendChild(lb);
+    c.onclick=()=>tapHunt(c,w);g.appendChild(c);});
+  if(q.promptWord)say(['p_whichlike','w_'+q.promptWord],'Which ones start like '+q.promptWord+'?');else say(['p_which','l_'+q.L],'Which ones start with '+q.L.toUpperCase()+'?');
+}
+function tapHunt(c,w){
+  if(H.done||c.classList.contains('ok'))return;
+  document.querySelectorAll('.hcard.glow').forEach(x=>x.classList.remove('glow'));
+  if(w[0]===H.q.L){
+    c.classList.add('ok');H.found++;sfxPop(H.found);
+    $('#huntFound').textContent='●'.repeat(H.found)+'○'.repeat(H.q.good.length-H.found);
+    const r=c.getBoundingClientRect();burstAt(r.left+r.width/2,r.top+r.height/2,['✨','⭐']);
+    if(ART[w]){const live=img(wordArt(w,'anim'));c.firstChild.replaceWith(live);}
+    if(H.found===H.q.good.length)huntDone();else say(['w_'+w],w);
+  }else{
+    H.mistakes++;sfxWrong();c.classList.remove('no');void c.offsetWidth;c.classList.add('no');setTimeout(()=>c.classList.remove('no'),500);
+    say(['w_'+w,'p_tryagain'],w+'. Try again!');
+    if(H.mistakes>=2)huntHint(false);
+  }
+}
+function huntHint(counts){if(H.done)return;if(counts)H.mistakes++;const hl=$('#huntLetter');if(hl&&hl.textContent==='?'){hl.textContent=H.q.L;hl.style.color='var(--coral)';hl.style.fontSize='22px';say(['f_'+H.q.L,'l_'+H.q.L],H.q.L.toUpperCase());return;}const t=[...document.querySelectorAll('.hcard:not(.ok)')].find(x=>x.dataset.w[0]===H.q.L);if(t)t.classList.add('glow');say(['f_'+H.q.L,'l_'+H.q.L],H.q.L.toUpperCase());}
+function huntDone(){
+  H.done=true;const stars=H.mistakes===0?3:H.mistakes<=2?2:1;H.total+=stars;addStars(stars);questProgress('spelled');
+  const c=streakUp('hunt');sfxWin();confetti();
+  say(['x_'+H.q.good.length].concat(H.q.good.map(w=>'w_'+w)).concat(c?[c]:[]),H.q.good.join(', ')+'!');
+  setTimeout(()=>$('#nextBtn3').classList.add('show'),800);
+}
+function nextHunt(){H.idx++;if(H.idx>=ROUND)return finishRound('hunt');renderHunt();}
+
 /* ============ math ============ */
 let M={};
 /* skill 0..1 from the last 12 results at this level (3 stars=1, 2=.5, 1=0) */
@@ -980,9 +1083,9 @@ function nextProblem(){M.idx++;if(M.idx>=ROUND)return finishRound('math');render
 let lastGame='spell';
 function finishRound(game){
   lastGame=game;stopParticles();
-  const total=game==='spell'?S.total:M.total,level=game==='spell'?S.level:M.level;
+  const G=game==='spell'?S:game==='hunt'?H:M;const total=G.total,level=G.level;
   const rs=roundStars(total,ROUND);
-  const station=game==='spell'?S.station:M.station;let extra='';
+  const station=G.station;let extra='';
   if(station!=null){const was=currentStation();store.map[station]=Math.max(store.map[station]||0,rs);const now=currentStation();if(now>was)extra=now>=STATIONS.length?' You finished the whole adventure! 🚀':(STATIONS[now].band!==STATIONS[station].band?' You woke up '+BOSS_NAMES[STATIONS[station].band]+'! Next: '+BANDS[STATIONS[now].band][1]+'!':' New station unlocked!');else if(rs<2)extra=' Get 2 stars to move on!';}
   store.lvl[game+level]=Math.max(store.lvl[game+level]||0,rs);save();pushCloud();
   $('#sumStars').innerHTML=starsText(rs);
@@ -1023,7 +1126,8 @@ $('#playBtn').onclick=()=>{
 };
 document.querySelectorAll('[data-home]').forEach(b=>b.onclick=()=>{sfxPop(3);renderHome();show('home');});
 $('#albumBtn').onclick=()=>{sfxWhoosh();renderAlbum();show('album');};
-$('#spellOpen').onclick=()=>openSheet('spell');$('#mathOpen').onclick=()=>openSheet('math');$('#sheetClose').onclick=()=>$('#levelSheet').classList.remove('on');
+$('#spellOpen').onclick=()=>openSheet('spell');$('#mathOpen').onclick=()=>openSheet('math');$('#huntOpen').onclick=()=>openSheet('hunt');
+$('#sayBtn3').onclick=()=>{const q=H.q;if(q.promptWord)say(['p_whichlike','w_'+q.promptWord],'Which ones start like '+q.promptWord+'?');else say(['p_which','l_'+q.L],'Which ones start with '+q.L.toUpperCase()+'?');};$('#hintBtn3').onclick=()=>huntHint(true);$('#nextBtn3').onclick=()=>{sfxWhoosh();nextHunt();};$('#sheetClose').onclick=()=>$('#levelSheet').classList.remove('on');
 $('#profileBtn').onclick=()=>{sfxPop(2);renderProfiles();$('#profiles').classList.add('on');};
 $('#profilesClose').onclick=()=>$('#profiles').classList.remove('on');
 $('#addProfile').onclick=()=>openNewProfile(false);
@@ -1051,7 +1155,7 @@ $('#hintBtn').onclick=()=>showHint(true);
 $('#nextBtn').onclick=()=>{sfxWhoosh();nextWord();};
 $('#sayBtn2').onclick=sayProblem;
 $('#nextBtn2').onclick=()=>{sfxWhoosh();nextProblem();};
-$('#againBtn').onclick=()=>{$('#summary').classList.remove('on');const st=lastGame==='spell'?S.station:M.station;if(st!=null){renderMap();show('mapScreen');}else lastGame==='spell'?startSpell(S.level):startMath(M.level);};
+$('#againBtn').onclick=()=>{$('#summary').classList.remove('on');const G=lastGame==='spell'?S:lastGame==='hunt'?H:M;if(G.station!=null){renderMap();show('mapScreen');}else lastGame==='spell'?startSpell(S.level):lastGame==='hunt'?startHunt(H.level):startMath(M.level);};
 $('#homeBtn').onclick=()=>{$('#summary').classList.remove('on');renderHome();show('home');};
 $('#advBtn').onclick=()=>{sfxWhoosh();show('mapScreen');renderMap();};
 if('serviceWorker' in navigator){
