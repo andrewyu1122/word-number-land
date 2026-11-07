@@ -319,7 +319,7 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 .mathstage .lbl.q{background:var(--coral)}
 .mathstage .pal.big .lbl{background:var(--mint)}
 .mathstage .pal img{height:var(--ph,150px)}
-.mathstage .op{position:relative;z-index:1;font-size:48px;padding-bottom:36px;color:#fff;text-shadow:0 3px 0 rgba(0,0,0,.25)}
+.mathstage .op{position:relative;z-index:1;font-size:var(--of,48px);padding-bottom:36px;color:#fff;text-shadow:0 3px 0 rgba(0,0,0,.25)}
 .mathstage .buddy{height:60px;left:8px;bottom:6px}
 .group{display:grid;gap:4px;justify-items:center;position:relative;z-index:1}
 .group.g5{grid-template-columns:repeat(5,1fr)}
@@ -392,7 +392,7 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
   .mathstage{height:500px;padding-bottom:50px;gap:12px}
   .mathstage .pal img{height:calc(var(--ph,150px)*1.6)}
   .mathstage .lbl{margin-bottom:calc(var(--ph,150px)*1.6*var(--hr,.25)*-1 + 4px)}
-  .mathstage .op{font-size:76px;padding-bottom:56px}
+  .mathstage .op{font-size:calc(var(--of,48px)*1.5);padding-bottom:56px}
   .mathstage .lbl{font-size:calc(var(--lf,38px)*1.5);padding:8px 22px}
   .mathstage .buddy{height:110px}
   .choice{width:130px;height:110px;font-size:52px}
@@ -992,8 +992,23 @@ let M={};
 /* skill 0..1 from the last 12 results at this level (3 stars=1, 2=.5, 1=0) */
 function mathSkill(level){const h=(store.mr['L'+level]||[]);if(h.length<3)return .65;const r=h.slice(-8);return r.reduce((a,b)=>a+b,0)/r.length;}
 function mrRecord(level,stars){const k='L'+level;const h=store.mr[k]||[];h.push(stars===3?1:stars===2?.5:0);store.mr[k]=h.slice(-30);}
+function genChain(level,tier){
+  const max=level===1?10:level===2?20:100;const n=(level>=2&&(tier>=2||Math.random()<.4))?4:3;
+  for(let tries=0;tries<50;tries++){
+    const terms=[rnd(1,Math.min(9,max-1))],ops=[];let cur=terms[0],ok=true;
+    for(let i=1;i<n;i++){const op=Math.random()<.55?'+':'-';let b;
+      if(op==='+'){if(cur>=max){ok=false;break;}b=rnd(1,Math.min(level===3?30:9,max-cur));cur+=b;}
+      else{if(cur<2){ok=false;break;}b=rnd(1,Math.min(level===3?30:9,cur));cur-=b;}
+      terms.push(b);ops.push(op);}
+    if(!ok||terms.some(t=>t===1&&Math.random()<.7))continue;
+    return{a:terms[0],b:terms[1],op:ops[0],terms,ops,ans:cur,visual:'none',input:(cur>20||level===3)?'keypad':'choices',chain:true};
+  }
+  return null;
+}
 function genProblem(level,tier){
   tier=tier||0;let sk=Math.max(mathSkill(level),tier*0.45);
+  // multi-step chains (1+2-4+8) once the kid is strong or on advanced stations
+  if(level<4&&(tier>=1||sk>=.8)&&Math.random()<(tier>=2?.4:.3)){const c=genChain(level,tier);if(c)return c;}
   // stretch: strong skill or a high-tier station mixes in problems from the next level
   if(level<4&&(tier>=2||sk>=.9)&&Math.random()<(tier>=2?.45:.3))return genProblem(level+1,0);
   let a,b,op;const hard=Math.random()<sk;
@@ -1026,18 +1041,19 @@ function pal(n,i,jump){const d=document.createElement('div');d.className='pal';d
   }
   return d;}
 const NUM_MISSING={},NUM_NOJUMP={};
-function renderProblem(){
-  const p=genProblem(M.level,M.tier);M.p=p;M.mistakes=0;M.done=false;M.typed='';
+function renderProblem(forced){
+  const p=forced||genProblem(M.level,M.tier);M.p=p;M.mistakes=0;M.done=false;M.typed='';
   renderDots($('#mathDots'),M.idx,ROUND);$('#nextBtn2').classList.remove('show');
   const v=$('#visual');v.className='stage mathstage';v.innerHTML='';
   v.appendChild(img(A+'scenes/'+pick(['meadow','sky','room','road','space'])+'.webp','bg'));buddy(v);
-  const digits=String(p.a).length+String(p.b).length+String(p.ans).length;
-  v.style.setProperty('--ph',({3:140,4:120,5:100,6:88})[digits]+'px');v.style.setProperty('--lf',({3:38,4:34,5:28,6:24})[digits]+'px');
+  const terms=p.terms||[p.a,p.b],ops=p.ops||[p.op];
+  const digits=terms.reduce((t,x)=>t+String(x).length,0)+String(p.ans).length;const slots=digits+ops.length*0.6+0.6;
+  const PH={3:140,4:124,5:108,6:100,7:90,8:80,9:72,10:64,11:58};const key=Math.min(11,Math.max(3,Math.round(slots)));
+  v.style.setProperty('--ph',PH[key]+'px');v.style.setProperty('--lf',Math.max(18,Math.round(PH[key]*0.27))+'px');v.style.setProperty('--of',Math.max(30,Math.round(PH[key]*0.36))+'px');
   const addPal=(n,i,extra)=>{const e=pal(n,i);if(extra)e.classList.add(extra);v.appendChild(e);return e;};
-  addPal(p.a,0);let o=document.createElement('span');o.className='op';o.textContent=p.op;v.appendChild(o);
-  addPal(p.b,1);o=document.createElement('span');o.className='op';o.textContent='=';v.appendChild(o);
-  const q=addPal('?',2);q.id='palQ';
-  [p.a,p.b,p.ans].forEach(n=>String(n).split('').forEach(d=>{if(HAS_JUMP(d))preload(numArt(d,'jump'));}));
+  terms.forEach((t,i)=>{addPal(t,i);const o=document.createElement('span');o.className='op';o.textContent=i<ops.length?ops[i]:'=';v.appendChild(o);});
+  const q=addPal('?',terms.length);q.id='palQ';
+  terms.concat([p.ans]).forEach(n=>String(n).split('').forEach(d=>{if(HAS_JUMP(d))preload(numArt(d,'jump'));}));
   const ch=$('#choices');ch.innerHTML='';ch.className='choices';
   if(p.input==='choices'){
     const cands=[p.ans+1,p.ans-1,p.ans+2,p.ans-2,p.a,p.b,p.ans+10,p.a+p.b,Math.abs(p.a-p.b)].filter(x=>x>=0&&x!==p.ans);
@@ -1054,19 +1070,21 @@ function renderProblem(){
   sayProblem();
 }
 function typeKey(d){if(M.done||M.typed.length>=3)return;M.typed+=d;$('#typed').textContent=M.typed;sfxPop(+d);}
-function sayProblem(){const p=M.p;const pieces=['n_'+p.a,OPKEY[p.op],'n_'+p.b];const whole=(p.op!=='×'&&p.a<=20&&p.b<=20&&p.ans<=20);say(whole?['q_'+mkey(p)]:pieces,p.a+' '+opWord(p.op)+' '+p.b+'?',whole?pieces:null);const q=$('#palQ');if(q&&!M.done){const im=q.querySelector('img');if(im&&/nq_idle/.test(im.src)){im.src=numArt('q','jump');setTimeout(()=>{if(im.isConnected&&!M.done)im.src=numArt('q','idle');},1100);}}}
+function exprPieces(p){const t=p.terms||[p.a,p.b],o=p.ops||[p.op];const out=['n_'+t[0]];for(let i=1;i<t.length;i++)out.push(OPKEY[o[i-1]],'n_'+t[i]);return out;}
+function exprText(p){const t=p.terms||[p.a,p.b],o=p.ops||[p.op];let txt=String(t[0]);for(let i=1;i<t.length;i++)txt+=' '+opWord(o[i-1])+' '+t[i];return txt;}
+function sayProblem(){const p=M.p;const pieces=exprPieces(p);const whole=(!p.chain&&p.op!=='×'&&p.a<=20&&p.b<=20&&p.ans<=20);say(whole?['q_'+mkey(p)]:pieces,exprText(p)+'?',whole?pieces:null);const q=$('#palQ');if(q&&!M.done){const im=q.querySelector('img');if(im&&/nq_idle/.test(im.src)){im.src=numArt('q','jump');setTimeout(()=>{if(im.isConnected&&!M.done)im.src=numArt('q','idle');},1100);}}}
 function answer(n,el){
   if(M.done)return;const p=M.p;
   if(n===p.ans){
     M.done=true;const stars=M.mistakes===0?3:M.mistakes<=2?2:1;M.total+=stars;mrRecord(M.level,stars);addStars(stars);questProgress('solved');
     el.classList.remove('no');el.classList.add('ok');
-    const old=$('#palQ');const q=pal(p.ans,2,true);q.id='palQ';q.classList.add('big');old.replaceWith(q);
-    [...document.querySelectorAll('#visual .pal')].slice(0,2).forEach(x=>x.classList.add('dance'));
+    const old=$('#palQ');const q=pal(p.ans,(p.terms||[0,0]).length,true);q.id='palQ';q.classList.add('big');old.replaceWith(q);
+    [...document.querySelectorAll('#visual .pal')].slice(0,-1).forEach(x=>x.classList.add('dance'));
     document.querySelectorAll('#visual .pal img').forEach(x=>{const m=x.src.match(/n(\d+)_idle/);if(m&&HAS_JUMP(m[1]))x.src=numArt(m[1],'jump');});
     startParticles($('#visual'),q,'spin');
     const r=el.getBoundingClientRect();burstAt(r.left+r.width/2,r.top+r.height/2,['⭐','✨','🌟']);
     buddyPlay('happy');sfxWin();confetti();
-    {const pieces=['x_'+p.ans,'n_'+p.a,OPKEY[p.op],'n_'+p.b,'p_is','n_'+p.ans];const whole=(p.op!=='×'&&p.a<=20&&p.b<=20&&p.ans<=20);const comboKey=streakUp('math');if(comboKey){pieces.push(comboKey);}say(whole?['a_'+mkey(p)].concat(comboKey?[comboKey]:[]):pieces,p.ans+'! '+p.a+' '+opWord(p.op)+' '+p.b+' is '+p.ans+'!',whole?pieces:null);}
+    {const pieces=['x_'+p.ans].concat(exprPieces(p),['p_is','n_'+p.ans]);const whole=(!p.chain&&p.op!=='×'&&p.a<=20&&p.b<=20&&p.ans<=20);const comboKey=streakUp('math');if(comboKey){pieces.push(comboKey);}say(whole?['a_'+mkey(p)].concat(comboKey?[comboKey]:[]):pieces,p.ans+'! '+exprText(p)+' is '+p.ans+'!',whole?pieces:null);}
     setTimeout(()=>$('#nextBtn2').classList.add('show'),800);
   }else{
     M.mistakes++;sfxWrong();buddyPlay('cheer');
@@ -1075,7 +1093,7 @@ function answer(n,el){
     say(['p_tryagain'],'Try again!');
     if(M.mistakes>=2){
       if(p.input==='choices'){[...document.querySelectorAll('.choice')].find(c=>c.textContent==String(p.ans))?.classList.add('glow');}
-      else{const q=pal(p.ans,2);q.id='palQ';q.style.opacity='.55';$('#palQ').replaceWith(q);}
+      else{const q=pal(p.ans,(p.terms||[0,0]).length);q.id='palQ';q.style.opacity='.55';$('#palQ').replaceWith(q);}
     }
   }
 }
