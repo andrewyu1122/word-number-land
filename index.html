@@ -395,8 +395,9 @@ body.xmas .tile::after{top:-8px}
 .mathstage .lbl.q{background:var(--coral)}
 .mathstage .pal.big .lbl{background:var(--mint)}
 .mathstage .pal img{height:var(--ph,150px)}
-.mathstage .op .opimg{height:calc(var(--of,48px)*1.3);filter:drop-shadow(0 4px 0 rgba(0,0,0,.2));display:block}
-.mathstage .op{position:relative;z-index:1;font-size:var(--of,48px);padding-bottom:36px;color:#fff;text-shadow:0 3px 0 rgba(0,0,0,.25)}
+.mathstage .op .opimg{height:calc(var(--of,48px)*1.25);display:block}
+.mathstage .op{position:relative;z-index:3;font-size:var(--of,48px);display:grid;place-items:center;min-width:calc(var(--of,48px)*1.3);height:calc(var(--of,48px)*1.3);border-radius:50%;background:rgba(255,255,255,.92);box-shadow:0 4px 0 rgba(0,0,0,.18),0 0 0 3px rgba(255,255,255,.5);color:var(--ink);text-shadow:none;margin-bottom:calc(var(--ph,150px)*.42);flex:none}
+.mathstage .op.plain{font-size:calc(var(--of,48px)*.95);font-weight:700;line-height:1;color:#2b2a55}
 .mathstage .buddy{height:60px;left:8px;bottom:6px}
 .group{display:grid;gap:4px;justify-items:center;position:relative;z-index:1}
 .group.g5{grid-template-columns:repeat(5,1fr)}
@@ -404,7 +405,7 @@ body.xmas .tile::after{top:-8px}
 .group.small img{height:30px}
 .group .taken{opacity:.3}
 .dot{width:24px;height:24px;border-radius:50%;background:var(--c);box-shadow:inset -4px -4px 0 rgba(0,0,0,.15);animation:popin .4s cubic-bezier(.3,1.7,.5,1) both;animation-delay:calc(var(--i)*.05s)}
-.mathstage .op{position:relative;z-index:1;padding:0}
+.mathstage .op{padding:0}
 .bigeq{font-size:60px;font-weight:700;color:#fff;text-shadow:0 3px 0 rgba(0,0,0,.25);position:relative;z-index:1}
 .choices{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
 .choice{width:94px;height:80px;border-radius:50% 50% 45% 45%;background:var(--card);font-size:38px;font-weight:700;box-shadow:var(--shadow),inset 0 -6px 0 rgba(0,0,0,.06);transition:transform .08s;animation:bob 2.4s ease-in-out infinite;animation-delay:calc(var(--i)*.2s)}
@@ -478,7 +479,8 @@ body.xmas .tile::after{top:-8px}
   .mathstage{height:500px;padding-bottom:50px;gap:12px}
   .mathstage .pal img{height:calc(var(--ph,150px)*1.6)}
   .mathstage .lbl{margin-bottom:calc(var(--ph,150px)*1.6*var(--hr,.25)*-1 + 4px)}
-  .mathstage .op{font-size:calc(var(--of,48px)*1.5);padding-bottom:56px}
+  .mathstage .op{font-size:calc(var(--of,48px)*1.5);min-width:calc(var(--of,48px)*2.3);height:calc(var(--of,48px)*2.3);margin-bottom:calc(var(--ph,150px)*1.6*.42)}
+  .mathstage .op .opimg{height:calc(var(--of,48px)*1.9)}
   .mathstage .lbl{font-size:calc(var(--lf,38px)*1.5);padding:8px 22px}
   .mathstage .buddy{height:110px}
   .choice{width:130px;height:110px;font-size:52px}
@@ -1290,7 +1292,7 @@ function renderProblem(forced){
   v.style.setProperty('--ph',PH[key]+'px');v.style.setProperty('--lf',Math.max(18,Math.round(PH[key]*0.27))+'px');v.style.setProperty('--of',Math.max(30,Math.round(PH[key]*0.36))+'px');
   const addPal=(n,i,extra)=>{const e=pal(n,i);if(extra)e.classList.add(extra);v.appendChild(e);return e;};
   const OPART={'+':'plus','-':'minus','×':'times','=':'equals'};
-  terms.forEach((t,i)=>{addPal(t,i);const sym=i<ops.length?ops[i]:'=';const o=document.createElement('span');o.className='op';const oi=img(A+'num/op_'+OPART[sym]+'_idle.webp');oi.className='opimg';oi.dataset.sym=OPART[sym];oi.onerror=()=>{o.textContent=sym;};o.appendChild(oi);v.appendChild(o);});
+  terms.forEach((t,i)=>{addPal(t,i);const sym=i<ops.length?ops[i]:'=';const o=document.createElement('span');o.className='op plain';o.textContent=sym==='-'?'−':sym;o.dataset.sym=OPART[sym];v.appendChild(o);});
   const q=addPal('?',terms.length);q.id='palQ';if(M.fg)v.appendChild(M.fg);
   terms.concat([p.ans]).forEach(n=>String(n).split('').forEach(d=>{if(HAS_JUMP(d))preload(numArt(d,'jump'));}));
   const ch=$('#choices');ch.innerHTML='';ch.className='choices';
@@ -1319,7 +1321,7 @@ function answer(n,el){
     el.classList.remove('no');el.classList.add('ok');
     const old=$('#palQ');const q=pal(p.ans,(p.terms||[0,0]).length,true);q.id='palQ';q.classList.add('big');old.replaceWith(q);
     [...document.querySelectorAll('#visual .pal')].slice(0,-1).forEach(x=>x.classList.add('dance'));
-    document.querySelectorAll('#visual .opimg').forEach(x=>{x.src=A+'num/op_'+x.dataset.sym+'_bounce.webp';});
+    document.querySelectorAll('#visual .op').forEach(x=>{x.style.animation='hop .7s ease-in-out infinite';});
     document.querySelectorAll('#visual .pal img').forEach(x=>{const m=x.src.match(/n(\d+)_idle/);if(m&&HAS_JUMP(m[1]))x.src=numArt(m[1],'jump');});
     startParticles($('#visual'),q,'spin');
     const r=el.getBoundingClientRect();burstAt(r.left+r.width/2,r.top+r.height/2,['⭐','✨','🌟']);
