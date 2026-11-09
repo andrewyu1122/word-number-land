@@ -941,7 +941,7 @@ function showHatch(){if(!hatchQueue.length||$('#hatch').classList.contains('on')
   sfxPop(1);setTimeout(()=>sfxPop(3),400);setTimeout(()=>sfxPop(5),800);
   setTimeout(()=>{const be=stg.querySelector('.bigegg');const hi=be.querySelector('img');if(hi){hi.src=A+'dino/'+st.egg+'_hatch.webp';be.style.animation='none';setTimeout(()=>be.classList.add('pop'),600);}else be.classList.add('pop');sfxWin();confetti();
     setTimeout(()=>{stg.innerHTML='';stg.appendChild(dinoEl(name,st.happy,'newdino'));$('#hatchTitle').textContent=info[1]+'!';$('#hatchText').textContent=(st.id==='dino'?'A new dinosaur joined your island!':'A new friend joined your reef!')+' ('+d.hatched.length+' of '+st.list.length+')';$('#hatchOk').style.display='';say(['p_hatched',st.voice+name],'A new friend hatched! '+info[1]+'!');
-      if(d.hatched.length===st.list.length&&SETS.indexOf(st)<SETS.length-1){$('#hatchText').textContent+=' You found them all — a new world opens: '+SETS[SETS.indexOf(st)+1].title+'!';}},450);},1300);}
+      if(d.hatched.length===st.list.length&&SETS.indexOf(st)<SETS.length-1){$('#hatchText').textContent+=' You found them all — a new world opens: '+SETS[SETS.indexOf(st)+1].title+'!';setTimeout(()=>say(['p_newworld'],'You found them all! A new world is open!'),2500);}},450);},1300);}
 function renderIsland(){const el=$('#island');if(!el)return;const st=curSet();const d=setState(st);el.innerHTML='';
   const stageN=st.scenes[d.hatched.length>=12?2:d.hatched.length>=6?1:0];const bg=img(A+'scenes/'+stageN+'.webp','bg');bg.onerror=()=>{bg.src=A+'scenes/island.webp';};el.appendChild(bg);
   const h=document.createElement('span');h.className='hint';h.textContent=st.emoji+' '+st.title+' · '+d.hatched.length+'/'+st.list.length;el.appendChild(h);
