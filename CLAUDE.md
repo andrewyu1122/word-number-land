@@ -41,6 +41,9 @@ Everything is one static page: `index.html` + `sw.js` + `manifest.webmanifest` +
 - Operators (`assets/num/op_plus|op_minus|op_times|op_equals`): `_idle.webp` + `_bounce.webp` (12 frames). Treasure chest
   (`assets/objects/chest_closed.webp`, `chest_open.webp`, `chest_open_anim.webp`): when a still and a sequence share a state
   name the converter writes the sequence as `{state}_anim`.
+- Sea collection (also in `assets/dino/`): 16 sea creatures `{name}_idle/_swim_###/_happy_###` (clownfish seahorse jellyfish starfish turtle octopus crab dolphin whale shark pufferfish lobster seal penguin narwhal manta), egg `seaegg_s0..s3` + `seaegg_hatch_###`, scene `reef`.
+  Toddler mode (`assets/objects/`): shapes circle square triangle star heart and colours red blue yellow green orange purple pink black white, `_idle` + `_jump` (12f).
+  Island levels `island_2/3`, Christmas `{scene}_xmas`, `mascot_xmas_idle/_wave`, `objects/hat_santa.png`.
 - Scenes: 1200×750 opaque, bottom quarter is ground, nothing busy in the centre: meadow sea sky road space room night.
 
 ## Converting & publishing new art
