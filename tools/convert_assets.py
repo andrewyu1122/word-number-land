@@ -81,8 +81,12 @@ def main():
     if kind == 'scenes':
         os.makedirs(f'{OUT}/scenes', exist_ok=True)
         for f in sorted(glob.glob(f'{src}/*.png')):
-            Image.open(f).convert('RGB').save(f'{OUT}/scenes/'+os.path.basename(f)[:-4]+'.webp', quality=78, method=4)
-            print('scene', os.path.basename(f))
+            name = os.path.basename(f)[:-4]
+            if name.endswith('_fg'):   # foreground layer: keep transparency
+                Image.open(f).convert('RGBA').save(f'{OUT}/scenes/{name}.webp', quality=82, method=4)
+            else:
+                Image.open(f).convert('RGB').save(f'{OUT}/scenes/{name}.webp', quality=78, method=4)
+            print('scene', name)
         return
     h, outdir = HEIGHT[kind], f'{OUT}/{DEST[kind]}'
     jobs, art = [], {}
