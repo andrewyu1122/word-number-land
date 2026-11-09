@@ -64,7 +64,12 @@ def collect(folder, name):
         if not f.endswith('.png') or not f.startswith(name+'_'): continue
         rest = f[len(name)+1:-4]
         m = re.match(r'(.+)_(\d{3})$', rest)
-        if m: files.setdefault(m.group(1), []).append(os.path.join(folder,f))
+        if m:
+            st = m.group(1)
+            if isinstance(files.get(st), str) and st+'_anim' not in files: files[st+'_anim'] = []   # still + sequence share a name: sequence -> {state}_anim
+            key = st+'_anim' if st+'_anim' in files else st
+            files.setdefault(key, []).append(os.path.join(folder,f))
+        elif isinstance(files.get(rest), list): files[rest+'_anim'] = files.pop(rest); files[rest] = os.path.join(folder,f)
         else: files[rest] = os.path.join(folder,f)
     # the game expects the word animation to be called "anim" and animals' motion "move"
     return files
@@ -85,7 +90,7 @@ def main():
     names = set()
     for f in glob.glob(f'{src}/**/*.png', recursive=True):
         b = os.path.basename(f)
-        m = re.match(r'([A-Za-z0-9]+)_[a-z0-9]+(?:_\d{3})?\.png$', b)
+        m = re.match(r'(op_[a-z]+|[A-Za-z0-9]+)_[a-z0-9]+(?:_\d{3})?\.png$', b)
         if m and 'sheet' not in b and 'preview' not in f: names.add((os.path.dirname(f), m.group(1)))
     for folder, name in sorted(names):
         files = collect(folder, name)
