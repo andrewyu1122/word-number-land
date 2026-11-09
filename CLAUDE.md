@@ -44,6 +44,10 @@ Everything is one static page: `index.html` + `sw.js` + `manifest.webmanifest` +
 - Sea collection (also in `assets/dino/`): 16 sea creatures `{name}_idle/_swim_###/_happy_###` (clownfish seahorse jellyfish starfish turtle octopus crab dolphin whale shark pufferfish lobster seal penguin narwhal manta), egg `seaegg_s0..s3` + `seaegg_hatch_###`, scene `reef`.
   Toddler mode (`assets/objects/`): shapes circle square triangle star heart and colours red blue yellow green orange purple pink black white, `_idle` + `_jump` (12f).
   Island levels `island_2/3`, Christmas `{scene}_xmas`, `mascot_xmas_idle/_wave`, `objects/hat_santa.png`.
+- **Asset refresh (Nov 2026)**: `wb.py` action curves were enlarged (drive 12 cm bounce ±6°, wiggle ±22° + 10% pulse, fly/swim/float bigger; animals with `legs` handles trot). `mascot_idle.webp` is now a 48-frame breathing loop (blink once per loop); mascot_wave uses both arms.
+  Scene foreground layers `assets/scenes/{scene}_fg.webp` (RGBA, props in the bottom ~20%) exist for the 7 worlds + island/island_2/island_3/reef; draw them above the characters.
+  Numbers: `python tools/align_num.py <png folders> [--out assets/num]` re-crops every n0–n100/nq with one rule (5% pad under the idle feet, 35% headroom) so sizes and feet rows match; re-run it whenever a number is re-rendered.
+  `tools/review_sheets.py` builds contact sheets + metrics into `tools/review/`.
 - Scenes: 1200×750 opaque, bottom quarter is ground, nothing busy in the centre: meadow sea sky road space room night.
 
 ## Converting & publishing new art
