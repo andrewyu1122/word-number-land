@@ -113,6 +113,13 @@ img{-webkit-user-drag:none;pointer-events:none}
 .sheet .lvl{padding:14px 6px 12px}
 .sheet .lvl b{font-size:30px}
 .sheet .lvl small{font-size:13px}
+.famrow{background:var(--slot);border-radius:18px;padding:12px;margin:6px 0 2px;text-align:left}
+.famrow h3{margin:0 0 6px;font-size:17px}
+.famrow .code{font-size:30px;letter-spacing:4px;font-weight:700;text-align:center;background:#fff7d6;border-radius:12px;padding:6px;margin:6px 0;color:var(--ink)}
+.famrow .row{margin-top:8px}
+.famrow .row button{font-size:16px;padding:9px 16px}
+.famrow input{font:inherit;font-size:22px;letter-spacing:3px;text-transform:uppercase;width:100%;padding:8px;border-radius:12px;border:3px solid var(--slotline);background:#fff;color:var(--ink);text-align:center;box-sizing:border-box;margin:6px 0}
+.famrow p{margin:4px 0 0;font-size:13px;color:var(--ink2)}
 .setrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;font-size:18px;font-weight:600;text-align:left}
 .hint-text.dark{color:var(--ink2);text-shadow:none;margin:8px 0 14px}
 @media (min-width:760px){.hmascot{height:90px}.htitle .logo img{height:44px}.htitle h1{font-size:22px}.advhero{height:210px}.advhero h2{font-size:38px}.advhero p{font-size:18px}.advhero .hero-m{height:170px}.mini{min-height:110px;padding:16px}.mini img{height:70px}.mini h2{font-size:26px}.mini p{font-size:16px}}
@@ -530,6 +537,7 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
     <div class="setrow"><span>✏️ Edit <b id="editWho"></b>’s name & avatar</span><button class="icon" id="editBtn" aria-label="Edit player">✏️</button></div>
     <div class="setrow"><span>🗑️ Reset <b id="resetWho"></b>’s progress</span><button class="icon" id="resetBtn" aria-label="Reset progress">↺</button></div>
     <div class="setrow" id="delRow"><span>👋 Remove <b id="delWho"></b> from this device</span><button class="icon" id="delBtn" aria-label="Remove player">✖</button></div>
+    <div class="famrow" id="famRow"></div>
     <p class="hint-text dark" id="syncBadge">📱 Progress saved on this device</p>
     <div class="setrow"><span>🔄 Version <span id="verNum"></span></span><button class="pressable chk" id="checkUpd">Check for updates</button></div>
     <div class="row"><button id="settingsClose">Done</button></div>
@@ -675,7 +683,7 @@ const KEY='wnl_v3';
 const AVATARS=['train','horse','dog','cat','fox','frog','bee','owl','lion','pig','duck','bear','cow','fish','rocket','dinosaur'];
 function avatarEl(a,cls){if(ART[a]){const i=img(wordArt(a,'idle'));if(cls)i.className=cls;return i;}const e=document.createElement('span');e.className='avemoji'+(cls?' '+cls:'');e.textContent=(EMOJI_BY_WORD[a]||{}).e||'⭐';return e;}
 const freshProfile=(name,avatar)=>({id:'p'+Date.now().toString(36),name,avatar,stars:0,words:{},lvl:{},album:{},daily:null,treasures:[],map:{},sr:{},mr:{}});
-let root={settings:{sound:true,music:true,upper:false},profiles:[],current:null};
+let root={settings:{sound:true,music:true,upper:false,family:null},profiles:[],current:null};
 try{const r=JSON.parse(localStorage.getItem(KEY)||'null');if(r&&r.profiles&&r.profiles.length)root=r;}catch(e){}
 if(!root.profiles.length){
   const pr=freshProfile('Jaron','train');
@@ -691,7 +699,7 @@ let store=root.profiles.find(x=>x.id===root.current)||root.profiles[0];root.curr
 ['sr','mr','map','treasures'].forEach(k=>{if(store[k]==null)store[k]=k==='treasures'?[]:{};});
 Object.defineProperty(store,'sound',{get(){return root.settings.sound;},set(v){root.settings.sound=v;},enumerable:false,configurable:true});
 Object.defineProperty(store,'music',{get(){return root.settings.music;},set(v){root.settings.music=v;},enumerable:false,configurable:true});
-function save(){try{localStorage.setItem(KEY,JSON.stringify(root));}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(root));}catch(e){}if(typeof pushCloud==='function')pushCloud();}
 function switchProfile(id){const pr=root.profiles.find(x=>x.id===id);if(!pr)return;root.current=id;save();location.reload();}
 
 /* ============ helpers ============ */
@@ -766,15 +774,58 @@ function roundStars(total,count){const r=total/(3*count);return r>=.9?3:r>=.6?2:
 const STREAK={spell:0,math:0,hunt:0};
 function streakUp(game){const m=game==='spell'?S.mistakes:game==='hunt'?H.mistakes:M.mistakes;if(m===0)STREAK[game]++;else STREAK[game]=0;const n=STREAK[game];if(n===3||n===5||n===8){setTimeout(()=>{sfxCombo(n);},150);return n===3?'p_combo3':n===5?'p_combo5':'p_combo8';}return null;}
 const sfxCombo=n=>{const base=[659,784,988,1175,1319];for(let i=0;i<Math.min(n,5);i++)tone(base[i],.18,'triangle',.2,i*.07);};
-/* ============ cloud sync (works on claude.ai only; local fallback) ============ */
-let db=null,cloudCan=false,lastCloud='',pushTimer=null;
-const SYNC_TEXT={local:'📱 Progress saved on this device',synced:'☁️ Progress synced for the whole family',saving:'☁️ Saving…',readonly:'☁️ Family progress loaded (this account can only view)',error:'☁️ Could not save to the cloud right now'};
-let lastSync='local';function setSync(s){lastSync=s;const b=$('#syncBadge');if(b)b.textContent=SYNC_TEXT[s]||SYNC_TEXT.local;}
-function progressDoc(){return{stars:store.stars,words:store.words,lvl:store.lvl,album:store.album,treasures:store.treasures,map:store.map,updatedAt:Date.now()};}
-function mergeCloud(d){let localMore=false;if((d.stars||0)>store.stars)store.stars=d.stars;else if(store.stars>(d.stars||0))localMore=true;['words','lvl','map'].forEach(k=>{const c=d[k]||{};for(const w in c)if((c[w]||0)>(store[k][w]||0))store[k][w]=c[w];for(const w in store[k])if((store[k][w]||0)>(c[w]||0))localMore=true;});const al=d.album||{};for(const w in al)store.album[w]=true;for(const w in store.album)if(!al[w])localMore=true;const ct=d.treasures||[];if(ct.length>store.treasures.length)store.treasures=ct;else if(store.treasures.length>ct.length)localMore=true;save();refreshStars();return localMore;}
-function pushCloud(){if(!db||!cloudCan)return;clearTimeout(pushTimer);pushTimer=setTimeout(async()=>{const doc=progressDoc();const key=JSON.stringify([doc.stars,doc.words,doc.lvl,doc.album]);if(key===lastCloud)return;setSync('saving');try{await db.doc('progress/'+store.id).set(doc);lastCloud=key;setSync('synced');}catch(e){if(e&&e.code==='invalid_argument'){cloudCan=false;setSync('readonly');}else setSync('error');}},900);}
-async function initCloud(){try{if(!window.claude||typeof claude.use!=='function'){setSync('local');return;}const [d,user]=await Promise.all([claude.use('db'),claude.use('user')]);if(!d){setSync('local');return;}db=d;let w=null;try{w=user?await user.can('data.write'):null;}catch(e){}cloudCan=(w!==false);let first=true;db.doc('progress/'+store.id).onSnapshot(snap=>{let localMore=true;if(snap.exists){const data=snap.data()||{};lastCloud=JSON.stringify([data.stars||0,data.words||{},data.lvl||{},data.album||{}]);localMore=mergeCloud(data);}if(first&&localMore)pushCloud();first=false;setSync(cloudCan?'synced':'readonly');if($('#home').classList.contains('on'))renderHome();},err=>{setSync('local');});}catch(e){setSync('local');}}
-
+/* ============ family sync (Firebase Firestore) ============ */
+const FB_CFG={apiKey:"AIzaSyAJDibN-kBWUn6zeZBwgS-6MqP9k7vbwtI",authDomain:"word-land-121a6.firebaseapp.com",projectId:"word-land-121a6",storageBucket:"word-land-121a6.firebasestorage.app",messagingSenderId:"260245120116",appId:"1:260245120116:web:3d5044857bd45365709d21"};
+let fdb=null,fUnsub=null,pushTimer=null,lastSync='local',cloudReady=false;
+const SYNC_TEXT={local:'📱 Progress saved on this device only',connecting:'☁️ Connecting…',synced:'☁️ Family sync on — all devices share this progress',offline:'☁️ Family sync on (offline — will sync when online)',error:'☁️ Sync problem — check your internet'};
+function setSync(st){lastSync=st;const b=$('#syncBadge');if(b)b.textContent=SYNC_TEXT[st]||SYNC_TEXT.local;}
+function loadScript(src){return new Promise((res,rej)=>{const sc=document.createElement('script');sc.src=src;sc.onload=res;sc.onerror=rej;document.head.appendChild(sc);});}
+async function fbInit(){if(fdb)return fdb;setSync('connecting');const v='10.12.0';for(const n of ['app','auth','firestore'])await loadScript('https://www.gstatic.com/firebasejs/'+v+'/firebase-'+n+'-compat.js');
+  const app=firebase.apps.length?firebase.app():firebase.initializeApp(FB_CFG);await firebase.auth().signInAnonymously();fdb=firebase.firestore();try{fdb.enablePersistence({synchronizeTabs:true});}catch(e){}return fdb;}
+const PROG_KEYS=['name','avatar','stars','words','lvl','album','daily','treasures','map','sr','mr','dino','bossSeen','recent','resetAt'];
+function profDoc(pr){const o={};PROG_KEYS.forEach(k=>{if(pr[k]!==undefined&&pr[k]!==null)o[k]=pr[k];});o.updatedAt=Date.now();return o;}
+const maxMap=(a,b)=>{const o=Object.assign({},a||{});for(const k in (b||{}))if((b[k]||0)>(o[k]||0))o[k]=b[k];return o;};
+function mergeProfile(loc,cl){ // returns merged profile; both are plain objects
+  if((cl.resetAt||0)>(loc.resetAt||0)){const m=Object.assign({},loc);PROG_KEYS.forEach(k=>{if(cl[k]!==undefined)m[k]=cl[k];});m.updatedAt=cl.updatedAt;return m;}
+  if((loc.resetAt||0)>(cl.resetAt||0))return Object.assign({},loc);
+  const m=Object.assign({},loc);
+  m.stars=Math.max(loc.stars||0,cl.stars||0);
+  m.words=maxMap(loc.words,cl.words);m.lvl=maxMap(loc.lvl,cl.lvl);m.map=maxMap(loc.map,cl.map);
+  m.album=Object.assign({},cl.album||{},loc.album||{});m.bossSeen=Object.assign({},cl.bossSeen||{},loc.bossSeen||{});
+  m.treasures=((cl.treasures||[]).length>(loc.treasures||[]).length)?cl.treasures:(loc.treasures||[]);
+  const sr=Object.assign({},cl.sr||{});for(const w in (loc.sr||{})){if(!sr[w]||(loc.sr[w].seen||0)>=(sr[w].seen||0))sr[w]=loc.sr[w];}m.sr=sr;
+  const mr={};new Set([...Object.keys(loc.mr||{}),...Object.keys(cl.mr||{})]).forEach(k=>{const a=(loc.mr||{})[k]||[],b=(cl.mr||{})[k]||[];mr[k]=a.length>=b.length?a:b;});m.mr=mr;
+  if(cl.dino||loc.dino){const ld=loc.dino||{hatched:[],prog:0},cd=cl.dino||{hatched:[],prog:0};m.dino={hatched:[...new Set([...(cd.hatched||[]),...(ld.hatched||[])])],prog:Math.max(ld.prog||0,cd.prog||0),order:cd.order||ld.order};}
+  if(cl.daily&&(!loc.daily||cl.daily.date>loc.daily.date))m.daily=cl.daily;else if(loc.daily&&cl.daily&&loc.daily.date===cl.daily.date)m.daily={date:loc.daily.date,spelled:Math.max(loc.daily.spelled,cl.daily.spelled),solved:Math.max(loc.daily.solved,cl.daily.solved),done:loc.daily.done||cl.daily.done};
+  if((cl.updatedAt||0)>(loc.updatedAt||0)){m.name=cl.name||loc.name;m.avatar=cl.avatar||loc.avatar;m.recent=cl.recent||loc.recent;}
+  return m;
+}
+const sig=pr=>JSON.stringify(profDoc(pr),(k,v)=>k==='updatedAt'?undefined:v);
+async function startFamilySync(){const code=root.settings.family;if(!code)return;try{await fbInit();}catch(e){setSync('error');return;}
+  if(fUnsub)fUnsub();
+  const col=fdb.collection('families').doc(code).collection('profiles');
+  fUnsub=col.onSnapshot(snap=>{
+    const cloud={};snap.forEach(d=>cloud[d.id]=d.data());let changed=false,need=[];
+    Object.keys(cloud).forEach(id=>{let pr=root.profiles.find(x=>x.id===id);
+      if(!pr){pr=Object.assign(freshProfile(cloud[id].name||'Player',cloud[id].avatar||'dog'),cloud[id],{id});root.profiles.push(pr);changed=true;return;}
+      const before=sig(pr);const m=mergeProfile(pr,cloud[id]);Object.assign(pr,m);if(sig(pr)!==before)changed=true;if(sig(pr)!==sig(cloud[id]))need.push(id);});
+    root.profiles.forEach(pr=>{if(!cloud[pr.id])need.push(pr.id);});
+    save();if(changed){refreshStars();if($('#home').classList.contains('on'))renderHome();}
+    need.forEach(id=>{const pr=root.profiles.find(x=>x.id===id);if(pr)col.doc(id).set(profDoc(pr),{merge:true}).catch(()=>setSync('error'));});
+    cloudReady=true;setSync(navigator.onLine?'synced':'offline');
+  },err=>{setSync('error');});
+  window.addEventListener('online',()=>{if(cloudReady)setSync('synced');});window.addEventListener('offline',()=>{if(cloudReady)setSync('offline');});
+}
+function pushCloud(){if(!fdb||!root.settings.family||!cloudReady)return;clearTimeout(pushTimer);pushTimer=setTimeout(()=>{fdb.collection('families').doc(root.settings.family).collection('profiles').doc(store.id).set(profDoc(store),{merge:true}).catch(()=>setSync('error'));},800);}
+function initCloud(){if(root.settings.family)startFamilySync();else setSync('local');}
+function genCode(){const A='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let c='';for(let i=0;i<6;i++)c+=A[Math.floor(Math.random()*A.length)];return c;}
+function renderFamily(){const el=$('#famRow');if(!el)return;const code=root.settings.family;
+  if(code){el.innerHTML='<h3>☁️ Family sync</h3><div class="code">'+code+'</div><p>Type this code in Settings on another phone or tablet to share progress.</p><div class="row"><button class="quiet" id="famLeave">Turn off on this device</button></div>';
+    $('#famLeave').onclick=()=>{if(!confirm('Turn off family sync on this device? Progress stays here and in the cloud.'))return;root.settings.family=null;save();if(fUnsub){fUnsub();fUnsub=null;}cloudReady=false;setSync('local');renderFamily();};}
+  else{el.innerHTML='<h3>☁️ Family sync</h3><p>Share progress between all your devices.</p><div class="row"><button id="famCreate">Create family code</button></div><input id="famInput" placeholder="or type a code" maxlength="6"><div class="row"><button class="quiet" id="famJoin">Join</button></div>';
+    $('#famCreate').onclick=()=>{root.settings.family=genCode();save();renderFamily();startFamilySync();sfxWin();};
+    $('#famJoin').onclick=()=>{const c=($('#famInput').value||'').trim().toUpperCase();if(c.length!==6){sfxWrong();return;}root.settings.family=c;save();renderFamily();startFamilySync();sfxWhoosh();};}
+}
 /* ============ scenes / particles / buddy ============ */
 function sceneFor(word,anim){if(SCENE_OVERRIDE[word])return SCENE_OVERRIDE[word];if(FOOD.includes(word))return 'room';return{swim:'sea',fly:'sky',drive:'road',float:'sky',flash:'night',hop:'meadow',grow:'meadow',spin:'room',wiggle:'meadow',ring:'room'}[anim]||'meadow';}
 let pTimer=null;
@@ -1232,7 +1283,7 @@ $('#addProfile').onclick=()=>openNewProfile(false);
 $('#editBtn').onclick=()=>openNewProfile(true);
 $('#newCancel').onclick=()=>$('#newProfile').classList.remove('on');
 $('#newOk').onclick=()=>{const name=($('#newName').value||'').trim()||('Player '+(root.profiles.length+1));if(editing){store.name=name;store.avatar=newAvatar;save();sfxPop(4);$('#newProfile').classList.remove('on');renderHome();return;}const pr=freshProfile(name,newAvatar);root.profiles.push(pr);root.current=pr.id;save();sfxWin();location.reload();};
-$('#settingsBtn').onclick=()=>{sfxPop(1);$('#resetWho').textContent=store.name;$('#delWho').textContent=store.name;$('#editWho').textContent=store.name;$('#delRow').style.display=root.profiles.length>1?'':'none';$('#settings').classList.add('on');};
+$('#settingsBtn').onclick=()=>{sfxPop(1);renderFamily();$('#resetWho').textContent=store.name;$('#delWho').textContent=store.name;$('#editWho').textContent=store.name;$('#delRow').style.display=root.profiles.length>1?'':'none';$('#settings').classList.add('on');};
 $('#delBtn').onclick=()=>{if(root.profiles.length<2)return;if(!confirm('Remove '+store.name+' and all their progress from this device?'))return;root.profiles=root.profiles.filter(x=>x.id!==store.id);root.current=root.profiles[0].id;save();location.reload();};$('#settingsClose').onclick=()=>$('#settings').classList.remove('on');
 $('#quest').onclick=()=>{sfxPop(3);const d=daily();say([d.done?'p_greatjob':'p_hi'],d.done?'Great job!':'Let’s play!');};
 $('#soundBtn').onclick=()=>{store.sound=!store.sound;save();renderHome();if(store.sound){sfxPop(4);say(['p_soundon'],'Sound on!');}};
@@ -1242,8 +1293,8 @@ $('#treasureOk').onclick=()=>{$('#treasure').classList.remove('on');if($('#home'
 $('#resetNo').onclick=()=>$('#resetDlg').classList.remove('on');
 $('#resetYes').onclick=async()=>{
   $('#resetDlg').classList.remove('on');
-  store.stars=0;store.words={};store.lvl={};store.album={};store.daily=null;store.treasures=[];store.map={};store.sr={};store.mr={};store.bossSeen={};store.dino=null;save();refreshStars();renderHome();
-  if(db&&cloudCan){try{setSync('saving');const doc=progressDoc();await db.doc('progress/'+store.id).set(doc);lastCloud=JSON.stringify([doc.stars,doc.words,doc.lvl,doc.album]);setSync('synced');}catch(e){setSync('error');}}
+  store.stars=0;store.words={};store.lvl={};store.album={};store.daily=null;store.treasures=[];store.map={};store.sr={};store.mr={};store.bossSeen={};store.dino=null;store.resetAt=Date.now();save();refreshStars();renderHome();
+  if(fdb&&root.settings.family){try{await fdb.collection('families').doc(root.settings.family).collection('profiles').doc(store.id).set(profDoc(store));}catch(e){}}
   sfxWhoosh();say(['p_allclear'],'All clear! Let’s start again!');
 };
 $('#caseBtn').onclick=()=>{root.settings.upper=!root.settings.upper;save();$('#caseBtn').textContent=root.settings.upper?'ABC':'abc';sfxPop(2);renderLogo();};

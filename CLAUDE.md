@@ -54,6 +54,11 @@ and writes animated WebP. Then:
 2. `git add -A && git commit -m "..." && git push` — GitHub Pages updates in ~1 min; the app shows a green
    "New version ready" bar.
 
+## Family sync
+Firebase Firestore project `word-land-121a6` (config in index.html `FB_CFG`, anonymous auth). Data: `families/{CODE}/profiles/{profileId}`.
+A 6-letter family code typed into Settings on each device shares all profiles. Merge is field-wise max/union (`mergeProfile`);
+`resetAt` lets a reset win over older data. The Firebase SDK (compat, gstatic CDN) is loaded only when a code is set.
+
 ## Voice
 To add voice lines run `python tools/make_audio3.py` (needs `pip install edge-tts`, internet) — it writes into `assets/audio/` and skips files that exist.
 Pre-recorded with Edge TTS voice `en-US-AnaNeural` (scripts in the chat history: `make_audio.py`, `make_audio2.py`).
