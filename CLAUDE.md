@@ -65,6 +65,7 @@ A 6-letter family code typed into Settings on each device shares all profiles. M
 ## Modes added later
 - **Little mode** (profile flag `little`, Jaden default): home shows Colors / Shapes / Count / ABC tiles; art in `assets/objects/` ({colour}_*, {shape}_*). 1 star per task.
 - **Christmas** (`root.settings.xmas` auto/on/off; auto = Dec 1–Jan 6): `sceneArt()`/`mascotArt()` pick `_xmas` variants, `body.xmas` adds Santa hats via CSS and snow.
+- **Collections**: `SETS` in index.html — Dino Island (16) then Coral Reef (16, `assets/dino/{sea name}_*`, egg `seaegg`, scene `reef`). State in `store.dino` / `store.sea`. Add a set = push to `SETS` + art + voice (`tools/make_audio5.py` pattern).
 - **Island stages**: island / island_2 / island_3 by hatched count (6, 12).
 
 ## Voice

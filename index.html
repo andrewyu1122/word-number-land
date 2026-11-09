@@ -213,6 +213,8 @@ body.xmas .tile::after{top:-8px}
 .island .dino{position:absolute;bottom:26px;height:70px;background:none;filter:drop-shadow(0 4px 0 rgba(0,0,0,.18));animation:roam var(--d,22s) linear infinite;animation-delay:var(--dl,0s);z-index:2}
 .island .dino img{height:100%}
 .island .dino .emoji{font-size:58px;line-height:70px;display:block}
+.island .dino.swimmer{animation-name:swimroam}
+@keyframes swimroam{0%{left:-16%;transform:scaleX(-1) translateY(0)}25%{transform:scaleX(-1) translateY(-14px)}48%{left:92%;transform:scaleX(-1) translateY(0)}50%{transform:scaleX(1)}75%{transform:scaleX(1) translateY(-14px)}98%{left:-16%;transform:scaleX(1) translateY(0)}100%{transform:scaleX(-1)}}
 .island .dino.roar{animation-play-state:paused}
 .island .dino.roar img,.island .dino.roar .emoji{animation:roarpop .8s ease-in-out}
 @keyframes roarpop{0%,100%{transform:scale(1)}40%{transform:scale(1.3) rotate(-8deg)}}
@@ -652,7 +654,7 @@ body.xmas .tile::after{top:-8px}
     <div class="stickers" id="stickers"></div>
     <h2>Daily treasures</h2>
     <div class="stickers" id="treasures"></div>
-    <h2>Dino collection <span id="dinoCount" style="font-size:16px;opacity:.9"></span></h2>
+    <h2>Collections <span id="dinoCount" style="font-size:16px;opacity:.9"></span></h2>
     <div class="dex" id="dex"></div>
   </section>
 
@@ -701,7 +703,10 @@ function mascotArt(state){if(xmasOn()&&(state==='idle'||state==='wave'))return A
 const ART={'ant':'drive','bag':'wiggle','ball':'hop','bat':'fly','bear':'hop','bed':'float','bee':'fly','bell':'ring','bike':'drive','bird':'fly','boat':'swim','book':'wiggle','box':'wiggle','bug':'wiggle','bus':'drive','cake':'wiggle','cap':'wiggle','car':'drive','cat':'hop','coin':'spin','corn':'grow','cow':'hop','crab':'swim','cup':'wiggle','deer':'hop','dog':'hop','drum':'wiggle','duck':'swim','egg':'wiggle','fan':'wiggle','fire':'flash','fish':'swim','fox':'hop','frog':'hop','gift':'wiggle','goat':'hop','hat':'wiggle','hen':'hop','ice':'wiggle','jet':'fly','key':'spin','kite':'fly','leaf':'float','lion':'hop','map':'wiggle','milk':'wiggle','moon':'float','nut':'wiggle','owl':'fly','pen':'wiggle','pie':'wiggle','pig':'hop','rain':'float','rat':'drive','ring':'spin','rose':'grow','seal':'swim','ship':'swim','snow':'float','star':'spin','sun':'spin','swan':'swim','taxi':'drive','tent':'wiggle','toy':'hop','tree':'grow','web':'spin','wolf':'hop','worm':'wiggle','airplane':'fly','ambulance':'drive','apple':'wiggle','athlete':'drive','backpack':'hop','balloon':'float','banana':'wiggle','basketball':'hop','bread':'wiggle','broccoli':'grow','butterfly':'fly','calendar':'wiggle','camel':'drive','candy':'spin','carrot':'wiggle','castle':'grow','cherry':'wiggle','chicken':'hop','clock':'ring','cloud':'float','compete':'spin','computer':'wiggle','cookie':'spin','crocodile':'swim','crown':'spin','dinosaur':'hop','dolphin':'swim','donut':'spin','dragon':'fly','eagle':'fly','elephant':'hop','flamingo':'wiggle','flower':'grow','football':'spin','ghost':'float','giraffe':'hop','grape':'wiggle','guitar':'wiggle','hamster':'hop','hedgehog':'drive','helicopter':'fly','horse':'drive','house':'wiggle','kangaroo':'hop','koala':'hop','lemon':'wiggle','lobster':'swim','lollipop':'spin','monkey':'hop','mountain':'grow','mouse':'hop','octopus':'swim','panda':'hop','parrot':'fly','peach':'wiggle','pencil':'wiggle','penguin':'wiggle','piano':'wiggle','pineapple':'wiggle','pirate':'wiggle','pizza':'spin','planet':'spin','popcorn':'hop','pumpkin':'wiggle','rabbit':'hop','rainbow':'grow','robot':'wiggle','rocket':'fly','sandwich':'wiggle','scissors':'wiggle','shark':'swim','sheep':'hop','snake':'swim','snowman':'wiggle','spider':'float','squirrel':'hop','strawberry':'wiggle','telephone':'ring','tiger':'hop','tomato':'hop','tornado':'spin','tractor':'drive','train':'drive','truck':'drive','trumpet':'wiggle','turtle':'drive','umbrella':'float','unicorn':'hop','volcano':'flash','whale':'swim','zebra':'hop','axe':'wiggle','bow':'wiggle','gem':'spin','jar':'wiggle','log':'wiggle','net':'wiggle','pan':'wiggle','pot':'wiggle','tub':'wiggle','van':'drive','ape':'hop','bun':'hop','elf':'hop','emu':'hop','ham':'wiggle','jam':'wiggle','mug':'wiggle','pin':'spin','saw':'wiggle','yak':'hop','boot':'hop','coat':'wiggle','door':'wiggle','foot':'hop','hand':'wiggle','lamp':'flash','lock':'wiggle','nest':'wiggle','shoe':'hop','sock':'wiggle','bone':'spin','kiwi':'spin','nose':'wiggle','pear':'wiggle','rice':'wiggle','road':'drive','salt':'wiggle','soap':'float','soup':'wiggle','wave':'swim','bull':'hop','crow':'fly','dove':'fly','hawk':'fly','lamb':'hop','moth':'fly','pony':'drive','taco':'wiggle','toad':'hop'};
 const OBJECTS=['apple', 'balloon', 'car', 'chick', 'cookie', 'cupcake', 'fish', 'flower', 'star', 'strawberry', 'acorn', 'ball', 'crayon', 'crown', 'donut', 'drum', 'feather', 'gem', 'icecream', 'kite', 'lollipop', 'medal', 'pencil', 'pinecone', 'pretzel', 'seashell', 'shell', 'teddy', 'trophy'];
 const DINOS=[['trex','T-rex','🦖'],['triceratops','Triceratops','🦕'],['stegosaurus','Stegosaurus','🦕'],['brachiosaurus','Brachiosaurus','🦕'],['pterodactyl','Pterodactyl','🦅'],['velociraptor','Velociraptor','🦖'],['ankylosaurus','Ankylosaurus','🦕'],['parasaurolophus','Parasaurolophus','🦕'],['spinosaurus','Spinosaurus','🦖'],['diplodocus','Diplodocus','🦕'],['pachycephalosaurus','Pachycephalosaurus','🦖'],['plesiosaurus','Plesiosaurus','🦕'],['iguanodon','Iguanodon','🦕'],['allosaurus','Allosaurus','🦖'],['dilophosaurus','Dilophosaurus','🦖'],['archaeopteryx','Archaeopteryx','🦅']];
-const DINO_BY={};DINOS.forEach(d=>DINO_BY[d[0]]=d);
+const SEA=[['clownfish','Clownfish','🐠'],['seahorse','Seahorse','🐴'],['jellyfish','Jellyfish','🪼'],['starfish','Starfish','⭐'],['turtle','Sea Turtle','🐢'],['octopus','Octopus','🐙'],['crab','Crab','🦀'],['dolphin','Dolphin','🐬'],['whale','Whale','🐳'],['shark','Shark','🦈'],['pufferfish','Pufferfish','🐡'],['lobster','Lobster','🦞'],['seal','Seal','🦭'],['penguin','Penguin','🐧'],['narwhal','Narwhal','🦄'],['manta','Manta Ray','🐟']];
+const SETS=[{id:'dino',title:'Dino Island',emoji:'🦕',list:DINOS,egg:'egg',scenes:['island','island_2','island_3'],move:'walk',happy:'roar',voice:'d_'},
+            {id:'sea',title:'Coral Reef',emoji:'🐠',list:SEA,egg:'seaegg',scenes:['reef','reef','reef'],move:'swim',happy:'happy',voice:'sea_'}];
+const DINO_BY={};DINOS.forEach(d=>DINO_BY[d[0]]=d);SEA.forEach(d=>DINO_BY[d[0]]=d);
 const DINO_MISSING={};
 function dinoEl(name,state,cls){const d=DINO_BY[name];const wrap=document.createElement('span');wrap.className=cls||'';
   if(DINO_MISSING[name]){const e=document.createElement('span');e.className='emoji';e.textContent=d[2];wrap.appendChild(e);return wrap;}
@@ -833,7 +838,7 @@ function setSync(st){lastSync=st;const b=$('#syncBadge');if(b)b.textContent=SYNC
 function loadScript(src){return new Promise((res,rej)=>{const sc=document.createElement('script');sc.src=src;sc.onload=res;sc.onerror=rej;document.head.appendChild(sc);});}
 async function fbInit(){if(fdb)return fdb;setSync('connecting');const v='10.12.0';for(const n of ['app','auth','firestore'])await loadScript('https://www.gstatic.com/firebasejs/'+v+'/firebase-'+n+'-compat.js');
   const app=firebase.apps.length?firebase.app():firebase.initializeApp(FB_CFG);await firebase.auth().signInAnonymously();fdb=firebase.firestore();try{fdb.enablePersistence({synchronizeTabs:true});}catch(e){}return fdb;}
-const PROG_KEYS=['name','avatar','little','stars','words','lvl','album','daily','treasures','map','sr','mr','dino','bossSeen','recent','resetAt'];
+const PROG_KEYS=['name','avatar','little','sea','stars','words','lvl','album','daily','treasures','map','sr','mr','dino','bossSeen','recent','resetAt'];
 function profDoc(pr){const o={};PROG_KEYS.forEach(k=>{if(pr[k]!==undefined&&pr[k]!==null)o[k]=pr[k];});o.updatedAt=Date.now();return o;}
 const maxMap=(a,b)=>{const o=Object.assign({},a||{});for(const k in (b||{}))if((b[k]||0)>(o[k]||0))o[k]=b[k];return o;};
 function mergeProfile(loc,cl){ // returns merged profile; both are plain objects
@@ -846,7 +851,7 @@ function mergeProfile(loc,cl){ // returns merged profile; both are plain objects
   m.treasures=((cl.treasures||[]).length>(loc.treasures||[]).length)?cl.treasures:(loc.treasures||[]);
   const sr=Object.assign({},cl.sr||{});for(const w in (loc.sr||{})){if(!sr[w]||(loc.sr[w].seen||0)>=(sr[w].seen||0))sr[w]=loc.sr[w];}m.sr=sr;
   const mr={};new Set([...Object.keys(loc.mr||{}),...Object.keys(cl.mr||{})]).forEach(k=>{const a=(loc.mr||{})[k]||[],b=(cl.mr||{})[k]||[];mr[k]=a.length>=b.length?a:b;});m.mr=mr;
-  if(cl.dino||loc.dino){const ld=loc.dino||{hatched:[],prog:0},cd=cl.dino||{hatched:[],prog:0};m.dino={hatched:[...new Set([...(cd.hatched||[]),...(ld.hatched||[])])],prog:Math.max(ld.prog||0,cd.prog||0),order:cd.order||ld.order};}
+  ['dino','sea'].forEach(k=>{if(cl[k]||loc[k]){const ld=loc[k]||{hatched:[],prog:0},cd=cl[k]||{hatched:[],prog:0};m[k]={hatched:[...new Set([...(cd.hatched||[]),...(ld.hatched||[])])],prog:Math.max(ld.prog||0,cd.prog||0),order:cd.order||ld.order};}});
   if(cl.daily&&(!loc.daily||cl.daily.date>loc.daily.date))m.daily=cl.daily;else if(loc.daily&&cl.daily&&loc.daily.date===cl.daily.date)m.daily={date:loc.daily.date,spelled:Math.max(loc.daily.spelled,cl.daily.spelled),solved:Math.max(loc.daily.solved,cl.daily.solved),done:loc.daily.done||cl.daily.done};
   if((cl.updatedAt||0)>(loc.updatedAt||0)){m.name=cl.name||loc.name;m.avatar=cl.avatar||loc.avatar;m.recent=cl.recent||loc.recent;}
   return m;
@@ -922,29 +927,38 @@ const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth
 function daily(){if(!store.daily||store.daily.date!==today())store.daily={date:today(),spelled:0,solved:0,done:false};return store.daily;}
 function dayIndex(){return Math.floor(Date.now()/86400000);}
 function questProgress(kind){const d=daily();d[kind]++;save();if(!d.done&&d.spelled>=QUEST_N&&d.solved>=QUEST_N){d.done=true;const ob=OBJECTS[dayIndex()%OBJECTS.length];store.treasures.push({date:d.date,ob});save();pushCloud();setTimeout(()=>{const ti=$('#treasureImg');ti.src=A+'objects/chest_open_anim.webp';$('#treasureText').textContent='You finished today’s quest! Opening the chest…';$('#treasure').classList.add('on');sfxPop(2);setTimeout(()=>{ti.src=A+'objects/'+ob+'_jump.webp';$('#treasureText').textContent='You found a '+ob+'!';confetti();sfxWin();say(['p_amazing'],'Amazing!');},1300);},1400);}}
-/* ============ dino island ============ */
-function dino(){if(!store.dino){store.dino={hatched:[],prog:0,order:shuffle(DINOS.map(d=>d[0]))};save();}if(!store.dino.order)store.dino.order=shuffle(DINOS.map(d=>d[0]));return store.dino;}
-function eggGoal(){return Math.min(20,10+2*dino().hatched.length);}
+/* ============ collections: dino island -> coral reef ============ */
+function setState(st){const k=st.id;if(!store[k]){store[k]={hatched:[],prog:0,order:shuffle(st.list.map(d=>d[0]))};save();}if(!store[k].order)store[k].order=shuffle(st.list.map(d=>d[0]));return store[k];}
+function curSet(){for(const st of SETS){if(setState(st).hatched.length<st.list.length)return st;}return SETS[SETS.length-1];}
+function dino(){return setState(SETS[0]);}
+function eggGoal(st){st=st||curSet();return Math.min(20,10+2*setState(st).hatched.length);}
 let hatchQueue=[];
-function dinoProgress(n){const d=dino();if(d.hatched.length>=DINOS.length)return;d.prog+=n;while(d.prog>=eggGoal()&&d.hatched.length<DINOS.length){d.prog-=eggGoal();const next=d.order.find(x=>!d.hatched.includes(x));if(!next)break;d.hatched.push(next);hatchQueue.push(next);}save();if(hatchQueue.length)setTimeout(showHatch,1500);}
-function showHatch(){if(!hatchQueue.length||$('#hatch').classList.contains('on'))return;if($('#treasure').classList.contains('on')||$('#summary').classList.contains('on')){setTimeout(showHatch,1500);return;}const name=hatchQueue.shift();const info=DINO_BY[name];
-  const st=$('#hatchStage');st.innerHTML='<div class="bigegg"><div class="shell"></div></div>';const eggIm=img(A+'dino/egg_s3.webp');eggIm.style.cssText='height:170px;filter:drop-shadow(0 8px 0 rgba(0,0,0,.15))';eggIm.onload=()=>{const be=st.querySelector('.bigegg');if(be){be.innerHTML='';be.appendChild(eggIm);}};$('#hatchTitle').textContent='It’s hatching!';$('#hatchText').textContent='Your egg is wobbling…';$('#hatchOk').style.display='none';$('#hatch').classList.add('on');
+function dinoProgress(n){const st=curSet();const d=setState(st);if(d.hatched.length>=st.list.length)return;d.prog+=n;while(d.prog>=eggGoal(st)&&d.hatched.length<st.list.length){d.prog-=eggGoal(st);const next=d.order.find(x=>!d.hatched.includes(x));if(!next)break;d.hatched.push(next);hatchQueue.push([st.id,next]);}save();if(hatchQueue.length)setTimeout(showHatch,1500);}
+function showHatch(){if(!hatchQueue.length||$('#hatch').classList.contains('on'))return;if($('#treasure').classList.contains('on')||$('#summary').classList.contains('on')){setTimeout(showHatch,1500);return;}
+  const [sid,name]=hatchQueue.shift();const st=SETS.find(x=>x.id===sid);const info=DINO_BY[name];const d=setState(st);
+  const stg=$('#hatchStage');stg.innerHTML='<div class="bigegg"><div class="shell"></div></div>';const eggIm=img(A+'dino/'+st.egg+'_s3.webp');eggIm.style.cssText='height:170px;filter:drop-shadow(0 8px 0 rgba(0,0,0,.15))';eggIm.onload=()=>{const be=stg.querySelector('.bigegg');if(be){be.innerHTML='';be.appendChild(eggIm);}};
+  $('#hatchTitle').textContent='It’s hatching!';$('#hatchText').textContent='Your egg is wobbling…';$('#hatchOk').style.display='none';$('#hatch').classList.add('on');
   sfxPop(1);setTimeout(()=>sfxPop(3),400);setTimeout(()=>sfxPop(5),800);
-  setTimeout(()=>{const be=st.querySelector('.bigegg');const hi=be.querySelector('img');if(hi){hi.src=A+'dino/egg_hatch.webp';be.style.animation='none';setTimeout(()=>be.classList.add('pop'),600);}else be.classList.add('pop');sfxWin();confetti();
-    setTimeout(()=>{st.innerHTML='';st.appendChild(dinoEl(name,'roar','newdino'));$('#hatchTitle').textContent=info[1]+'!';$('#hatchText').textContent='A new dinosaur joined your island! ('+dino().hatched.length+' of '+DINOS.length+')';$('#hatchOk').style.display='';say(['p_hatched','d_'+name],'A new dinosaur hatched! '+info[1]+'!');},450);},1300);}
-function renderIsland(){const el=$('#island');if(!el)return;const d=dino();el.innerHTML='';
-  const stageN=d.hatched.length>=12?'island_3':d.hatched.length>=6?'island_2':'island';const bg=img(A+'scenes/'+stageN+'.webp','bg');bg.onerror=()=>{bg.src=A+'scenes/island.webp';};el.appendChild(bg);
-  const h=document.createElement('span');h.className='hint';h.textContent='🦕 Dino Island · '+d.hatched.length+'/'+DINOS.length;el.appendChild(h);
-  if(d.hatched.length<DINOS.length){const goal=eggGoal();const stage=d.prog>=goal*.75?3:d.prog>=goal*.5?2:d.prog>=goal*.25?1:0;
-    const egg=document.createElement('button');egg.className='egg art';egg.dataset.stage=stage;const ei=img(A+'dino/egg_s'+stage+'.webp');ei.onerror=()=>{egg.classList.remove('art');egg.innerHTML='<div class="shell"></div><svg viewBox="0 0 74 94"><path class="c1" d="M30 20l6 10-4 9 7 8"/><path class="c2" d="M48 30l-6 8 5 7-4 9"/><path class="c3" d="M22 50l8 4-2 9 9 6M50 58l-7 5 3 8"/></svg>';};egg.appendChild(ei);
+  setTimeout(()=>{const be=stg.querySelector('.bigegg');const hi=be.querySelector('img');if(hi){hi.src=A+'dino/'+st.egg+'_hatch.webp';be.style.animation='none';setTimeout(()=>be.classList.add('pop'),600);}else be.classList.add('pop');sfxWin();confetti();
+    setTimeout(()=>{stg.innerHTML='';stg.appendChild(dinoEl(name,st.happy,'newdino'));$('#hatchTitle').textContent=info[1]+'!';$('#hatchText').textContent=(st.id==='dino'?'A new dinosaur joined your island!':'A new friend joined your reef!')+' ('+d.hatched.length+' of '+st.list.length+')';$('#hatchOk').style.display='';say(['p_hatched',st.voice+name],'A new friend hatched! '+info[1]+'!');
+      if(d.hatched.length===st.list.length&&SETS.indexOf(st)<SETS.length-1){$('#hatchText').textContent+=' You found them all — a new world opens: '+SETS[SETS.indexOf(st)+1].title+'!';}},450);},1300);}
+function renderIsland(){const el=$('#island');if(!el)return;const st=curSet();const d=setState(st);el.innerHTML='';
+  const stageN=st.scenes[d.hatched.length>=12?2:d.hatched.length>=6?1:0];const bg=img(A+'scenes/'+stageN+'.webp','bg');bg.onerror=()=>{bg.src=A+'scenes/island.webp';};el.appendChild(bg);
+  const h=document.createElement('span');h.className='hint';h.textContent=st.emoji+' '+st.title+' · '+d.hatched.length+'/'+st.list.length;el.appendChild(h);
+  if(d.hatched.length<st.list.length){const goal=eggGoal(st);const stage=d.prog>=goal*.75?3:d.prog>=goal*.5?2:d.prog>=goal*.25?1:0;
+    const egg=document.createElement('button');egg.className='egg art';egg.dataset.stage=stage;const ei=img(A+'dino/'+st.egg+'_s'+stage+'.webp');ei.onerror=()=>{egg.classList.remove('art');egg.innerHTML='<div class="shell"></div>';};egg.appendChild(ei);
     egg.onclick=()=>{egg.classList.remove('wob');void egg.offsetWidth;egg.classList.add('wob');sfxPop(stage*2);};el.appendChild(egg);
     const pr=document.createElement('span');pr.className='eggprog';pr.textContent='⭐ '+d.prog+' / '+goal;el.appendChild(pr);}
-  d.hatched.slice(-6).forEach((name,i)=>{const b=document.createElement('button');b.className='dino';b.style.setProperty('--d',(18+(i*5)%12)+'s');b.style.setProperty('--dl',(-(i*7)%18)+'s');b.appendChild(dinoEl(name,'walk'));
-    b.onclick=()=>{b.classList.add('roar');sfxWhoosh();say(['d_'+name],DINO_BY[name][1]);setTimeout(()=>b.classList.remove('roar'),900);};el.appendChild(b);});
+  d.hatched.slice(-6).forEach((name,i)=>{const b=document.createElement('button');b.className='dino'+(st.id==='sea'?' swimmer':'');b.style.setProperty('--d',(18+(i*5)%12)+'s');b.style.setProperty('--dl',(-(i*7)%18)+'s');if(st.id==='sea')b.style.bottom=(20+(i*23)%90)+'px';b.appendChild(dinoEl(name,st.move));
+    b.onclick=()=>{b.classList.add('roar');sfxWhoosh();say([st.voice+name],DINO_BY[name][1]);setTimeout(()=>b.classList.remove('roar'),900);};el.appendChild(b);});
 }
-function renderDex(){const d=dino();const el=$('#dex');el.innerHTML='';$('#dinoCount').textContent=d.hatched.length+' / '+DINOS.length;
-  DINOS.forEach(([name,label])=>{const c=document.createElement('button');const has=d.hatched.includes(name);c.className='dexcard'+(has?'':' locked');c.appendChild(dinoEl(name,'idle'));const sm=document.createElement('small');sm.textContent=has?label:'???';c.appendChild(sm);
-    c.onclick=()=>{if(has){sfxPop(2);say(['d_'+name],label);const im=c.firstChild;const r=dinoEl(name,'roar');im.replaceWith(r);setTimeout(()=>{if(r.isConnected)r.replaceWith(dinoEl(name,'idle'));},1200);}else sfxPop(0);};el.appendChild(c);});}
+function renderDex(){const el=$('#dex');el.innerHTML='';let tot=0,has=0;
+  SETS.forEach(st=>{const d=setState(st);tot+=st.list.length;has+=d.hatched.length;
+    if(SETS.indexOf(st)>0&&setState(SETS[SETS.indexOf(st)-1]).hatched.length<SETS[SETS.indexOf(st)-1].list.length){const hd=document.createElement('div');hd.className='empty';hd.style.gridColumn='1/-1';hd.textContent=st.emoji+' '+st.title+' opens after Dino Island is complete';el.appendChild(hd);return;}
+    const hd=document.createElement('div');hd.style.cssText='grid-column:1/-1;color:#fff;font-weight:700;text-shadow:0 2px 0 rgba(0,0,0,.2);font-size:18px';hd.textContent=st.emoji+' '+st.title+' · '+d.hatched.length+'/'+st.list.length;el.appendChild(hd);
+    st.list.forEach(([name,label])=>{const c=document.createElement('button');const ok=d.hatched.includes(name);c.className='dexcard'+(ok?'':' locked');c.appendChild(dinoEl(name,'idle'));const sm=document.createElement('small');sm.textContent=ok?label:'???';c.appendChild(sm);
+      c.onclick=()=>{if(ok){sfxPop(2);say([st.voice+name],label);const im=c.firstChild;const r=dinoEl(name,st.happy);im.replaceWith(r);setTimeout(()=>{if(r.isConnected)r.replaceWith(dinoEl(name,'idle'));},1200);}else sfxPop(0);};el.appendChild(c);});});
+  $('#dinoCount').textContent=has+' / '+tot;}
 function renderQuest(){const d=daily();const el=$('#quest');const ob=OBJECTS[dayIndex()%OBJECTS.length];el.className='mini quest pressable'+(d.done?' done':'');
   const row=(label,im,n)=>'<div class="qrow"><img src="'+im+'" alt=""><div class="qbar"><i style="width:'+Math.min(100,n/QUEST_N*100)+'%"></i></div><b>'+Math.min(n,QUEST_N)+'/'+QUEST_N+'</b></div>';
   el.innerHTML='<h3><span>'+(d.done?'Quest done!':'Today’s quest')+'</span><span class="prize"><img src="'+A+'objects/'+(d.done?'chest_open':'chest_closed')+'.webp" alt=""></span></h3>'+row('Spell',A+'letters/a_idle.webp',d.spelled)+row('Count',A+'num/n5_idle.webp',d.solved);}
@@ -1381,7 +1395,7 @@ $('#treasureOk').onclick=()=>{$('#treasure').classList.remove('on');if($('#home'
 $('#resetNo').onclick=()=>$('#resetDlg').classList.remove('on');
 $('#resetYes').onclick=async()=>{
   $('#resetDlg').classList.remove('on');
-  store.stars=0;store.words={};store.lvl={};store.album={};store.daily=null;store.treasures=[];store.map={};store.sr={};store.mr={};store.bossSeen={};store.dino=null;store.resetAt=Date.now();save();refreshStars();renderHome();
+  store.stars=0;store.words={};store.lvl={};store.album={};store.daily=null;store.treasures=[];store.map={};store.sr={};store.mr={};store.bossSeen={};store.dino=null;store.sea=null;store.resetAt=Date.now();save();refreshStars();renderHome();
   if(fdb&&root.settings.family){try{await fdb.collection('families').doc(root.settings.family).collection('profiles').doc(store.id).set(profDoc(store));}catch(e){}}
   sfxWhoosh();say(['p_allclear'],'All clear! Let’s start again!');
 };
