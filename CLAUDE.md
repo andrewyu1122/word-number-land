@@ -59,6 +59,11 @@ Firebase Firestore project `word-land-121a6` (config in index.html `FB_CFG`, ano
 A 6-letter family code typed into Settings on each device shares all profiles. Merge is field-wise max/union (`mergeProfile`);
 `resetAt` lets a reset win over older data. The Firebase SDK (compat, gstatic CDN) is loaded only when a code is set.
 
+## Modes added later
+- **Little mode** (profile flag `little`, Jaden default): home shows Colors / Shapes / Count / ABC tiles; art in `assets/objects/` ({colour}_*, {shape}_*). 1 star per task.
+- **Christmas** (`root.settings.xmas` auto/on/off; auto = Dec 1–Jan 6): `sceneArt()`/`mascotArt()` pick `_xmas` variants, `body.xmas` adds Santa hats via CSS and snow.
+- **Island stages**: island / island_2 / island_3 by hatched count (6, 12).
+
 ## Voice
 To add voice lines run `python tools/make_audio3.py` (needs `pip install edge-tts`, internet) — it writes into `assets/audio/` and skips files that exist.
 Pre-recorded with Edge TTS voice `en-US-AnaNeural` (scripts in the chat history: `make_audio.py`, `make_audio2.py`).
