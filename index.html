@@ -268,7 +268,9 @@ body.xmas .tile::after{top:-8px}
 /* stage */
 .stage{--mx:260px;--sx:120px;--fx:180px;position:relative;border-radius:28px;height:260px;overflow:hidden;box-shadow:0 10px 0 rgba(0,0,0,.12),inset 0 0 0 5px #fff;background:#cfeeff}
 .stage .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.buddy{position:absolute;left:10px;bottom:8px;height:72px;filter:drop-shadow(0 3px 0 rgba(0,0,0,.2));z-index:2;transition:transform .3s}
+.stage .fg,.island .fg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;pointer-events:none;z-index:2}
+.island .fg{z-index:4}
+.buddy{position:absolute;left:10px;bottom:8px;height:72px;filter:drop-shadow(0 3px 0 rgba(0,0,0,.2));z-index:3;transition:transform .3s}
 .buddy.cheer{transform:scale(1.15) rotate(-6deg)}
 .actor{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;z-index:1}
 .actor .em{height:170px;max-width:360px;object-fit:contain;filter:grayscale(.8) brightness(1.05) drop-shadow(0 6px 0 rgba(0,0,0,.18));transition:filter .4s;display:block}
@@ -698,6 +700,7 @@ body.xmas .tile::after{top:-8px}
 const A='assets/';
 function xmasOn(){const m=root.settings.xmas||'auto';if(m==='on')return true;if(m==='off')return false;const d=new Date(),mo=d.getMonth(),da=d.getDate();return (mo===11&&da>=1)||(mo===0&&da<=6);}
 const XMAS_SCENES=['meadow','road','sky','sea','room','night','space'];
+function fgLayer(name){if(xmasOn()&&XMAS_SCENES.includes(name))return null;const f=img(A+'scenes/'+name+'_fg.webp','fg');f.onerror=()=>f.remove();return f;}
 function sceneArt(name){return A+'scenes/'+name+(xmasOn()&&XMAS_SCENES.includes(name)?'_xmas':'')+'.webp';}
 function mascotArt(state){if(xmasOn()&&(state==='idle'||state==='wave'))return A+'mascot/mascot_xmas_'+state+'.webp';return A+'mascot/mascot_'+state+'.webp';}
 const ART={'ant':'drive','bag':'wiggle','ball':'hop','bat':'fly','bear':'hop','bed':'float','bee':'fly','bell':'ring','bike':'drive','bird':'fly','boat':'swim','book':'wiggle','box':'wiggle','bug':'wiggle','bus':'drive','cake':'wiggle','cap':'wiggle','car':'drive','cat':'hop','coin':'spin','corn':'grow','cow':'hop','crab':'swim','cup':'wiggle','deer':'hop','dog':'hop','drum':'wiggle','duck':'swim','egg':'wiggle','fan':'wiggle','fire':'flash','fish':'swim','fox':'hop','frog':'hop','gift':'wiggle','goat':'hop','hat':'wiggle','hen':'hop','ice':'wiggle','jet':'fly','key':'spin','kite':'fly','leaf':'float','lion':'hop','map':'wiggle','milk':'wiggle','moon':'float','nut':'wiggle','owl':'fly','pen':'wiggle','pie':'wiggle','pig':'hop','rain':'float','rat':'drive','ring':'spin','rose':'grow','seal':'swim','ship':'swim','snow':'float','star':'spin','sun':'spin','swan':'swim','taxi':'drive','tent':'wiggle','toy':'hop','tree':'grow','web':'spin','wolf':'hop','worm':'wiggle','airplane':'fly','ambulance':'drive','apple':'wiggle','athlete':'drive','backpack':'hop','balloon':'float','banana':'wiggle','basketball':'hop','bread':'wiggle','broccoli':'grow','butterfly':'fly','calendar':'wiggle','camel':'drive','candy':'spin','carrot':'wiggle','castle':'grow','cherry':'wiggle','chicken':'hop','clock':'ring','cloud':'float','compete':'spin','computer':'wiggle','cookie':'spin','crocodile':'swim','crown':'spin','dinosaur':'hop','dolphin':'swim','donut':'spin','dragon':'fly','eagle':'fly','elephant':'hop','flamingo':'wiggle','flower':'grow','football':'spin','ghost':'float','giraffe':'hop','grape':'wiggle','guitar':'wiggle','hamster':'hop','hedgehog':'drive','helicopter':'fly','horse':'drive','house':'wiggle','kangaroo':'hop','koala':'hop','lemon':'wiggle','lobster':'swim','lollipop':'spin','monkey':'hop','mountain':'grow','mouse':'hop','octopus':'swim','panda':'hop','parrot':'fly','peach':'wiggle','pencil':'wiggle','penguin':'wiggle','piano':'wiggle','pineapple':'wiggle','pirate':'wiggle','pizza':'spin','planet':'spin','popcorn':'hop','pumpkin':'wiggle','rabbit':'hop','rainbow':'grow','robot':'wiggle','rocket':'fly','sandwich':'wiggle','scissors':'wiggle','shark':'swim','sheep':'hop','snake':'swim','snowman':'wiggle','spider':'float','squirrel':'hop','strawberry':'wiggle','telephone':'ring','tiger':'hop','tomato':'hop','tornado':'spin','tractor':'drive','train':'drive','truck':'drive','trumpet':'wiggle','turtle':'drive','umbrella':'float','unicorn':'hop','volcano':'flash','whale':'swim','zebra':'hop','axe':'wiggle','bow':'wiggle','gem':'spin','jar':'wiggle','log':'wiggle','net':'wiggle','pan':'wiggle','pot':'wiggle','tub':'wiggle','van':'drive','ape':'hop','bun':'hop','elf':'hop','emu':'hop','ham':'wiggle','jam':'wiggle','mug':'wiggle','pin':'spin','saw':'wiggle','yak':'hop','boot':'hop','coat':'wiggle','door':'wiggle','foot':'hop','hand':'wiggle','lamp':'flash','lock':'wiggle','nest':'wiggle','shoe':'hop','sock':'wiggle','bone':'spin','kiwi':'spin','nose':'wiggle','pear':'wiggle','rice':'wiggle','road':'drive','salt':'wiggle','soap':'float','soup':'wiggle','wave':'swim','bull':'hop','crow':'fly','dove':'fly','hawk':'fly','lamb':'hop','moth':'fly','pony':'drive','taco':'wiggle','toad':'hop'};
@@ -943,7 +946,7 @@ function showHatch(){if(!hatchQueue.length||$('#hatch').classList.contains('on')
     setTimeout(()=>{stg.innerHTML='';stg.appendChild(dinoEl(name,st.happy,'newdino'));$('#hatchTitle').textContent=info[1]+'!';$('#hatchText').textContent=(st.id==='dino'?'A new dinosaur joined your island!':'A new friend joined your reef!')+' ('+d.hatched.length+' of '+st.list.length+')';$('#hatchOk').style.display='';say(['p_hatched',st.voice+name],'A new friend hatched! '+info[1]+'!');
       if(d.hatched.length===st.list.length&&SETS.indexOf(st)<SETS.length-1){$('#hatchText').textContent+=' You found them all — a new world opens: '+SETS[SETS.indexOf(st)+1].title+'!';setTimeout(()=>say(['p_newworld'],'You found them all! A new world is open!'),2500);}},450);},1300);}
 function renderIsland(){const el=$('#island');if(!el)return;const st=curSet();const d=setState(st);el.innerHTML='';
-  const stageN=st.scenes[d.hatched.length>=12?2:d.hatched.length>=6?1:0];const bg=img(A+'scenes/'+stageN+'.webp','bg');bg.onerror=()=>{bg.src=A+'scenes/island.webp';};el.appendChild(bg);
+  const stageN=st.scenes[d.hatched.length>=12?2:d.hatched.length>=6?1:0];const bg=img(A+'scenes/'+stageN+'.webp','bg');bg.onerror=()=>{bg.src=A+'scenes/island.webp';};el.appendChild(bg);const fgI=img(A+'scenes/'+stageN+'_fg.webp','fg');fgI.onerror=()=>fgI.remove();el.appendChild(fgI);
   const h=document.createElement('span');h.className='hint';h.textContent=st.emoji+' '+st.title+' · '+d.hatched.length+'/'+st.list.length;el.appendChild(h);
   if(d.hatched.length<st.list.length){const goal=eggGoal(st);const stage=d.prog>=goal*.75?3:d.prog>=goal*.5?2:d.prog>=goal*.25?1:0;
     const egg=document.createElement('button');egg.className='egg art';egg.dataset.stage=stage;const ei=img(A+'dino/'+st.egg+'_s'+stage+'.webp');ei.onerror=()=>{egg.classList.remove('art');egg.innerHTML='<div class="shell"></div>';};egg.appendChild(ei);
@@ -1054,7 +1057,7 @@ function renderWord(){
   else{const em=document.createElement('span');em.className='emoji';em.id='stageEm';em.textContent=w.emoji;actor.appendChild(em);}
   const sh=document.createElement('span');sh.className='shadow';actor.appendChild(sh);
   const zz=document.createElement('span');zz.className='zz';zz.textContent='💤';actor.appendChild(zz);
-  stage.appendChild(actor);buddy(stage);
+  stage.appendChild(actor);const fgS=fgLayer(sceneFor(w.word,w.anim));if(fgS)stage.appendChild(fgS);buddy(stage);
   // preload next word's art
   const nx=S.queue[S.idx+1];if(nx&&ART[nx.word]){preload(wordArt(nx.word,'sleep'));preload(wordArt(nx.word,'anim'));}
   $('#nextBtn').classList.remove('show');
@@ -1271,7 +1274,7 @@ function renderProblem(forced){
   const p=forced||genProblem(M.level,M.tier);M.p=p;M.mistakes=0;M.done=false;M.typed='';
   renderDots($('#mathDots'),M.idx,ROUND);$('#nextBtn2').classList.remove('show');
   const v=$('#visual');v.className='stage mathstage';v.innerHTML='';
-  v.appendChild(img(sceneArt(pick(['meadow','sky','room','road','space'])),'bg'));buddy(v);
+  const scn=pick(['meadow','sky','room','road','space']);v.appendChild(img(sceneArt(scn),'bg'));buddy(v);M.fg=fgLayer(scn);
   const terms=p.terms||[p.a,p.b],ops=p.ops||[p.op];
   const digits=terms.reduce((t,x)=>t+String(x).length,0)+String(p.ans).length;const slots=digits+ops.length*0.6+0.6;
   const PH={3:140,4:124,5:108,6:100,7:90,8:80,9:72,10:64,11:58};const key=Math.min(11,Math.max(3,Math.round(slots)));
@@ -1279,7 +1282,7 @@ function renderProblem(forced){
   const addPal=(n,i,extra)=>{const e=pal(n,i);if(extra)e.classList.add(extra);v.appendChild(e);return e;};
   const OPART={'+':'plus','-':'minus','×':'times','=':'equals'};
   terms.forEach((t,i)=>{addPal(t,i);const sym=i<ops.length?ops[i]:'=';const o=document.createElement('span');o.className='op';const oi=img(A+'num/op_'+OPART[sym]+'_idle.webp');oi.className='opimg';oi.dataset.sym=OPART[sym];oi.onerror=()=>{o.textContent=sym;};o.appendChild(oi);v.appendChild(o);});
-  const q=addPal('?',terms.length);q.id='palQ';
+  const q=addPal('?',terms.length);q.id='palQ';if(M.fg)v.appendChild(M.fg);
   terms.concat([p.ans]).forEach(n=>String(n).split('').forEach(d=>{if(HAS_JUMP(d))preload(numArt(d,'jump'));}));
   const ch=$('#choices');ch.innerHTML='';ch.className='choices';
   if(p.input==='choices'){
