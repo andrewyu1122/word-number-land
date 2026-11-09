@@ -90,7 +90,7 @@ def main():
     names = set()
     for f in glob.glob(f'{src}/**/*.png', recursive=True):
         b = os.path.basename(f)
-        m = re.match(r'(op_[a-z]+|[A-Za-z0-9]+)_[a-z0-9]+(?:_\d{3})?\.png$', b)
+        m = re.match(r'(op_[a-z]+|mascot_xmas|[A-Za-z0-9]+)_[a-z0-9]+(?:_\d{3})?\.png$', b)
         if m and 'sheet' not in b and 'preview' not in f: names.add((os.path.dirname(f), m.group(1)))
     for folder, name in sorted(names):
         files = collect(folder, name)
