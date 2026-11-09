@@ -181,6 +181,9 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 .island{position:relative;height:190px;border-radius:26px;overflow:hidden;box-shadow:0 8px 0 rgba(0,0,0,.12),inset 0 0 0 4px #fff;background:linear-gradient(180deg,#9fe0ff 0%,#d6f3ff 55%,#f3dca5 56%,#e9c98a 100%)}
 .island .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .island .egg{position:absolute;left:50%;bottom:34px;transform:translateX(-50%);width:74px;height:94px;background:none;z-index:3}
+.island .egg.art img{height:100%;filter:drop-shadow(0 6px 0 rgba(0,0,0,.18));transform-origin:bottom center}
+.island .egg.art[data-stage="3"] img{animation:eggwob 1.2s ease-in-out infinite}
+.island .egg.art.wob img{animation:eggwob .5s ease-in-out}
 .island .egg .shell{position:absolute;inset:0;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:radial-gradient(circle at 35% 30%,#fff 0%,#f6efdd 45%,#d9c9a0 100%);box-shadow:0 6px 0 rgba(0,0,0,.18),inset -8px -10px 0 rgba(0,0,0,.06)}
 .island .egg .shell::before{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(circle at 30% 60%,#8bd3ff 0 6px,transparent 7px),radial-gradient(circle at 65% 40%,#ff9fbf 0 5px,transparent 6px),radial-gradient(circle at 55% 75%,#ffd66b 0 5px,transparent 6px),radial-gradient(circle at 25% 30%,#b7f29b 0 4px,transparent 5px)}
 .island .egg svg{position:absolute;inset:0;width:100%;height:100%}
@@ -202,7 +205,7 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 .hatchstage{position:relative;height:200px;display:grid;place-items:center}
 .hatchstage .bigegg{width:120px;height:150px;position:relative;animation:eggwob .35s ease-in-out infinite}
 .hatchstage .bigegg .shell{position:absolute;inset:0;border-radius:50%/60% 60% 40% 40%;background:radial-gradient(circle at 35% 30%,#fff 0%,#f6efdd 45%,#d9c9a0 100%);box-shadow:0 8px 0 rgba(0,0,0,.15)}
-.hatchstage .bigegg.pop{animation:eggpop .5s ease-in forwards}
+.hatchstage .bigegg.pop{animation:eggpop .5s ease-in forwards !important}
 @keyframes eggpop{to{transform:scale(1.6);opacity:0}}
 .hatchstage .newdino{position:absolute;height:170px;animation:popin .6s cubic-bezier(.3,1.7,.5,1) both;filter:drop-shadow(0 6px 0 rgba(0,0,0,.18))}
 .hatchstage .newdino img{height:170px}
@@ -223,7 +226,8 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 .qbar i{display:block;height:100%;background:linear-gradient(90deg,var(--mint),#8ff0b4);border-radius:7px;transition:width .6s cubic-bezier(.3,1.4,.5,1)}
 .qrow b{min-width:28px;font-size:13px;text-align:right;color:var(--ink)}
 .quest .prize{width:34px;height:34px;border-radius:10px;background:var(--slot);border:2px dashed var(--slotline);display:grid;place-items:center;font-size:18px}
-.quest .prize img{height:28px}
+.quest .prize img{height:30px}
+.quest .prize{border:0;background:none}
 .quest.done .prize{border-style:solid;border-color:var(--sun);background:#fff7d6;animation:glow .8s ease-in-out infinite}
 /* garden field */
 .field{position:relative;height:170px;border-radius:24px;overflow:hidden;background:linear-gradient(180deg,#bfeaff 0%,#dff6ff 55%,#8ee07a 56%,#6fcf63 100%);box-shadow:0 8px 0 rgba(0,0,0,.1),inset 0 0 0 4px #fff}
@@ -355,6 +359,7 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 .mathstage .lbl.q{background:var(--coral)}
 .mathstage .pal.big .lbl{background:var(--mint)}
 .mathstage .pal img{height:var(--ph,150px)}
+.mathstage .op .opimg{height:calc(var(--of,48px)*1.3);filter:drop-shadow(0 4px 0 rgba(0,0,0,.2));display:block}
 .mathstage .op{position:relative;z-index:1;font-size:var(--of,48px);padding-bottom:36px;color:#fff;text-shadow:0 3px 0 rgba(0,0,0,.25)}
 .mathstage .buddy{height:60px;left:8px;bottom:6px}
 .group{display:grid;gap:4px;justify-items:center;position:relative;z-index:1}
@@ -814,22 +819,22 @@ const QUEST_N=5;
 const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
 function daily(){if(!store.daily||store.daily.date!==today())store.daily={date:today(),spelled:0,solved:0,done:false};return store.daily;}
 function dayIndex(){return Math.floor(Date.now()/86400000);}
-function questProgress(kind){const d=daily();d[kind]++;save();if(!d.done&&d.spelled>=QUEST_N&&d.solved>=QUEST_N){d.done=true;const ob=OBJECTS[dayIndex()%OBJECTS.length];store.treasures.push({date:d.date,ob});save();pushCloud();setTimeout(()=>{$('#treasureImg').src=A+'objects/'+ob+'_jump.webp';$('#treasureText').textContent='You finished today’s quest and found a '+ob+'!';$('#treasure').classList.add('on');confetti();sfxWin();say(['p_amazing'],'Amazing!');},1400);}}
+function questProgress(kind){const d=daily();d[kind]++;save();if(!d.done&&d.spelled>=QUEST_N&&d.solved>=QUEST_N){d.done=true;const ob=OBJECTS[dayIndex()%OBJECTS.length];store.treasures.push({date:d.date,ob});save();pushCloud();setTimeout(()=>{const ti=$('#treasureImg');ti.src=A+'objects/chest_open_anim.webp';$('#treasureText').textContent='You finished today’s quest! Opening the chest…';$('#treasure').classList.add('on');sfxPop(2);setTimeout(()=>{ti.src=A+'objects/'+ob+'_jump.webp';$('#treasureText').textContent='You found a '+ob+'!';confetti();sfxWin();say(['p_amazing'],'Amazing!');},1300);},1400);}}
 /* ============ dino island ============ */
 function dino(){if(!store.dino){store.dino={hatched:[],prog:0,order:shuffle(DINOS.map(d=>d[0]))};save();}if(!store.dino.order)store.dino.order=shuffle(DINOS.map(d=>d[0]));return store.dino;}
 function eggGoal(){return Math.min(20,10+2*dino().hatched.length);}
 let hatchQueue=[];
 function dinoProgress(n){const d=dino();if(d.hatched.length>=DINOS.length)return;d.prog+=n;while(d.prog>=eggGoal()&&d.hatched.length<DINOS.length){d.prog-=eggGoal();const next=d.order.find(x=>!d.hatched.includes(x));if(!next)break;d.hatched.push(next);hatchQueue.push(next);}save();if(hatchQueue.length)setTimeout(showHatch,1500);}
-function showHatch(){if(!hatchQueue.length||$('#hatch').classList.contains('on'))return;const name=hatchQueue.shift();const info=DINO_BY[name];
-  const st=$('#hatchStage');st.innerHTML='<div class="bigegg"><div class="shell"></div></div>';$('#hatchTitle').textContent='It’s hatching!';$('#hatchText').textContent='Your egg is wobbling…';$('#hatchOk').style.display='none';$('#hatch').classList.add('on');
+function showHatch(){if(!hatchQueue.length||$('#hatch').classList.contains('on'))return;if($('#treasure').classList.contains('on')||$('#summary').classList.contains('on')){setTimeout(showHatch,1500);return;}const name=hatchQueue.shift();const info=DINO_BY[name];
+  const st=$('#hatchStage');st.innerHTML='<div class="bigegg"><div class="shell"></div></div>';const eggIm=img(A+'dino/egg_s3.webp');eggIm.style.cssText='height:170px;filter:drop-shadow(0 8px 0 rgba(0,0,0,.15))';eggIm.onload=()=>{const be=st.querySelector('.bigegg');if(be){be.innerHTML='';be.appendChild(eggIm);}};$('#hatchTitle').textContent='It’s hatching!';$('#hatchText').textContent='Your egg is wobbling…';$('#hatchOk').style.display='none';$('#hatch').classList.add('on');
   sfxPop(1);setTimeout(()=>sfxPop(3),400);setTimeout(()=>sfxPop(5),800);
-  setTimeout(()=>{st.querySelector('.bigegg').classList.add('pop');sfxWin();confetti();
+  setTimeout(()=>{const be=st.querySelector('.bigegg');const hi=be.querySelector('img');if(hi){hi.src=A+'dino/egg_hatch.webp';be.style.animation='none';setTimeout(()=>be.classList.add('pop'),600);}else be.classList.add('pop');sfxWin();confetti();
     setTimeout(()=>{st.innerHTML='';st.appendChild(dinoEl(name,'roar','newdino'));$('#hatchTitle').textContent=info[1]+'!';$('#hatchText').textContent='A new dinosaur joined your island! ('+dino().hatched.length+' of '+DINOS.length+')';$('#hatchOk').style.display='';say(['p_hatched','d_'+name],'A new dinosaur hatched! '+info[1]+'!');},450);},1300);}
 function renderIsland(){const el=$('#island');if(!el)return;const d=dino();el.innerHTML='';
   const bg=img(A+'scenes/island.webp','bg');bg.onerror=()=>{bg.src=A+'scenes/meadow.webp';};el.appendChild(bg);
   const h=document.createElement('span');h.className='hint';h.textContent='🦕 Dino Island · '+d.hatched.length+'/'+DINOS.length;el.appendChild(h);
   if(d.hatched.length<DINOS.length){const goal=eggGoal();const stage=d.prog>=goal*.75?3:d.prog>=goal*.5?2:d.prog>=goal*.25?1:0;
-    const egg=document.createElement('button');egg.className='egg';egg.dataset.stage=stage;egg.innerHTML='<div class="shell"></div><svg viewBox="0 0 74 94"><path class="c1" d="M30 20l6 10-4 9 7 8"/><path class="c2" d="M48 30l-6 8 5 7-4 9"/><path class="c3" d="M22 50l8 4-2 9 9 6M50 58l-7 5 3 8"/></svg>';
+    const egg=document.createElement('button');egg.className='egg art';egg.dataset.stage=stage;const ei=img(A+'dino/egg_s'+stage+'.webp');ei.onerror=()=>{egg.classList.remove('art');egg.innerHTML='<div class="shell"></div><svg viewBox="0 0 74 94"><path class="c1" d="M30 20l6 10-4 9 7 8"/><path class="c2" d="M48 30l-6 8 5 7-4 9"/><path class="c3" d="M22 50l8 4-2 9 9 6M50 58l-7 5 3 8"/></svg>';};egg.appendChild(ei);
     egg.onclick=()=>{egg.classList.remove('wob');void egg.offsetWidth;egg.classList.add('wob');sfxPop(stage*2);};el.appendChild(egg);
     const pr=document.createElement('span');pr.className='eggprog';pr.textContent='⭐ '+d.prog+' / '+goal;el.appendChild(pr);}
   d.hatched.slice(-6).forEach((name,i)=>{const b=document.createElement('button');b.className='dino';b.style.setProperty('--d',(18+(i*5)%12)+'s');b.style.setProperty('--dl',(-(i*7)%18)+'s');b.appendChild(dinoEl(name,'walk'));
@@ -840,7 +845,7 @@ function renderDex(){const d=dino();const el=$('#dex');el.innerHTML='';$('#dinoC
     c.onclick=()=>{if(has){sfxPop(2);say(['d_'+name],label);const im=c.firstChild;const r=dinoEl(name,'roar');im.replaceWith(r);setTimeout(()=>{if(r.isConnected)r.replaceWith(dinoEl(name,'idle'));},1200);}else sfxPop(0);};el.appendChild(c);});}
 function renderQuest(){const d=daily();const el=$('#quest');const ob=OBJECTS[dayIndex()%OBJECTS.length];el.className='mini quest pressable'+(d.done?' done':'');
   const row=(label,im,n)=>'<div class="qrow"><img src="'+im+'" alt=""><div class="qbar"><i style="width:'+Math.min(100,n/QUEST_N*100)+'%"></i></div><b>'+Math.min(n,QUEST_N)+'/'+QUEST_N+'</b></div>';
-  el.innerHTML='<h3><span>'+(d.done?'Quest done!':'Today’s quest')+'</span><span class="prize">'+(d.done?'<img src="'+A+'objects/'+ob+'_idle.webp" alt="">':'🎁')+'</span></h3>'+row('Spell',A+'letters/a_idle.webp',d.spelled)+row('Count',A+'num/n5_idle.webp',d.solved);}
+  el.innerHTML='<h3><span>'+(d.done?'Quest done!':'Today’s quest')+'</span><span class="prize"><img src="'+A+'objects/'+(d.done?'chest_open':'chest_closed')+'.webp" alt=""></span></h3>'+row('Spell',A+'letters/a_idle.webp',d.spelled)+row('Count',A+'num/n5_idle.webp',d.solved);}
 function renderGarden(el){
   const n=Math.floor(store.stars/5);el.innerHTML='<div class="sunlit"></div>';
   const plants=document.createElement('div');plants.className='plants';el.appendChild(plants);
@@ -1122,7 +1127,8 @@ function renderProblem(forced){
   const PH={3:140,4:124,5:108,6:100,7:90,8:80,9:72,10:64,11:58};const key=Math.min(11,Math.max(3,Math.round(slots)));
   v.style.setProperty('--ph',PH[key]+'px');v.style.setProperty('--lf',Math.max(18,Math.round(PH[key]*0.27))+'px');v.style.setProperty('--of',Math.max(30,Math.round(PH[key]*0.36))+'px');
   const addPal=(n,i,extra)=>{const e=pal(n,i);if(extra)e.classList.add(extra);v.appendChild(e);return e;};
-  terms.forEach((t,i)=>{addPal(t,i);const o=document.createElement('span');o.className='op';o.textContent=i<ops.length?ops[i]:'=';v.appendChild(o);});
+  const OPART={'+':'plus','-':'minus','×':'times','=':'equals'};
+  terms.forEach((t,i)=>{addPal(t,i);const sym=i<ops.length?ops[i]:'=';const o=document.createElement('span');o.className='op';const oi=img(A+'num/op_'+OPART[sym]+'_idle.webp');oi.className='opimg';oi.dataset.sym=OPART[sym];oi.onerror=()=>{o.textContent=sym;};o.appendChild(oi);v.appendChild(o);});
   const q=addPal('?',terms.length);q.id='palQ';
   terms.concat([p.ans]).forEach(n=>String(n).split('').forEach(d=>{if(HAS_JUMP(d))preload(numArt(d,'jump'));}));
   const ch=$('#choices');ch.innerHTML='';ch.className='choices';
@@ -1151,6 +1157,7 @@ function answer(n,el){
     el.classList.remove('no');el.classList.add('ok');
     const old=$('#palQ');const q=pal(p.ans,(p.terms||[0,0]).length,true);q.id='palQ';q.classList.add('big');old.replaceWith(q);
     [...document.querySelectorAll('#visual .pal')].slice(0,-1).forEach(x=>x.classList.add('dance'));
+    document.querySelectorAll('#visual .opimg').forEach(x=>{x.src=A+'num/op_'+x.dataset.sym+'_bounce.webp';});
     document.querySelectorAll('#visual .pal img').forEach(x=>{const m=x.src.match(/n(\d+)_idle/);if(m&&HAS_JUMP(m[1]))x.src=numArt(m[1],'jump');});
     startParticles($('#visual'),q,'spin');
     const r=el.getBoundingClientRect();burstAt(r.left+r.width/2,r.top+r.height/2,['⭐','✨','🌟']);
