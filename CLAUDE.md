@@ -38,6 +38,9 @@ Everything is one static page: `index.html` + `sw.js` + `manifest.webmanifest` +
 - Garden: plants `{name}_s1/s2/s3.png` (3 growth stages), animals `{name}_idle.png` + `{name}_fly|walk_###.png`.
 - Dino Island (`assets/dino/`): 16 dinos `{name}_idle.png`, `{name}_walk_###`, `{name}_roar_###`; egg `egg_s0..s3.png`, `egg_hatch_###`; scene `island`.
   Names are in `DINOS` in index.html. Until a dino's files exist the game shows an emoji (`DINO_MISSING` fallback).
+- Operators (`assets/num/op_plus|op_minus|op_times|op_equals`): `_idle.webp` + `_bounce.webp` (12 frames). Treasure chest
+  (`assets/objects/chest_closed.webp`, `chest_open.webp`, `chest_open_anim.webp`): when a still and a sequence share a state
+  name the converter writes the sequence as `{state}_anim`.
 - Scenes: 1200×750 opaque, bottom quarter is ground, nothing busy in the centre: meadow sea sky road space room night.
 
 ## Converting & publishing new art
