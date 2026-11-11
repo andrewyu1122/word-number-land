@@ -387,7 +387,8 @@ body.xmas .tile::after{top:-8px}
 @keyframes dance{0%,100%{transform:rotate(-8deg) translateY(0)}50%{transform:rotate(8deg) translateY(-14px)}}
 .pal.big{animation:popin .5s cubic-bezier(.3,1.7,.5,1),dance .55s .5s ease-in-out infinite}
 .op{font-size:44px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.2);padding-bottom:26px}
-.mathstage{height:330px;display:flex;justify-content:center;align-items:flex-end;gap:4px;flex-wrap:nowrap;padding:0 8px 34px 8px}
+.mathstage{height:330px;display:flex;justify-content:center;align-items:flex-end;gap:4px;overflow:hidden;flex-wrap:nowrap;padding:0 8px 34px 8px}
+.mathstage .eqrow{display:flex;align-items:flex-end;gap:4px;transform-origin:bottom center;position:relative;z-index:1;flex:none;max-width:none}
 .mathstage .pal{position:relative;z-index:1;flex-direction:column;align-items:center;gap:0}
 .mathstage .lbl{position:relative;z-index:2;margin-bottom:calc(var(--ph,150px)*var(--hr,.25)*-1 + 4px)}
 .mathstage .digits{display:flex;align-items:flex-end;gap:2px}
@@ -1290,10 +1291,12 @@ function renderProblem(forced){
   const digits=terms.reduce((t,x)=>t+String(x).length,0)+String(p.ans).length;const slots=digits+ops.length*0.6+0.6;
   const PH={3:140,4:124,5:108,6:100,7:90,8:80,9:72,10:64,11:58};const key=Math.min(11,Math.max(3,Math.round(slots)));
   v.style.setProperty('--ph',PH[key]+'px');v.style.setProperty('--lf',Math.max(18,Math.round(PH[key]*0.27))+'px');v.style.setProperty('--of',Math.max(30,Math.round(PH[key]*0.36))+'px');
-  const addPal=(n,i,extra)=>{const e=pal(n,i);if(extra)e.classList.add(extra);v.appendChild(e);return e;};
+  const row=document.createElement('div');row.className='eqrow';v.appendChild(row);
+  const addPal=(n,i,extra)=>{const e=pal(n,i);if(extra)e.classList.add(extra);row.appendChild(e);return e;};
   const OPART={'+':'plus','-':'minus','×':'times','=':'equals'};
-  terms.forEach((t,i)=>{addPal(t,i);const sym=i<ops.length?ops[i]:'=';const o=document.createElement('span');o.className='op plain';o.textContent=sym==='-'?'−':sym;o.dataset.sym=OPART[sym];v.appendChild(o);});
+  terms.forEach((t,i)=>{addPal(t,i);const sym=i<ops.length?ops[i]:'=';const o=document.createElement('span');o.className='op plain';o.textContent=sym==='-'?'−':sym;o.dataset.sym=OPART[sym];row.appendChild(o);});
   const q=addPal('?',terms.length);q.id='palQ';if(M.fg)v.appendChild(M.fg);
+  const fitRow=()=>{const avail=v.clientWidth-20;row.style.transform='';const w=row.scrollWidth;if(w>avail)row.style.transform='scale('+(avail/w).toFixed(3)+')';};requestAnimationFrame(fitRow);setTimeout(fitRow,250);setTimeout(fitRow,900);
   terms.concat([p.ans]).forEach(n=>String(n).split('').forEach(d=>{if(HAS_JUMP(d))preload(numArt(d,'jump'));}));
   const ch=$('#choices');ch.innerHTML='';ch.className='choices';
   if(p.input==='choices'){
