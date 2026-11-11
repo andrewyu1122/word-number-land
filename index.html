@@ -346,6 +346,8 @@ body.xmas #world .hills,body.xmas #world .hills2{background:#f4f9ff}
 .mini.big h2{font-size:24px}
 .lcard{position:relative;background:var(--card);border-radius:24px;aspect-ratio:1;box-shadow:var(--shadow);display:block;overflow:hidden}
 .lcard img{position:absolute;left:10%;width:80%;top:8%;height:80%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 4px 0 rgba(0,0,0,.15))}
+.lcard.mem .q{position:absolute;inset:0;display:grid;place-items:center;font-size:54px;font-weight:700;color:var(--slotline)}
+.lcard.mem{background:linear-gradient(135deg,#eaf4ff,#fff)}
 .lcard.ok{background:#e8ffee;box-shadow:0 7px 0 #22a85a}
 .lcard.no{animation:shake .4s;background:#ffe3ea}
 .lcard.glow{animation:glow .8s ease-in-out infinite;box-shadow:0 0 0 5px var(--sun),var(--shadow)}
@@ -567,12 +569,7 @@ body.xmas #world .hills,body.xmas #world .hills2{background:#f4f9ff}
     </header>
 
     <div id="littleHome" style="display:none">
-      <div class="duo">
-        <button class="mini big pressable" id="lcolors" style="--c:#ff4f8b"><img src="assets/objects/red_idle.webp" alt=""><div><h2>Colors</h2><p>Tap the red one</p></div></button>
-        <button class="mini big pressable" id="lshapes" style="--c:#3aa6ff"><img src="assets/objects/triangle_idle.webp" alt=""><div><h2>Shapes</h2><p>Find the circle</p></div></button>
-        <button class="mini big pressable" id="lcount" style="--c:#38d47a"><img src="assets/objects/apple_idle.webp" alt=""><div><h2>Count</h2><p>1, 2, 3!</p></div></button>
-        <button class="mini big pressable" id="lletters" style="--c:#9b6bff"><img src="assets/letters/a_idle.webp" alt=""><div><h2>ABC</h2><p>Tap and listen</p></div></button>
-      </div>
+      <div class="duo" id="littleTiles"></div>
     </div>
     <button class="advhero pressable" id="advBtn"></button>
 
@@ -921,7 +918,7 @@ function setSync(st){lastSync=st;const b=$('#syncBadge');if(b)b.textContent=SYNC
 function loadScript(src){return new Promise((res,rej)=>{const sc=document.createElement('script');sc.src=src;sc.onload=res;sc.onerror=rej;document.head.appendChild(sc);});}
 async function fbInit(){if(fdb)return fdb;setSync('connecting');const v='10.12.0';for(const n of ['app','auth','firestore'])await loadScript('https://www.gstatic.com/firebasejs/'+v+'/firebase-'+n+'-compat.js');
   const app=firebase.apps.length?firebase.app():firebase.initializeApp(FB_CFG);await firebase.auth().signInAnonymously();fdb=firebase.firestore();try{fdb.enablePersistence({synchronizeTabs:true});}catch(e){}return fdb;}
-const PROG_KEYS=['name','avatar','little','sea','log','limit','stars','words','lvl','album','daily','treasures','map','sr','mr','dino','bossSeen','recent','resetAt'];
+const PROG_KEYS=['name','avatar','little','sea','log','limit','ll','stars','words','lvl','album','daily','treasures','map','sr','mr','dino','bossSeen','recent','resetAt'];
 function profDoc(pr){const o={};PROG_KEYS.forEach(k=>{if(pr[k]!==undefined&&pr[k]!==null)o[k]=pr[k];});o.updatedAt=Date.now();return o;}
 const maxMap=(a,b)=>{const o=Object.assign({},a||{});for(const k in (b||{}))if((b[k]||0)>(o[k]||0))o[k]=b[k];return o;};
 function mergeProfile(loc,cl){ // returns merged profile; both are plain objects
@@ -936,6 +933,7 @@ function mergeProfile(loc,cl){ // returns merged profile; both are plain objects
   const mr={};new Set([...Object.keys(loc.mr||{}),...Object.keys(cl.mr||{})]).forEach(k=>{const a=(loc.mr||{})[k]||[],b=(cl.mr||{})[k]||[];mr[k]=a.length>=b.length?a:b;});m.mr=mr;
   if(cl.log||loc.log){const L=Object.assign({},cl.log||{});for(const k in (loc.log||{})){const a=loc.log[k],b=L[k];L[k]=b?{secs:Math.max(a.secs||0,b.secs||0),stars:Math.max(a.stars||0,b.stars||0),words:[...new Set([...(a.words||[]),...(b.words||[])])]}:a;}const keys=Object.keys(L).sort().slice(-60);m.log={};keys.forEach(k=>m.log[k]=L[k]);}
   if(cl.limit!==undefined&&(cl.updatedAt||0)>(loc.updatedAt||0))m.limit=cl.limit;
+  m.ll=maxMap(loc.ll,cl.ll);
   ['dino','sea'].forEach(k=>{if(cl[k]||loc[k]){const ld=loc[k]||{hatched:[],prog:0},cd=cl[k]||{hatched:[],prog:0};m[k]={hatched:[...new Set([...(cd.hatched||[]),...(ld.hatched||[])])],prog:Math.max(ld.prog||0,cd.prog||0),order:cd.order||ld.order};}});
   if(cl.daily&&(!loc.daily||cl.daily.date>loc.daily.date))m.daily=cl.daily;else if(loc.daily&&cl.daily&&loc.daily.date===cl.daily.date)m.daily={date:loc.daily.date,spelled:Math.max(loc.daily.spelled,cl.daily.spelled),solved:Math.max(loc.daily.solved,cl.daily.solved),done:loc.daily.done||cl.daily.done};
   if((cl.updatedAt||0)>(loc.updatedAt||0)){m.name=cl.name||loc.name;m.avatar=cl.avatar||loc.avatar;m.recent=cl.recent||loc.recent;}
@@ -1168,7 +1166,7 @@ function renderProfileBtn(){const sl=$('#avatarSlot');sl.innerHTML='';sl.appendC
 function renderProfiles(){const el=$('#plist');el.innerHTML='';root.profiles.forEach(pr=>{const b=document.createElement('button');b.className='prow'+(pr.id===store.id?' cur':'');b.appendChild(avatarEl(pr.avatar||'dog'));b.insertAdjacentHTML('beforeend','<b>'+pr.name+'</b><small>⭐ '+pr.stars+'</small>');b.onclick=()=>{if(pr.id!==store.id){sfxWhoosh();switchProfile(pr.id);}else $('#profiles').classList.remove('on');};el.appendChild(b);});}
 let newAvatar='cat',editing=false;
 function openNewProfile(edit){editing=!!edit;$('#profiles').classList.remove('on');$('#settings').classList.remove('on');$('#newProfile h2').textContent=editing?'Edit player':'New player';$('#newOk').textContent=editing?'Save':'Let’s go!';$('#newName').value=editing?store.name:'';$('#littleChk').checked=editing?!!store.little:false;newAvatar=editing?(store.avatar||'dog'):AVATARS[(root.profiles.length)%AVATARS.length];const g=$('#avgrid');g.innerHTML='';AVATARS.forEach(a=>{const b=document.createElement('button');b.className=a===newAvatar?'sel':'';b.appendChild(avatarEl(a));b.onclick=()=>{newAvatar=a;g.querySelectorAll('button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');sfxPop(2);};g.appendChild(b);});$('#newProfile').classList.add('on');setTimeout(()=>$('#newName').focus(),100);}
-function renderHome(){renderProfileBtn();const little=!!store.little;$('#littleHome').style.display=little?'':'none';$('#advBtn').style.display=little?'none':'';document.querySelectorAll('#home > .duo').forEach(d=>d.style.display=little?'none':'');renderAdvCard();renderIsland();$('#homeStars').textContent=store.stars;renderLevels();renderQuest();const c=Object.keys(store.album).length;$('#albumCount').textContent=c?c+' collected':'Spell to collect';$('#soundBtn').textContent=store.sound?'🔊':'🔇';$('#soundBtn').classList.toggle('off',!store.sound);$('#musicBtn').classList.toggle('off',!store.music);}
+function renderHome(){renderProfileBtn();const little=!!store.little;$('#littleHome').style.display=little?'':'none';if(little)renderLittleHome();$('#advBtn').style.display=little?'none':'';document.querySelectorAll('#home > .duo').forEach(d=>d.style.display=little?'none':'');renderAdvCard();renderIsland();$('#homeStars').textContent=store.stars;renderLevels();renderQuest();const c=Object.keys(store.album).length;$('#albumCount').textContent=c?c+' collected':'Spell to collect';$('#soundBtn').textContent=store.sound?'🔊':'🔇';$('#soundBtn').classList.toggle('off',!store.sound);$('#musicBtn').classList.toggle('off',!store.music);}
 
 /* ============ spelling ============ */
 let S={};
@@ -1268,39 +1266,79 @@ function wordDone(voiceOnly){
 }
 function nextWord(){S.idx++;if(S.idx>=S.queue.length)return finishRound('spell');renderWord();}
 
-/* ============ little mode (toddler) ============ */
+/* ============ little mode (toddler) — 6 activities × 5 levels, auto level-up ============ */
 const LCOLORS=['red','blue','yellow','green','orange','purple','pink','black','white'];
 const LSHAPES=['circle','square','triangle','star','heart'];
 const LOBJS=['apple','strawberry','chick','balloon','cookie','cupcake','fish','flower','car'];
+const COLOR_THINGS={red:['apple','strawberry','tomato','cherry','rose'],yellow:['banana','sun','lemon','corn','bus'],green:['frog','tree','leaf','broccoli','turtle'],orange:['carrot','fox','pumpkin']};
+const LKINDS=[['colors','Colors','#ff4f8b','objects/red_idle'],['shapes','Shapes','#3aa6ff','objects/triangle_idle'],['count','Count','#38d47a','num/n3_idle'],['abc','ABC','#9b6bff','letters/a_idle'],['words','Words','#ff8a3d','words/dog_idle'],['match','Match','#2fcfc0','words/cat_idle']];
+const LROUND=6;
 let L={};
-function startLittle(kind){L={kind,idx:0,total:0,mistakes:0};$('#littleStars').textContent=store.stars;show('little');renderLittle();}
+function llv(kind){if(!store.ll)store.ll={};return store.ll[kind]||1;}
+function renderLittleHome(){const el=$('#littleTiles');el.innerHTML='';LKINDS.forEach(([k,title,color,art])=>{const b=document.createElement('button');b.className='mini big pressable';b.style.setProperty('--c',color);b.innerHTML='<img src="'+A+art+'.webp" alt=""><div><h2>'+title+'</h2><p><span class="st">'+'★'.repeat(llv(k))+'</span><span class="st off" style="opacity:.25">'+'★'.repeat(5-llv(k))+'</span></p></div>';b.onclick=()=>{sfxWhoosh();startLittle(k);};el.appendChild(b);});}
+function startLittle(kind){L={kind,lv:llv(kind),idx:0,total:0,roundMiss:0};$('#littleStars').textContent=store.stars;show('little');$('#littleBar').innerHTML='';$('#littleGrid').innerHTML='';$('#nextBtn4').classList.remove('show');readyGo('#littleBar',renderLittle);}
+const lcard=(src,key,emoji)=>{const c=document.createElement('button');c.className='lcard';c.dataset.k=key;if(src)c.appendChild(img(src));else{const e=document.createElement('span');e.className='emoji';e.style.cssText='position:absolute;inset:0;display:grid;place-items:center;font-size:56px';e.textContent=emoji;c.appendChild(e);}return c;};
+const wArt=w=>ART[w]?wordArt(w,'idle'):null;
+function lbar(imgSrc,html){const bar=$('#littleBar');bar.innerHTML='';if(imgSrc)bar.appendChild(img(imgSrc));const t=document.createElement('div');t.className='txt';t.innerHTML=html;bar.appendChild(t);}
+function pickOne(g,opts,target,onPick,cols){g.style.setProperty('--cols',cols||(opts.length<=2?2:opts.length<=4?2:3));L.target=target;opts.forEach(o=>{const c=o.el;c.onclick=()=>{if(L.done)return;if(o.key===target){c.classList.add('ok');const r=c.getBoundingClientRect();burstAt(r.left+r.width/2,r.top+r.height/2,['⭐','✨']);onPick(true,o,c);littleDone();}else{L.mistakes++;L.roundMiss++;sfxWrong();c.classList.remove('no');void c.offsetWidth;c.classList.add('no');setTimeout(()=>c.classList.remove('no'),500);onPick(false,o,c);if(L.mistakes>=2){const t=[...g.querySelectorAll('.lcard')].find(x=>x.dataset.k===String(target));if(t)t.classList.add('glow');}}};g.appendChild(c);});}
 function renderLittle(){
-  L.done=false;L.mistakes=0;renderDots($('#littleDots'),L.idx,6);$('#nextBtn4').classList.remove('show');
-  const bar=$('#littleBar'),g=$('#littleGrid');bar.innerHTML='';g.innerHTML='';g.className='huntgrid';
-  if(L.kind==='colors'||L.kind==='shapes'){
-    const pool=L.kind==='colors'?LCOLORS:LSHAPES;const n=L.idx<2?2:L.idx<4?3:4;const opts=shuffle(pool.slice()).slice(0,n);const target=pick(opts);L.target=target;
-    bar.appendChild(img(A+'objects/'+target+'_jump.webp'));const t=document.createElement('div');t.className='txt';t.innerHTML='<h2>Tap the <b>'+target+'</b>!</h2>';bar.appendChild(t);
-    g.style.setProperty('--cols',n<=2?2:n===3?3:2);
-    opts.forEach(o=>{const c=document.createElement('button');c.className='lcard';c.dataset.k=o;c.appendChild(img(A+'objects/'+o+'_idle.webp'));c.onclick=()=>littleTap(c,o);g.appendChild(c);});
-    L.say=()=>say(['p_tapthe',(L.kind==='colors'?'c_':'sh_')+target],'Tap the '+target+'!');
-  }else if(L.kind==='count'){
-    const n=rnd(1,L.idx<2?3:5);const ob=pick(LOBJS);L.n=n;L.count=0;L.ob=ob;
-    bar.appendChild(img(A+'objects/'+ob+'_idle.webp'));const t=document.createElement('div');t.className='txt';t.innerHTML='<h2>Tap every <b>'+ob+'</b>!</h2><p id="lcount">Let’s count</p>';bar.appendChild(t);
-    g.style.setProperty('--cols',n<=2?2:3);
-    for(let i=0;i<n;i++){const c=document.createElement('button');c.className='lcard';c.appendChild(img(A+'objects/'+ob+'_idle.webp'));c.onclick=()=>{if(c.classList.contains('ok')||L.done)return;c.classList.add('ok');L.count++;const b=document.createElement('span');b.className='cnt';b.textContent=L.count;c.appendChild(b);c.firstChild.src=A+'objects/'+ob+'_jump.webp';sfxPop(L.count);say(['n_'+L.count],String(L.count));$('#lcount').textContent=L.count+' so far';if(L.count===n)setTimeout(()=>{littleDone();say(['x_'+n,'w_'+ob,'p_welldone'],n+' '+ob+'s! Well done!');},700);};g.appendChild(c);}
-    L.say=()=>say(['p_tapthe','w_'+ob],'Tap every '+ob+'!');
-  }else{ // letters: free tapping, each tap counts; 6 taps = done
-    const t=document.createElement('div');t.className='txt';t.innerHTML='<h2>Tap a letter!</h2>';bar.appendChild(img(letterArt('a','idle')));bar.appendChild(t);
-    g.className='letters-grid';L.taps=0;
-    'abcdefghijklmnopqrstuvwxyz'.split('').forEach(l=>{const b=document.createElement('button');b.appendChild(img(letterArt(l,'idle')));b.onclick=()=>{b.classList.remove('hit');void b.offsetWidth;b.classList.add('hit');const im=b.querySelector('img');im.src=letterArt(l,'jump');setTimeout(()=>{im.src=letterArt(l,'idle');},1100);sfxPop(l.charCodeAt(0)%8);say(['l_'+l,'f_'+l],l.toUpperCase());L.taps++;if(L.taps===8&&!L.done){littleDone(true);}};g.appendChild(b);});
-    L.say=()=>say(['p_tapthe'],'Tap a letter!');
+  L.done=false;L.mistakes=0;renderDots($('#littleDots'),L.idx,LROUND);$('#nextBtn4').classList.remove('show');
+  const g=$('#littleGrid');g.innerHTML='';g.className='huntgrid';const lv=L.lv,k=L.kind;
+  if(k==='colors'){
+    if(lv<=4){const n=[2,3,4,6][lv-1];const opts=shuffle(LCOLORS.slice()).slice(0,n);const t=pick(opts);lbar(A+'objects/'+t+'_jump.webp','<h2>Tap the <b>'+t+'</b>!</h2>');
+      pickOne(g,opts.map(o=>({key:o,el:lcard(A+'objects/'+o+'_idle.webp',o)})),t,(ok,o,c)=>{if(ok){c.firstChild.src=A+'objects/'+o.key+'_jump.webp';say(['c_'+o.key,'p_welldone'],o.key+'! Well done!');}else say(['c_'+o.key],o.key);});
+      L.say=()=>say(['p_tapthe','c_'+t],'Tap the '+t+'!');}
+    else{const cols=shuffle(Object.keys(COLOR_THINGS));const t=cols[0];const good=pick(COLOR_THINGS[t]);const bad=cols.slice(1,4).map(c=>pick(COLOR_THINGS[c]));lbar(A+'objects/'+t+'_jump.webp','<h2>What is <b>'+t+'</b>?</h2>');
+      pickOne(g,shuffle([good].concat(bad)).map(w=>({key:w,el:lcard(wArt(w),w,(EMOJI_BY_WORD[w]||{}).e)})),good,(ok,o,c)=>{if(ok){if(ART[o.key])c.firstChild.src=wordArt(o.key,'anim');say(['c_'+t,'w_'+o.key,'p_welldone'],t+' '+o.key+'! Well done!');}else say(['w_'+o.key],o.key);});
+      L.say=()=>say(['p_whatis','c_'+t],'What is '+t+'?');}
+  }else if(k==='shapes'){
+    if(lv<=3){const n=[2,3,5][lv-1];const opts=shuffle(LSHAPES.slice()).slice(0,n);const t=pick(opts);lbar(A+'objects/'+t+'_jump.webp','<h2>Tap the <b>'+t+'</b>!</h2>');
+      pickOne(g,opts.map(o=>({key:o,el:lcard(A+'objects/'+o+'_idle.webp',o)})),t,(ok,o,c)=>{if(ok){c.firstChild.src=A+'objects/'+o.key+'_jump.webp';say(['sh_'+o.key,'p_welldone'],o.key+'! Well done!');}else say(['sh_'+o.key],o.key);});
+      L.say=()=>say(['p_tapthe','sh_'+t],'Tap the '+t+'!');}
+    else{const pool=lv===4?LSHAPES:LCOLORS;const two=shuffle(pool.slice()).slice(0,2);const same=two[0],odd=two[1];const n=lv===4?4:6;const items=shuffle(Array(n-1).fill(same).concat([odd]));lbar(A+'mascot/mascot_think.webp','<h2>Which one is <b>different</b>?</h2>');
+      let i=0;pickOne(g,items.map(o=>({key:o===odd?'odd':'same'+(i++),name:o,el:lcard(A+'objects/'+o+'_idle.webp',o===odd?'odd':'s')})),'odd',(ok,o,c)=>{if(ok){c.firstChild.src=A+'objects/'+o.name+'_jump.webp';say(['p_welldone'],'Well done!');}else say(['p_tryagain'],'Try again!');},n===4?2:3);
+      L.say=()=>say(['p_different'],'Which one is different?');}
+  }else if(k==='count'){
+    const ob=pick(LOBJS);
+    if(lv<=2){const n=rnd(1,lv===1?3:5);L.count=0;lbar(A+'objects/'+ob+'_idle.webp','<h2>Tap every <b>'+ob+'</b>!</h2><p id="lcount">Let’s count</p>');g.style.setProperty('--cols',n<=2?2:3);
+      for(let i=0;i<n;i++){const c=lcard(A+'objects/'+ob+'_idle.webp','o');c.onclick=()=>{if(c.classList.contains('ok')||L.done)return;c.classList.add('ok');L.count++;const b=document.createElement('span');b.className='cnt';b.textContent=L.count;c.appendChild(b);c.firstChild.src=A+'objects/'+ob+'_jump.webp';sfxPop(L.count);say(['n_'+L.count],String(L.count));$('#lcount').textContent=L.count+' so far';if(L.count===n)setTimeout(()=>{littleDone();say(['x_'+n,'p_welldone'],n+'! Well done!');},700);};g.appendChild(c);}
+      L.say=()=>say(['p_tapthe','w_'+ob],'Tap every '+ob+'!');}
+    else if(lv<=4){const max=lv===3?5:10;const n=rnd(1,max);const bar=$('#littleBar');bar.innerHTML='';const grp=document.createElement('div');grp.style.cssText='display:grid;grid-template-columns:repeat(5,1fr);gap:4px;flex:none';for(let i=0;i<n;i++){const im=img(A+'objects/'+ob+'_idle.webp');im.style.height='40px';im.style.animation='none';grp.appendChild(im);}bar.appendChild(grp);const t=document.createElement('div');t.className='txt';t.innerHTML='<h2>How many?</h2>';bar.appendChild(t);
+      const opts=new Set([n]);while(opts.size<3){const x=Math.max(1,Math.min(max,n+rnd(-2,2)));opts.add(x);}
+      pickOne(g,shuffle([...opts]).map(x=>({key:String(x),el:lcard(numArt(String(x),'idle'),String(x))})),String(n),(ok,o,c)=>{if(ok){say(['x_'+n,'p_welldone'],n+'! Well done!');}else say(['n_'+o.key],o.key);},3);
+      L.say=()=>say(['p_howmany'],'How many?');}
+    else{let a=rnd(1,8),b2=rnd(1,8);while(b2===a)b2=rnd(1,8);lbar(A+'mascot/mascot_think.webp','<h2>Which has <b>more</b>?</h2>');g.style.setProperty('--cols',2);const more=a>b2?'a':'b';L.target=more;
+      [['a',a],['b',b2]].forEach(([key,n])=>{const c=document.createElement('button');c.className='lcard';c.dataset.k=key;c.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:10px;place-items:center';for(let i=0;i<n;i++){const im=img(A+'objects/'+ob+'_idle.webp');im.style.cssText='position:static;width:100%;height:auto;max-height:44px';c.appendChild(im);}
+        c.onclick=()=>{if(L.done)return;if(key===more){c.classList.add('ok');littleDone();say(['x_'+n,'p_welldone'],n+'! Well done!');}else{L.mistakes++;L.roundMiss++;sfxWrong();c.classList.add('no');setTimeout(()=>c.classList.remove('no'),500);say(['n_'+n],String(n));}};g.appendChild(c);});
+      L.say=()=>say(['p_more'],'Which has more?');}
+  }else if(k==='abc'){
+    const AL='abcdefghijklmnopqrstuvwxyz'.split('');
+    if(lv===1){lbar(letterArt('a','idle'),'<h2>Tap a letter!</h2>');g.className='letters-grid';L.taps=0;AL.forEach(l=>{const b=document.createElement('button');b.appendChild(img(letterArt(l,'idle')));b.onclick=()=>{b.classList.remove('hit');void b.offsetWidth;b.classList.add('hit');const im=b.querySelector('img');im.src=letterArt(l,'jump');setTimeout(()=>{im.src=letterArt(l,'idle');},1100);sfxPop(l.charCodeAt(0)%8);say(['l_'+l,'f_'+l],l.toUpperCase());L.taps++;if(L.taps===8&&!L.done)littleDone(true);};g.appendChild(b);});L.say=()=>say(['p_tapthe'],'Tap a letter!');}
+    else{const n=[0,3,5,8,5][lv-1];const opts=shuffle(AL.slice()).slice(0,n);const t=pick(opts);const bySound=lv===5;lbar(bySound?A+'mascot/mascot_think.webp':letterArt(t,'jump'),bySound?'<h2>Which letter says…? 🔊</h2>':'<h2>Find the letter <b>'+t+'</b>!</h2>');
+      pickOne(g,opts.map(o=>({key:o,el:lcard(letterArt(o,'idle'),o)})),t,(ok,o,c)=>{if(ok){c.firstChild.src=letterArt(o.key,'jump');say(['l_'+o.key,'f_'+o.key,'p_welldone'],o.key.toUpperCase()+'! Well done!');}else say(['l_'+o.key],o.key.toUpperCase());},n<=3?3:n<=5?3:4);
+      L.say=()=>bySound?say(['f_'+t,'f_'+t],t):say(['p_findletter','l_'+t],'Find the letter '+t.toUpperCase()+'!');}
+  }else if(k==='words'){
+    const pool=(lv<=3?WORDS[1]:lv===4?WORDS[1].concat(WORDS[2]):WORDS[1].concat(WORDS[2],WORDS[3])).map(w=>w[0]).filter(w=>ART[w]&&!(L.seenWords||[]).includes(w));const n=[2,3,4,6,6][lv-1];const opts=shuffle(pool.slice()).slice(0,n);const t=pick(opts);L.seenWords=(L.seenWords||[]).concat([t]);
+    lbar(A+'mascot/mascot_think.webp','<h2>Where is the <b>'+t+'</b>?</h2>');
+    pickOne(g,opts.map(w=>({key:w,el:lcard(wordArt(w,'idle'),w)})),t,(ok,o,c)=>{if(ok){c.firstChild.src=wordArt(o.key,'anim');say(['w_'+o.key,'p_welldone'],o.key+'! Well done!');}else say(['w_'+o.key],o.key);});
+    L.say=()=>say(['p_whereis','w_'+t],'Where is the '+t+'?');
+  }else{ // match
+    const pool=WORDS[1].concat(WORDS[2]).map(w=>w[0]).filter(w=>ART[w]);
+    if(lv<=3){const n=[2,3,4][lv-1];const opts=shuffle(pool.slice()).slice(0,n);const t=pick(opts);lbar(wordArt(t,'idle'),'<h2>Find my <b>shadow</b>!</h2>');
+      pickOne(g,opts.map(w=>{const c=lcard(wordArt(w,'idle'),w);c.firstChild.style.filter='brightness(0) opacity(.55)';return {key:w,el:c};}),t,(ok,o,c)=>{if(ok){c.firstChild.style.filter='';c.firstChild.src=wordArt(o.key,'anim');say(['w_'+o.key,'p_welldone'],o.key+'! Well done!');}else say(['p_tryagain'],'Try again!');});
+      L.say=()=>say(['p_shadow'],'Find my shadow!');}
+    else{const pairs=lv===4?2:3;const ws=shuffle(pool.slice()).slice(0,pairs);const cards=shuffle(ws.concat(ws));lbar(A+'mascot/mascot_think.webp','<h2>Find the <b>pairs</b>!</h2>');g.style.setProperty('--cols',lv===4?2:3);let open=[],found=0,lock=false;
+      cards.forEach(w=>{const c=document.createElement('button');c.className='lcard mem';c.dataset.k=w;const im=img(wordArt(w,'idle'));im.style.visibility='hidden';c.appendChild(im);const q=document.createElement('span');q.className='q';q.textContent='?';c.appendChild(q);
+        c.onclick=()=>{if(lock||L.done||c.classList.contains('ok')||open.includes(c))return;im.style.visibility='';q.style.display='none';sfxPop(open.length+2);say(['w_'+w],w);open.push(c);
+          if(open.length===2){lock=true;const [x,y]=open;if(x.dataset.k===y.dataset.k){setTimeout(()=>{x.classList.add('ok');y.classList.add('ok');open=[];lock=false;found++;if(found===pairs){littleDone();say(['p_welldone'],'Well done!');}},500);}else{L.mistakes++;setTimeout(()=>{[x,y].forEach(z=>{z.firstChild.style.visibility='hidden';z.querySelector('.q').style.display='';});open=[];lock=false;},900);}}};g.appendChild(c);});
+      L.say=()=>say(['p_pairs'],'Find the pairs!');}
   }
-  setTimeout(()=>L.say(),300);
+  setTimeout(()=>L.say&&L.say(),300);
 }
-function littleTap(c,o){if(L.done)return;if(o===L.target){c.classList.add('ok');c.firstChild.src=A+'objects/'+o+'_jump.webp';const r=c.getBoundingClientRect();burstAt(r.left+r.width/2,r.top+r.height/2,['⭐','✨']);littleDone();say([(L.kind==='colors'?'c_':'sh_')+o,'p_welldone'],o+'! Well done!');}
-  else{L.mistakes++;sfxWrong();c.classList.remove('no');void c.offsetWidth;c.classList.add('no');setTimeout(()=>c.classList.remove('no'),500);say([(L.kind==='colors'?'c_':'sh_')+o],o);if(L.mistakes>=2){const t=[...document.querySelectorAll('.lcard')].find(x=>x.dataset.k===L.target);if(t)t.classList.add('glow');}}}
-function littleDone(quiet){L.done=true;addStars(1);L.total+=1;if(!quiet){sfxWin();confetti();}setTimeout(()=>$('#nextBtn4').classList.add('show'),700);}
-function nextLittle(){L.idx++;if(L.idx>=6){$('#sumStars').innerHTML=starsText(3);$('#sumMascot').src=mascotArt('wave');$('#sumTitle').textContent='Well done!';$('#sumText').textContent='You earned '+L.total+' stars. Total: '+store.stars+' ⭐';$('#againBtn').textContent='Play again';lastGame='little';$('#summary').classList.add('on');sfxWin();confetti();say(['p_welldone'],'Well done!');return;}renderLittle();}
+function littleDone(quiet){L.done=true;const stars=L.mistakes===0?2:1;addStars(stars);L.total+=stars;if(!quiet){sfxWin();celebrate(1);}setTimeout(()=>$('#nextBtn4').classList.add('show'),700);}
+function nextLittle(){L.idx++;if(L.idx<LROUND){renderLittle();return;}
+  const before=L.lv;let msg='';if(L.roundMiss<=1&&L.lv<5){store.ll[L.kind]=L.lv+1;msg=' Level up! ⭐';}else if(L.roundMiss>=6&&L.lv>1){store.ll[L.kind]=L.lv-1;}else{if(!store.ll[L.kind])store.ll[L.kind]=L.lv;}save();
+  $('#sumStars').innerHTML=starsText(L.roundMiss<=1?3:L.roundMiss<=4?2:1);$('#sumMascot').src=mascotArt('wave');$('#sumTitle').textContent=msg?'Level up!':'Well done!';$('#sumText').textContent='You earned '+L.total+' stars.'+msg;$('#sumWords').innerHTML='';$('#againBtn').textContent='Play again';lastGame='little';$('#summary').classList.add('on');sfxWin();celebrate(msg?3:2);say(msg?['p_levelup','p_welldone']:['p_welldone'],msg?'Level up! Well done!':'Well done!');}
 
 /* ============ letter hunt ============ */
 let H={};
@@ -1532,7 +1570,6 @@ $('#playBtn').onclick=()=>{
 };
 document.querySelectorAll('[data-home]').forEach(b=>b.onclick=()=>{sfxPop(3);renderHome();show('home');});
 $('#albumBtn').onclick=()=>{sfxWhoosh();renderAlbum();show('album');};
-$('#lcolors').onclick=()=>{sfxWhoosh();startLittle('colors');};$('#lshapes').onclick=()=>{sfxWhoosh();startLittle('shapes');};$('#lcount').onclick=()=>{sfxWhoosh();startLittle('count');};$('#lletters').onclick=()=>{sfxWhoosh();startLittle('letters');};
 $('#sayBtn4').onclick=()=>L.say&&L.say();$('#nextBtn4').onclick=()=>{sfxWhoosh();nextLittle();};
 $('#spellOpen').onclick=()=>openSheet('spell');$('#mathOpen').onclick=()=>openSheet('math');$('#huntOpen').onclick=()=>openSheet('hunt');
 $('#sayBtn3').onclick=()=>{const q=H.q;if(q.promptWord)say(['p_whichlike','w_'+q.promptWord],'Which ones start like '+q.promptWord+'?');else say(['p_which','l_'+q.L],'Which ones start with '+q.L.toUpperCase()+'?');};$('#hintBtn3').onclick=()=>huntHint(true);$('#nextBtn3').onclick=()=>{sfxWhoosh();nextHunt();};$('#sheetClose').onclick=()=>$('#levelSheet').classList.remove('on');
@@ -1555,7 +1592,7 @@ $('#treasureOk').onclick=()=>{$('#treasure').classList.remove('on');if($('#home'
 $('#resetNo').onclick=()=>$('#resetDlg').classList.remove('on');
 $('#resetYes').onclick=async()=>{
   $('#resetDlg').classList.remove('on');
-  store.stars=0;store.words={};store.lvl={};store.album={};store.daily=null;store.treasures=[];store.map={};store.sr={};store.mr={};store.bossSeen={};store.dino=null;store.sea=null;store.resetAt=Date.now();save();refreshStars();renderHome();
+  store.stars=0;store.words={};store.lvl={};store.album={};store.daily=null;store.treasures=[];store.map={};store.sr={};store.mr={};store.bossSeen={};store.dino=null;store.sea=null;store.ll={};store.resetAt=Date.now();save();refreshStars();renderHome();
   if(fdb&&root.settings.family){try{await fdb.collection('families').doc(root.settings.family).collection('profiles').doc(store.id).set(profDoc(store));}catch(e){}}
   sfxWhoosh();say(['p_allclear'],'All clear! Let’s start again!');
 };

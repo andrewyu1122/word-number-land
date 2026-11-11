@@ -1,10 +1,8 @@
-# Voice batch 7: praise lines played after a perfect word (p_praise1..8). Same voice as every other batch.
-# (make_audio6.py was already taken by the phonics re-do, so this batch is 7.)
-# Run from repo root: python tools/make_audio7.py   (skips files that exist)
+# Voice batch 7: prompts for Little mode. Run from repo root: python tools/make_audio7.py
 import asyncio, os, edge_tts
 VOICE="en-US-AnaNeural"; RATE="-5%"; OUT="assets/audio"
-PRAISE=["Great!","Awesome!","You did it!","Super!","Fantastic!","Wonderful!","Yes!","Brilliant!"]
-jobs=[(f"p_praise{i+1}",t) for i,t in enumerate(PRAISE)]
+jobs=[("p_whatis","What is"),("p_different","Which one is different?"),("p_howmany","How many?"),("p_more","Which has more?"),
+      ("p_findletter","Find the letter"),("p_whereis","Where is the"),("p_shadow","Find my shadow!"),("p_pairs","Find the pairs!"),("p_levelup","Level up!")]
 async def one(name,text,sem):
     path=f"{OUT}/{name}.mp3"
     if os.path.exists(path) and os.path.getsize(path)>500: return
