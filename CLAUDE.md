@@ -61,6 +61,11 @@ and writes animated WebP. Then:
 2. `git add -A && git commit -m "..." && git push` — GitHub Pages updates in ~1 min; the app shows a green
    "New version ready" bar.
 
+## Sound effects & music
+`assets/sfx/*.mp3` and `assets/music/{home,map,play}.mp3` — see the README in each folder for the exact list and specs.
+Loaded by `loadSfx()` / `setTrack()`; every sound has a synthesized fallback, so missing files never break anything.
+Praise lines `p_praise1..8` are played after a perfect word.
+
 ## Family sync
 Firebase Firestore project `word-land-121a6` (config in index.html `FB_CFG`, anonymous auth). Data: `families/{CODE}/profiles/{profileId}`.
 A 6-letter family code typed into Settings on each device shares all profiles. Merge is field-wise max/union (`mergeProfile`);
