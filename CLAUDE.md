@@ -61,6 +61,12 @@ and writes animated WebP. Then:
 2. `git add -A && git commit -m "..." && git push` — GitHub Pages updates in ~1 min; the app shows a green
    "New version ready" bar.
 
+## Parent report, limits, hints
+- `store.log[date]={secs,stars,words[]}` feeds Settings → Parent report (7-day minutes, learned / tricky words, math skill) and the Monday weekly recap.
+- `store.limit` (minutes/day) shows the bedtime overlay; a grown-up holds the button for 5 more minutes.
+- First-time hand hints: `root.tut.{home,spell,math,hunt}`; `pointAt(el)` / `tutDone(k)`.
+- `readyGo()` plays a "Ready? Go!" before each round. `celebrate(level)` picks one of four celebration effects.
+
 ## Sound effects & music
 `assets/sfx/*.mp3` and `assets/music/{home,map,play}.mp3` — see the README in each folder for the exact list and specs.
 Loaded by `loadSfx()` / `setTrack()`; every sound has a synthesized fallback, so missing files never break anything.
