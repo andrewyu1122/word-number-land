@@ -208,6 +208,12 @@ body.xmas #world .hills,body.xmas #world .hills2{background:#f4f9ff}
 .island .dino{position:absolute;bottom:26px;height:70px;background:none;filter:drop-shadow(0 4px 0 rgba(0,0,0,.18));animation:roam var(--d,22s) linear infinite;animation-delay:var(--dl,0s);z-index:2}
 .island .dino img{height:100%}
 .island .dino .emoji{font-size:58px;line-height:70px;display:block}
+.island .dino.ai{animation:none;left:50%;transition:none}
+.island .dino.ai.hopit .emoji,.island .dino.ai.hopit img{animation:hop .6s ease-in-out}
+.island .ibub{position:absolute;transform:translateX(-50%);font-size:24px;z-index:5;pointer-events:none;animation:ibub 1.4s ease-out forwards}
+@keyframes ibub{0%{opacity:0;transform:translate(-50%,10px) scale(.5)}20%{opacity:1;transform:translate(-50%,0) scale(1.1)}100%{opacity:0;transform:translate(-50%,-34px) scale(1)}}
+.island .ifood{position:absolute;bottom:24px;transform:translateX(-50%);font-size:26px;z-index:1;animation:popin .3s cubic-bezier(.3,1.7,.5,1)}
+.island{cursor:pointer}
 .island .dino.swimmer{animation-name:swimroam}
 @keyframes swimroam{0%{left:-16%;transform:scaleX(-1) translateY(0)}25%{transform:scaleX(-1) translateY(-14px)}48%{left:92%;transform:scaleX(-1) translateY(0)}50%{transform:scaleX(1)}75%{transform:scaleX(1) translateY(-14px)}98%{left:-16%;transform:scaleX(1) translateY(0)}100%{transform:scaleX(-1)}}
 .island .dino.roar{animation-play-state:paused}
@@ -1054,8 +1060,40 @@ function renderIsland(){const el=$('#island');if(!el)return;const st=curSet();co
     const egg=document.createElement('button');egg.className='egg art';egg.dataset.stage=stage;const ei=img(A+'dino/'+st.egg+'_s'+stage+'.webp');ei.onerror=()=>{egg.classList.remove('art');egg.innerHTML='<div class="shell"></div>';};egg.appendChild(ei);
     egg.onclick=()=>{egg.classList.remove('wob');void egg.offsetWidth;egg.classList.add('wob');sfxNamed('crack',()=>synthPop(stage*2));vib(20);};el.appendChild(egg);
     const pr=document.createElement('span');pr.className='eggprog';pr.textContent='⭐ '+d.prog+' / '+goal;el.appendChild(pr);}
-  d.hatched.slice(-6).forEach((name,i)=>{const b=document.createElement('button');b.className='dino'+(st.id==='sea'?' swimmer':'');b.style.setProperty('--d',(18+(i*5)%12)+'s');b.style.setProperty('--dl',(-(i*7)%18)+'s');if(st.id==='sea')b.style.bottom=(20+(i*23)%90)+'px';b.appendChild(dinoEl(name,st.move));
-    b.onclick=()=>{b.classList.add('roar');sfxNamed(st.id==='sea'?'splash':'roar',synthWhoosh);vib(40);say([st.voice+name],DINO_BY[name][1]);setTimeout(()=>b.classList.remove('roar'),900);};el.appendChild(b);});
+  startIslandLife(el,st,d.hatched.slice(-7));
+}
+/* ---- island life: creatures wander, pause, meet, eat, react ---- */
+let islandRun=0;
+function startIslandLife(el,st,names){
+  const run=++islandRun;const sea=st.id==='sea';const W=()=>el.clientWidth||360;
+  const mk=(name,i)=>{const b=document.createElement('button');b.className='dino ai';const wrap=dinoEl(name,st.move);b.appendChild(wrap);el.appendChild(b);
+    const c={name,b,wrap,x:0.1+0.8*((i*0.37)%1),y:sea?(20+(i*29)%80):26,tx:Math.random(),dir:1,state:'walk',until:0,speed:0.035+Math.random()*0.03,cool:0,art:st.move};
+    b.onclick=e=>{e.stopPropagation();poke(c);};return c;};
+  const cs=names.map(mk);
+  const setArt=(c,a)=>{if(c.art===a)return;c.art=a;const im=c.wrap.querySelector('img');if(im)im.src=A+'dino/'+c.name+'_'+a+'.webp';};
+  const bubble=(c,ch)=>{const s2=document.createElement('span');s2.className='ibub';s2.textContent=ch;s2.style.left=(c.x*100)+'%';s2.style.bottom=(c.y+ (W()>=700?100:70))+'px';el.appendChild(s2);setTimeout(()=>s2.remove(),1400);};
+  const now=()=>performance.now();
+  const poke=c=>{c.state='happy';c.until=now()+1300;setArt(c,st.happy);sfxNamed(sea?'splash':'roar',synthWhoosh);vib(40);say([st.voice+c.name],DINO_BY[c.name][1]);bubble(c,'❤️');
+    cs.forEach(o=>{if(o!==c&&Math.abs(o.x-c.x)<0.35){o.dir=c.x>o.x?1:-1;o.state='look';o.until=now()+900;setArt(o,'idle');o.b.classList.remove('hopit');void o.b.offsetWidth;o.b.classList.add('hopit');}});};
+  // food: tap the ground
+  let food=null;
+  el.onclick=e=>{if(e.target.closest('.egg')||e.target.closest('.dino'))return;const r=el.getBoundingClientRect();const fx=(e.clientX-r.left)/r.width;if(food)food.el.remove();const f=document.createElement('span');f.className='ifood';f.textContent=sea?'🦐':pick(['🍃','🍖','🍎']);f.style.left=(fx*100)+'%';el.appendChild(f);food={x:fx,el:f};sfxPop(2);
+    let best=null;cs.forEach(c=>{if(!best||Math.abs(c.x-fx)<Math.abs(best.x-fx))best=c;});if(best){best.state='tofood';best.tx=fx;setArt(best,st.move);}};
+  const eggEl=el.querySelector('.egg');const eggHot=eggEl&&eggEl.dataset.stage==='3';
+  let last=now();
+  const tick=()=>{if(run!==islandRun||!el.isConnected)return;const t=now();const dt=Math.min(0.1,(t-last)/1000);last=t;
+    cs.forEach(c=>{
+      if(c.state==='walk'||c.state==='tofood'){const sp=c.speed*(c.state==='tofood'?2.4:1);const dx=c.tx-c.x;c.dir=dx>=0?1:-1;if(Math.abs(dx)<0.012){
+          if(c.state==='tofood'&&food){c.state='happy';c.until=t+1400;setArt(c,st.happy);bubble(c,'😋');sfxNamed('pop',()=>synthPop(4));food.el.remove();food=null;}
+          else{c.state='idle';c.until=t+800+Math.random()*2600;setArt(c,'idle');if(Math.random()<.25){bubble(c,pick(['🎵','💭','✨','💤']));}}
+        }else c.x+=c.dir*sp*dt;}
+      else if(t>c.until){c.state='walk';let tx,tries=0;do{tx=eggHot&&Math.random()<.4?0.5+(Math.random()-.5)*.4:0.06+Math.random()*0.88;tries++;}while(tries<8&&cs.some(o=>o!==c&&Math.abs(o.tx-tx)<0.14));c.tx=tx;setArt(c,st.move);}
+      // meet a friend
+      if(c.state==='walk'&&t>c.cool){const o=cs.find(o=>o!==c&&o.state==='walk'&&t>o.cool&&Math.abs(o.x-c.x)<0.13);if(o&&Math.random()<.02){[c,o].forEach(z=>{z.state='chat';z.until=t+1600;z.cool=t+9000;setArt(z,st.happy);});c.dir=o.x>c.x?1:-1;o.dir=-c.dir;bubble(c,pick(['❤️','😄','🎵']));setTimeout(()=>bubble(o,pick(['❤️','😆','⭐'])),400);}}
+      c.b.style.left=(c.x*100)+'%';c.b.style.bottom=(c.y+(sea?Math.sin(t/700+c.x*9)*8:0))+'px';c.b.style.transform='translateX(-50%) scaleX('+(-c.dir)+')';c.b.style.zIndex=sea?2:(c.state==='happy'?3:2);
+    });
+    requestAnimationFrame(tick);};
+  requestAnimationFrame(tick);
 }
 function renderDex(){const el=$('#dex');el.innerHTML='';let tot=0,has=0;
   SETS.forEach(st=>{const d=setState(st);tot+=st.list.length;has+=d.hatched.length;
