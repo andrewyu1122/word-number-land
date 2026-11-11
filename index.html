@@ -187,11 +187,6 @@ h1{margin:0;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0
 /* christmas */
 body.xmas{--sky1:#9fc9ff;--sky2:#eaf4ff}
 body.xmas #world .hills,body.xmas #world .hills2{background:#f4f9ff}
-body.xmas .tile::after,body.xmas .slot.filled::after,body.xmas .mathstage .digits::after{content:"";position:absolute;left:50%;transform:translateX(-50%) rotate(-8deg);top:-16px;width:46px;height:40px;background:url(assets/objects/hat_santa.png) center/contain no-repeat;pointer-events:none;z-index:3;filter:drop-shadow(0 2px 0 rgba(0,0,0,.2))}
-body.xmas .slot.filled{position:relative;overflow:visible}
-body.xmas .mathstage .digits{position:relative}
-body.xmas .mathstage .digits::after{top:calc(var(--ph,150px)*var(--hr,.25) - 24px);width:calc(var(--ph,150px)*.45);height:calc(var(--ph,150px)*.4)}
-body.xmas .tile::after{top:-8px}
 #world .snow{position:absolute;top:-10px;width:8px;height:8px;border-radius:50%;background:#fff;opacity:.9;animation:snowfall linear infinite}
 @keyframes snowfall{to{transform:translateY(110vh) translateX(30px)}}
 /* dino island */
