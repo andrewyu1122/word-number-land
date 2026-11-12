@@ -24,7 +24,7 @@ from concurrent.futures import ProcessPoolExecutor
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT  = os.path.join(ROOT, 'assets')
-HEIGHT = {'words':384,'letters':176,'upper':176,'num':224,'objects':160,'garden':128,'mascot':288,'bosses':512,'dino':384}
+HEIGHT = {'words':320,'letters':176,'upper':176,'num':224,'objects':160,'garden':128,'mascot':288,'bosses':420,'dino':320}
 DEST   = {'words':'words','letters':'letters','upper':'letters_upper','num':'num','objects':'objects','garden':'garden','mascot':'mascot','bosses':'bosses','dino':'dino'}
 PAD = 6
 
@@ -52,7 +52,7 @@ def convert_one(args):
         out = f'{outdir}/{name}_{state}.webp'
         if isinstance(v, list):
             fr = [prep(f,bb,h) for f in v]
-            fr[0].save(out, save_all=True, append_images=fr[1:], duration=42 if len(v)>12 else 60, loop=0, quality=80, method=4)
+            fr[0].save(out, save_all=True, append_images=fr[1:], duration=42 if len(v)>12 else 60, loop=0, quality=74, method=4)
         else:
             prep(v,bb,h).save(out, quality=82, method=4)
     return name

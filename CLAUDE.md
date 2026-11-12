@@ -114,3 +114,7 @@ treasure-chest opening animation, 11–20 as single characters, animated operato
 renders idle + walk/roar (swim/happy) + **eat / sleep / run** for one character with a single camera; `render_scene.py` renders
 `island_night`, `island_2_night`, `island_3_night`, `reef_night` and their `_fg` layers. Every dino / sea creature now has
 `{name}_eat|sleep|run.webp` in `assets/dino/`. Sleep is a lying-down breathing loop (frame 1 is not idle — cross-fade in/out).
+- Asset sizes (Nov 2026 slimming): `convert_assets.py` now uses words/dino height 320, bosses 420, animated WebP quality 74.
+  `python tools/slim_reconvert.py ./incoming <other png roots>` re-converts only characters whose source PNGs match what is committed.
+- Added art: mascot verbs `mascot_{run,jump,swim,eat,look,play,go,sit,read,kick,catch,hug}.webp`, scene `library` + `library_fg`,
+  lowercase `{letter}_no.webp` (head shake), medals `assets/objects/medal_{words50,words100,words200,math,hunt,read,dino,sea,streak7,map}_{idle,spin}.webp`.
