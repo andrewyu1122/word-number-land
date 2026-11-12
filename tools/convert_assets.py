@@ -6,7 +6,7 @@ Usage examples (run from the repo root):
   python tools/convert_assets.py letters ./incoming/letters        # a/, b/ ... or flat a_idle.png
   python tools/convert_assets.py upper   ./incoming/letters_upper
   python tools/convert_assets.py num     ./incoming/num
-  python tools/convert_assets.py objects ./incoming/objects
+  python tools/convert_assets.py objects ./incoming/objects        # also medal_{name}_idle / medal_{name}_spin_###
   python tools/convert_assets.py garden  ./incoming/garden
   python tools/convert_assets.py mascot  ./incoming/mascot
   python tools/convert_assets.py bosses  ./incoming/bosses
@@ -94,7 +94,7 @@ def main():
     names = set()
     for f in glob.glob(f'{src}/**/*.png', recursive=True):
         b = os.path.basename(f)
-        m = re.match(r'(op_[a-z]+|mascot_xmas|[A-Za-z0-9]+)_[a-z0-9]+(?:_\d{3})?\.png$', b)
+        m = re.match(r'(op_[a-z]+|mascot_xmas|medal_[a-z0-9]+|[A-Za-z0-9]+)_[a-z0-9]+(?:_\d{3})?\.png$', b)
         if m and 'sheet' not in b and 'preview' not in f: names.add((os.path.dirname(f), m.group(1)))
     for folder, name in sorted(names):
         files = collect(folder, name)
