@@ -175,6 +175,48 @@ elif BASE == "reef":   # coral reef sea floor
     bm = mat((0.85, 0.95, 1.0), 0.2, 0.5)
     for k in range(32): S(random.uniform(0.08, 0.25), (random.uniform(-16, 16), random.uniform(5, 40), random.uniform(2, 13)), (1,1,1), bm)
     for k in range(8): S(0.5, (random.uniform(-16, 16), random.uniform(25, 45), random.uniform(4, 10)), (1.6, 0.5, 0.9), mat(random.choice([(1,0.6,0.2),(1,0.9,0.3),(0.9,0.4,0.6)])))
+elif BASE == "library":   # warm children's reading corner (Read mode)
+    sky((0.98, 0.9, 0.74), (0.98, 0.9, 0.74), (0.85, 0.75, 0.65), 0.55); ground((0.86, 0.66, 0.42))
+    plane((0, 22, 10), 60, 22, mat((0.99, 0.9, 0.72)), (rad(90), 0, 0)); sun.energy = 2.0; sun.color = (1.0, 0.95, 0.85)
+    for k in range(-24, 25): B((k*1.6, 26, 0.01), (0.05, 56, 0.02), mat((0.74, 0.54, 0.32)))
+    B((0, 21.8, 0.4), (60, 0.3, 0.8), mat((1, 0.97, 0.9)))
+    cols = [(0.92, 0.33, 0.3), (0.3, 0.55, 0.92), (0.35, 0.72, 0.42), (0.97, 0.78, 0.25), (0.72, 0.45, 0.85), (0.98, 0.55, 0.25), (0.3, 0.75, 0.78), (0.95, 0.5, 0.65)]
+    def shelf(x0, w=6.2, hgt=9.2, rows=4):
+        B((x0, 20.9, hgt/2), (w, 1.5, hgt), mat((0.72, 0.5, 0.3))); B((x0, 20.2, hgt/2), (w - 0.5, 0.3, hgt - 0.5), mat((0.55, 0.36, 0.2)))
+        rh = (hgt - 0.6)/rows
+        for r in range(rows):
+            B((x0, 20.3, 0.3 + r*rh), (w - 0.3, 1.2, 0.16), mat((0.78, 0.56, 0.34))); x = x0 - w/2 + 0.45
+            while x < x0 + w/2 - 0.5:
+                bw = random.uniform(0.3, 0.55); bh = rh*random.uniform(0.6, 0.86); tilt = rad(random.choice([0, 0, 0, 0, 9]))
+                B((x + bw/2, 20.0, 0.38 + r*rh + bh/2), (bw, 0.9, bh), mat(random.choice(cols)), (0, tilt, 0)); x += bw + 0.06
+        B((x0, 20.9, hgt + 0.1), (w + 0.3, 1.7, 0.2), mat((0.78, 0.56, 0.34)))
+    shelf(-11.2); shelf(11.2)
+    S(0.8, (-12.2, 20.6, 10.1), (1, 1, 1), mat((0.4, 0.7, 0.9))); Cy(0.25, 0.3, (-12.2, 20.6, 9.35), mat((0.6, 0.4, 0.25)))                    # globe
+    Cy(0.5, 0.7, (10.2, 20.6, 9.65), mat((0.85, 0.5, 0.35))); S(0.9, (10.2, 20.6, 10.6), (1, 1, 1.1), mat((0.4, 0.72, 0.4)))                    # plant
+    # window with soft sunlight, high on the wall
+    B((0, 21.7, 9.6), (7.0, 0.3, 5.4), mat((1, 1, 1))); B((0, 21.5, 9.6), (6.4, 0.2, 4.8), mat((0.5, 0.74, 0.95), 0.3, 0.0))
+    B((0, 21.4, 9.6), (0.22, 0.1, 4.8), mat((1, 1, 1))); B((0, 21.4, 9.6), (6.4, 0.1, 0.22), mat((1, 1, 1)))
+    S(1.0, (-1.6, 21.45, 10.9), (1, 0.05, 1), mat((1.0, 0.92, 0.55), 0.5, 1.2)); cm = mat((1, 1, 1), 0.9)
+    for (dx, dz, r) in [(0, 0, 0.6), (-0.6, -0.1, 0.42), (0.6, -0.08, 0.45)]: S(r, (1.7 + dx, 21.45, 8.6 + dz), (1, 0.05, 1), cm)
+    for sx in (-1, 1): B((sx*3.9, 21.3, 9.6), (1.1, 0.12, 6.0), mat((0.98, 0.72, 0.45)))
+    for k in range(11):                                   # paper bunting between the shelves
+        x = -6.5 + 13*k/10; z = 14.6 - 1.0*math.sin(math.pi*k/10)
+        bpy.ops.mesh.primitive_cone_add(vertices=3, radius1=0.5, depth=0.05, location=(x, 21.78, z), rotation=(rad(90), 0, rad(180))); o = bpy.context.active_object; o.data.materials.append(mat(cols[k % 8]))
+    # push everything on the back wall away from the camera (same picture, but the floor now fills the bottom ~1/5)
+    camv = Vector((0, -9, 2.4)); K_ = 2.0
+    for o in list(bpy.data.objects):
+        if o.type == 'MESH' and o.location.y > 19.5 and o.location.y < 60 and o.location.z > 0.1:
+            o.location = camv + (o.location - camv)*K_ + Vector((0, 0, 1.3)); o.scale = tuple(v*K_ for v in o.scale)
+    # sun patch + soft rug on the floor
+    plane((1.5, 12.5, 0.015), 6.5, 5.0, mat((0.95, 0.8, 0.52)), (0, 0, rad(18)))
+    S(1.0, (0, 9.5, 0.02), (6.5, 3.4, 0.03), mat((0.62, 0.8, 0.82))); S(1.0, (0, 9.5, 0.03), (5.6, 2.8, 0.03), mat((0.78, 0.9, 0.9)))
+    # little round table with stools on the right, floor cushions on the left
+    Cy(1.6, 0.18, (9.0, 12.5, 1.55), mat((0.98, 0.85, 0.55)), verts=32); Cy(0.22, 1.5, (9.0, 12.5, 0.75), mat((0.75, 0.55, 0.35))); Cy(0.8, 0.12, (9.0, 12.5, 0.06), mat((0.75, 0.55, 0.35)))
+    for k, c in enumerate([(0.92, 0.33, 0.3), (0.3, 0.55, 0.92), (0.97, 0.78, 0.25)]): B((9.0 + 0.1*k, 12.5, 1.72 + 0.16*k), (1.1, 0.8, 0.15), mat(c), (0, 0, rad(12*k)))
+    for (x, y, c) in [(7.0, 10.6, (0.95, 0.5, 0.65)), (11.3, 11.0, (0.35, 0.72, 0.42))]: Cy(0.6, 0.16, (x, y, 0.95), mat(c)); Cy(0.12, 0.9, (x, y, 0.45), mat((0.75, 0.55, 0.35)))
+    S(1.2, (-9.2, 12.0, 0.45), (1.2, 1.0, 0.45), mat((0.95, 0.6, 0.3))); S(0.9, (-11.3, 14.0, 0.4), (1.1, 1.0, 0.45), mat((0.6, 0.5, 0.9)))
+    for k, c in enumerate([(0.35, 0.72, 0.42), (0.92, 0.33, 0.3)]): B((-7.4, 11.0 + 0.2*k, 0.1 + 0.17*k), (1.2, 0.9, 0.16), mat(c), (0, 0, rad(20 - 30*k)))
+    B((-13.6, 16, 2.6), (0.25, 0.25, 5.2), mat((0.35, 0.35, 0.4))); Co(1.1, 1.2, (-13.6, 16, 5.6), mat((1, 0.85, 0.5), 0.8, 0.6))
 elif BASE == "room":
     sky((0.8, 0.74, 0.62), (0.8, 0.74, 0.62), (0.7, 0.65, 0.6), 0.5); ground((0.8, 0.6, 0.4))
     plane((0, 22, 10), 60, 22, mat((0.9, 0.8, 0.66)), (rad(90), 0, 0)); sun.energy = 1.8
