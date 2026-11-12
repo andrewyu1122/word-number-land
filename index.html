@@ -210,6 +210,7 @@ body.xmas #world .hills,body.xmas #world .hills2{background:#f4f9ff}
 .island .dino .emoji{font-size:58px;line-height:70px;display:block}
 .island .dino.ai{animation:none;left:50%;transition:none}
 .island .dino.ai.hopit .emoji,.island .dino.ai.hopit img{animation:hop .6s ease-in-out}
+.island .daynight.worldsw{right:54px}
 .island .daynight{position:absolute;right:10px;top:8px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.85);font-size:18px;display:grid;place-items:center;z-index:6;box-shadow:0 3px 0 rgba(0,0,0,.15)}
 .island .ibub{position:absolute;transform:translateX(-50%);font-size:24px;z-index:5;pointer-events:none;animation:ibub 1.4s ease-out forwards}
 @keyframes ibub{0%{opacity:0;transform:translate(-50%,10px) scale(.5)}20%{opacity:1;transform:translate(-50%,0) scale(1.1)}100%{opacity:0;transform:translate(-50%,-34px) scale(1)}}
@@ -974,7 +975,7 @@ function setSync(st){lastSync=st;const b=$('#syncBadge');if(b)b.textContent=SYNC
 function loadScript(src){return new Promise((res,rej)=>{const sc=document.createElement('script');sc.src=src;sc.onload=res;sc.onerror=rej;document.head.appendChild(sc);});}
 async function fbInit(){if(fdb)return fdb;setSync('connecting');const v='10.12.0';for(const n of ['app','auth','firestore'])await loadScript('https://www.gstatic.com/firebasejs/'+v+'/firebase-'+n+'-compat.js');
   const app=firebase.apps.length?firebase.app():firebase.initializeApp(FB_CFG);await firebase.auth().signInAnonymously();fdb=firebase.firestore();try{fdb.enablePersistence({synchronizeTabs:true});}catch(e){}return fdb;}
-const PROG_KEYS=['name','avatar','little','sea','log','limit','ll','sw','medals','stars','words','lvl','album','daily','treasures','map','sr','mr','dino','bossSeen','recent','resetAt'];
+const PROG_KEYS=['name','avatar','little','sea','log','limit','ll','sw','medals','viewSet','stars','words','lvl','album','daily','treasures','map','sr','mr','dino','bossSeen','recent','resetAt'];
 function profDoc(pr){const o={};PROG_KEYS.forEach(k=>{if(pr[k]!==undefined&&pr[k]!==null)o[k]=pr[k];});o.updatedAt=Date.now();return o;}
 const maxMap=(a,b)=>{const o=Object.assign({},a||{});for(const k in (b||{}))if((b[k]||0)>(o[k]||0))o[k]=b[k];return o;};
 function mergeProfile(loc,cl){ // returns merged profile; both are plain objects
@@ -1110,26 +1111,29 @@ function renderReport(){const el=$('#repBody');const days=[];const now=Date.now(
 function setState(st){const k=st.id;if(!store[k]){store[k]={hatched:[],prog:0,order:shuffle(st.list.map(d=>d[0]))};save();}if(!store[k].order)store[k].order=shuffle(st.list.map(d=>d[0]));return store[k];}
 function curSet(){for(const st of SETS){if(setState(st).hatched.length<st.list.length)return st;}return SETS[SETS.length-1];}
 function dino(){return setState(SETS[0]);}
+function setUnlocked(i){return i===0||setState(SETS[i-1]).hatched.length>=SETS[i-1].list.length;}
+function viewSet(){const v=SETS.find(x=>x.id===store.viewSet);if(v&&setUnlocked(SETS.indexOf(v)))return v;return curSet();}
 function eggGoal(st){st=st||curSet();return Math.min(20,10+2*setState(st).hatched.length);}
 let hatchQueue=[];
 function dinoProgress(n){const st=curSet();const d=setState(st);if(d.hatched.length>=st.list.length)return;d.prog+=n;while(d.prog>=eggGoal(st)&&d.hatched.length<st.list.length){d.prog-=eggGoal(st);const next=d.order.find(x=>!d.hatched.includes(x));if(!next)break;d.hatched.push(next);hatchQueue.push([st.id,next]);}save();if(hatchQueue.length)setTimeout(showHatch,1500);}
 function showHatch(){if(!hatchQueue.length||$('#hatch').classList.contains('on'))return;if($('#treasure').classList.contains('on')||$('#summary').classList.contains('on')){setTimeout(showHatch,1500);return;}
-  const [sid,name]=hatchQueue.shift();const st=SETS.find(x=>x.id===sid);const info=DINO_BY[name];const d=setState(st);
+  const [sid,name]=hatchQueue.shift();store.viewSet=sid;const st=SETS.find(x=>x.id===sid);const info=DINO_BY[name];const d=setState(st);
   const stg=$('#hatchStage');stg.innerHTML='<div class="bigegg"><div class="shell"></div></div>';const eggIm=img(A+'dino/'+st.egg+'_s3.webp');eggIm.style.cssText='height:170px;filter:drop-shadow(0 8px 0 rgba(0,0,0,.15))';eggIm.onload=()=>{const be=stg.querySelector('.bigegg');if(be){be.innerHTML='';be.appendChild(eggIm);}};
   $('#hatchTitle').textContent='It’s hatching!';$('#hatchText').textContent='Your egg is wobbling…';$('#hatchOk').style.display='none';$('#hatch').classList.add('on');
   sfxPop(1);setTimeout(()=>sfxPop(3),400);setTimeout(()=>sfxPop(5),800);
   setTimeout(()=>{const be=stg.querySelector('.bigegg');const hi=be.querySelector('img');if(hi){hi.src=A+'dino/'+st.egg+'_hatch.webp';be.style.animation='none';setTimeout(()=>be.classList.add('pop'),600);}else be.classList.add('pop');sfxNamed('hatch',synthWin);celebrate(3);
     setTimeout(()=>{stg.innerHTML='';stg.appendChild(dinoEl(name,st.happy,'newdino'));$('#hatchTitle').textContent=info[1]+'!';$('#hatchText').textContent=(st.id==='dino'?'A new dinosaur joined your island!':'A new friend joined your reef!')+' ('+d.hatched.length+' of '+st.list.length+')';$('#hatchOk').style.display='';say(['p_hatched',st.voice+name],'A new friend hatched! '+info[1]+'!');
-      if(d.hatched.length===st.list.length&&SETS.indexOf(st)<SETS.length-1){$('#hatchText').textContent+=' You found them all — a new world opens: '+SETS[SETS.indexOf(st)+1].title+'!';setTimeout(()=>say(['p_newworld'],'You found them all! A new world is open!'),2500);}},450);},1300);}
-function renderIsland(){const el=$('#island');if(!el)return;const st=curSet();const d=setState(st);el.innerHTML='';
+      if(d.hatched.length===st.list.length&&SETS.indexOf(st)<SETS.length-1){$('#hatchText').textContent+=' You found them all — a new world opens: '+SETS[SETS.indexOf(st)+1].title+'!';store.viewSet=SETS[SETS.indexOf(st)+1].id;save();setTimeout(()=>say(['p_newworld'],'You found them all! A new world is open!'),2500);}},450);},1300);}
+function renderIsland(){const el=$('#island');if(!el)return;const st=viewSet();const d=setState(st);el.innerHTML='';
   const night=isNight();const stageN=st.scenes[d.hatched.length>=12?2:d.hatched.length>=6?1:0]+(night?'_night':'');const bg=img(A+'scenes/'+stageN+'.webp','bg');bg.onerror=()=>{bg.src=A+'scenes/island.webp';};el.appendChild(bg);const fgI=img(A+'scenes/'+stageN+'_fg.webp','fg');fgI.onerror=()=>fgI.remove();el.appendChild(fgI);
+  const open=SETS.filter((x,i)=>setUnlocked(i));if(open.length>1){const nxt=open[(open.indexOf(st)+1)%open.length];const sw=document.createElement('button');sw.className='daynight worldsw';sw.textContent=nxt.emoji;sw.setAttribute('aria-label','Go to '+nxt.title);sw.onclick=e=>{e.stopPropagation();store.viewSet=nxt.id;save();sfxWhoosh();renderIsland();};el.appendChild(sw);}
   const tog=document.createElement('button');tog.className='daynight';tog.textContent=night?'🌙':'☀️';tog.setAttribute('aria-label','Day or night');tog.onclick=e=>{e.stopPropagation();nightOverride=!night;sfxPop(night?5:1);renderIsland();};el.appendChild(tog);
   const h=document.createElement('span');h.className='hint';h.textContent=st.emoji+' '+st.title+' · '+d.hatched.length+'/'+st.list.length;el.appendChild(h);
   if(d.hatched.length<st.list.length){const goal=eggGoal(st);const stage=d.prog>=goal*.75?3:d.prog>=goal*.5?2:d.prog>=goal*.25?1:0;
     const egg=document.createElement('button');egg.className='egg art';egg.dataset.stage=stage;const ei=img(A+'dino/'+st.egg+'_s'+stage+'.webp');ei.onerror=()=>{egg.classList.remove('art');egg.innerHTML='<div class="shell"></div>';};egg.appendChild(ei);
     egg.onclick=()=>{egg.classList.remove('wob');void egg.offsetWidth;egg.classList.add('wob');sfxNamed('crack',()=>synthPop(stage*2));vib(20);};el.appendChild(egg);
     const pr=document.createElement('span');pr.className='eggprog';pr.textContent='⭐ '+d.prog+' / '+goal;el.appendChild(pr);}
-  startIslandLife(el,st,d.hatched.slice(-7));
+  startIslandLife(el,st,d.hatched.length>=st.list.length?shuffle(d.hatched.slice()).slice(0,8):d.hatched.slice(-7));
 }
 let nightOverride=null;
 function isNight(){if(nightOverride!==null)return nightOverride;const h=new Date().getHours();return h>=20||h<6;}
