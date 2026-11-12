@@ -67,10 +67,16 @@ def b_gym():
     S(0.22, (-0.9, -0.7, 0.42), (1, 1, 1), "orange"); To(0.22, 0.012, (-0.9, -0.7, 0.42), "black", (R90, 0, 0))
     face(1.25, -0.27, 0.2, 0.11, mouth_dz=0.26, mr=0.1); fit(); return {}
 def b_mat():
-    RB((0, 0.4, 0.07), (1.5, 1.7, 0.1), "purple", lv=1); RC(0.33, 1.5, (0, -0.5, 0.36), "purple", (0, R90, 0), lv=1)
-    for sx in (-1, 1): To(0.22, 0.025, (sx*0.83, -0.5, 0.36), "lavender", (0, R90, 0)); To(0.1, 0.02, (sx*0.83, -0.5, 0.36), "lavender", (0, R90, 0))
-    for y in (0.0, 0.5, 1.0): RB((0, y, 0.125), (1.4, 0.08, 0.02), "lavender", lv=1)
-    sface(0.44, 0.2, 0.1, mouth_dz=0.2, mr=0.08); return {}
+    e = E((0, 0, 0)); n0 = len(LIDS)
+    BX((0, 0, 0.85), (2.3, 0.14, 1.5), "brown", e, bevel=0.05); BX((0, -0.03, 0.85), (2.05, 0.14, 1.25), "straw", e, bevel=0.03)
+    for k in range(5): BX((0, -0.045, 0.37 + 0.24*k), (2.05, 0.14, 0.1), "red" if k % 2 == 0 else "green", e, bevel=0.01)
+    for sx in (-1, 1):
+        for k in range(9): BX((sx*1.2, 0, 0.2 + 0.16*k), (0.12, 0.08, 0.05), "straw", e, bevel=0.01)
+    face(0.95, -0.11, 0.2, 0.1, parent=e, mouth_dz=0.22, mr=0.09)
+    e.rotation_euler = (rad(-62), 0, 0); e.location = (0, -0.6, 0.02); bpy.context.view_layer.update()
+    M = e.matrix_world
+    for i in range(n0, len(LIDS)): pp, parent, r = LIDS[i]; LIDS[i] = (M @ Vector(pp), parent, r)
+    return {}
 def b_ox():
     h = quad_meta((0.72, 0.5, 0.3), (0.86, 0.7, 0.5), (0.92, 0.8, 0.62), (0.25, 0.15, 0.08), ear="round", tail="long", snout_len=0.08)
     for sx in (-1, 1):
@@ -84,10 +90,11 @@ def b_sky():
     for k in range(8): a = k*TAU/8; S(0.05, (0.55 + 0.34*math.cos(a), -0.3, 1.5 + 0.34*math.sin(a)), (1, 0.5, 1), "yellow")
     face(1.0, -0.29, 0.24, 0.12, mouth_dz=0.3, mr=0.11); return {}
 def b_toe():
-    RB((0.45, 0.35, 0.22), (2.1, 1.0, 0.42), "peach", lv=2)
-    RC(0.48, 1.25, (-0.35, 0, 0.72), "peach", lv=2); S(0.28, (-0.35, -0.42, 1.2), (1, 0.3, 0.85), "pink")
-    for (x, r, hh) in [(0.42, 0.28, 0.75), (0.92, 0.24, 0.62), (1.35, 0.2, 0.5)]: RC(r, hh, (x, 0.05, hh/2 + 0.1), "peach", lv=2); S(r*0.55, (x, -r*0.85 + 0.05, hh*0.85), (1, 0.3, 0.8), "pink")
-    sface(0.72, 0.17, 0.1, x=-0.35, mouth_dz=0.28, mr=0.09); return {}
+    RB((0.35, 0.55, 0.3), (2.3, 1.5, 0.58), "peach", lv=2)                                # front half of the foot
+    S(0.8, (-0.6, -0.45, 0.78), (1, 1.1, 0.98), "peach"); S(0.5, (-0.6, -0.5, 1.42), (1, 1.05, 0.4), "red", rot=(rad(-22), 0, 0)); S(0.12, (-0.8, -0.7, 1.56), (1.5, 0.8, 0.3), "white", rot=(rad(-22), 0, 0))
+    for k, (x, r) in enumerate([(0.22, 0.3), (0.72, 0.27), (1.15, 0.23), (1.5, 0.19)]):
+        y = -0.25 + 0.14*k; S(r, (x, y, r*0.95), (1, 1.15, 0.95), "peach"); S(r*0.55, (x, y - r*0.2, r*1.75), (1, 1.1, 0.35), "pink", rot=(rad(-14), 0, 0))
+    sface(0.85, 0.24, 0.13, x=-0.6, mouth_dz=0.32, mr=0.11, fb=-1.2); return {}
 # ---------------------------------------------------------------- level 2
 def b_band():
     base(2.5, 1.6, "wood", 0.24)
@@ -125,12 +132,22 @@ def b_clam():
     for k in range(5): a = rad(-50 + 25*k); S(0.09, (0.78*math.sin(a), -0.72*math.cos(a), 0.42), (1, 1, 0.8), "purple")
     S(0.7, (0, 0.05, 0.6), (1, 0.85, 0.35), "pink"); S(0.2, (0.38, -0.3, 0.78), (1, 1, 1), "white")
     face(0.82, -0.52, 0.17, 0.11, x=-0.12, mouth_dz=0.0, mr=0.0, tongue=False); smile(0.62, -0.72, 0.1, x=-0.12, tongue=False); return {"lid": p}
-def coin(c, r, rim=None, emblem=None, z=None):
-    z = z or r + 0.05; Cy(r, 0.16, (0, 0, z), c, (R90, 0, 0), verts=48); To(r*0.92, 0.04, (0, -0.07, z), rim or c, (R90, 0, 0)); To(r*0.92, 0.04, (0, 0.07, z), rim or c, (R90, 0, 0))
-    if emblem: emblem(z)
-    face(z + r*0.12, -0.09, r*0.3, r*0.15, mouth_dz=r*0.42, mr=r*0.14)
-def b_dime():
-    coin("silver", 0.7, emblem=lambda z: [S(0.05, (0.5*math.cos(k*TAU/12), -0.09, z + 0.5*math.sin(k*TAU/12)), (1, 0.4, 1), "lgrey") for k in range(12)]); return {}
+def T3(txt, size, loc, c, depth=0.04):
+    """extruded text standing up, facing the camera side (-Y)"""
+    bpy.ops.object.text_add(location=loc, rotation=(R90, 0, 0)); o = bpy.context.active_object
+    o.data.body = txt; o.data.size = size; o.data.extrude = depth; o.data.align_x = 'CENTER'; o.data.align_y = 'CENTER'
+    try: o.data.font = bpy.data.fonts.load("C:/Windows/Fonts/arialbd.ttf", check_existing=True)
+    except Exception: pass
+    o.data.materials.append(mat(c)); par(o, ROOT); return o
+def coin(c, r, thick, rim, txt, tc, ridges=False):
+    z = r + 0.05; Cy(r, thick, (0, 0, z), c, (R90, 0, 0), verts=64)
+    for sy in (-1, 1): To(r*0.93, 0.045, (0, sy*thick/2, z), rim, (R90, 0, 0))
+    if ridges:
+        for k in range(48): a = k*TAU/48; BX((r*1.01*math.cos(a), 0, z + r*1.01*math.sin(a)), (0.06, thick, 0.035), rim, rot=(0, -a, 0), bevel=0.0)
+    yf = -thick/2 - 0.03
+    T3(txt, r*(1.15 if len(txt) < 3 else 0.84), (0, yf, z + r*0.22), tc, depth=0.05)
+    face(z - r*0.48, yf + 0.02, r*0.19, r*0.1, mouth_dz=r*0.2, mr=r*0.09)
+def b_dime(): coin("silver", 0.6, 0.09, "lgrey", "10¢", (0.12, 0.13, 0.2)); return {}
 def b_dirt():
     S(0.95, (0, 0, 0.3), (1.25, 1.0, 0.75), "brown"); S(0.5, (-0.6, 0.2, 0.55), (1, 1, 0.8), "dkbrown"); S(0.45, (0.65, 0.1, 0.5), (1, 1, 0.8), "dkbrown"); S(0.4, (0.1, 0.2, 0.9), (1, 1, 0.8), "brown")
     for (x, y, z) in [(-0.9, -0.6, 0.1), (0.8, -0.7, 0.08), (1.1, -0.2, 0.1), (-1.2, 0.0, 0.1)]: S(0.12, (x, y, z), (1.2, 1, 0.7), "stone")
@@ -244,11 +261,17 @@ def b_town():
     BX((0.85, 0.6, 1.6), (0.14, 0.14, 0.3), "brick", bevel=0.02); tree_s(-1.15, -0.2, 0.6); tree_s(1.2, -0.25, 0.55, "lgreen")
     face(1.15, -0.31, 0.16, 0.09, mouth_dz=0.2, mr=0.07); fit(); return {}
 def b_vest():
-    RB((0, 0, 0.9), (1.3, 0.5, 1.45), "red", lv=1)
-    Fp([(-0.3, 0), (0.3, 0), (0, -0.75)], (0, -0.3, 1.72), 0.1, "cream"); BX((0, -0.33, 0.75), (0.05, 0.04, 0.9), "roof", bevel=0.01)
-    for sx in (-1, 1): S(0.2, (sx*0.6, 0, 1.3), (0.45, 0.9, 1.2), "roof"); BX((sx*0.3, -0.33, 0.45), (0.3, 0.05, 0.1), "roof", bevel=0.02)
-    for z in (0.5, 0.75, 1.0): S(0.05, (0.12, -0.36, z), (1, 0.5, 1), "gold")
-    face(1.25, -0.31, 0.3, 0.1, mouth_dz=0.0, mr=0.0, tongue=False); smile(0.75, -0.34, 0.09, x=-0.25); return {}
+    C = "orange"
+    pts = [(-0.75, 0.12), (0.75, 0.12), (0.8, 1.05), (0.56, 1.22), (0.5, 1.6), (0.62, 1.98), (0.3, 2.0), (0, 1.15), (-0.3, 2.0), (-0.62, 1.98), (-0.5, 1.6), (-0.56, 1.22), (-0.8, 1.05)]
+    o = Fp(pts, (0, 0, 0), 0.36, C); bevel(o, 0.05)
+    BX((0, 0.16, 1.0), (1.35, 0.06, 1.7), "navy", bevel=0.03); Fp([(-0.36, 1.98), (0.36, 1.98), (0.3, 1.5), (-0.3, 1.5)], (0, 0.14, 0), 0.1, "navy")
+    for sx in (-1, 1):
+        Fp([(sx*0.3, 2.0), (sx*0.0, 1.15), (sx*0.1, 1.12), (sx*0.42, 1.98)], (0, -0.19, 0), 0.03, "yellow")
+        for z in (0.35, 0.6, 0.85): S(0.06, (sx*0.14, -0.2, z), (1, 0.5, 1), "white")
+        BX((sx*0.45, -0.19, 0.36), (0.36, 0.03, 0.08), "yellow", bevel=0.01)
+    BX((0, -0.19, 0.6), (0.03, 0.02, 1.0), "rust", bevel=0.0)
+    eyes(1.3, -0.2, 0.42, 0.095); smile(1.02, -0.2, 0.0001, x=0) if False else None
+    S(0.001, (0, 0, 1), (1, 1, 1), C).hide_render = True; smile(0.16 + 0.9, -0.21, 0.085, x=0.42, tongue=False); return {}
 def b_wind():
     for (x, z, r) in [(0, 1.2, 0.6), (-0.6, 1.1, 0.42), (0.55, 1.15, 0.45), (-0.2, 1.6, 0.4), (0.3, 1.58, 0.38)]: S(r, (x, 0, z), (1, 0.75, 1), (0.82, 0.92, 1.0))
     for (x, z, R_) in [(1.25, 1.0, 0.3), (1.75, 1.35, 0.22), (1.3, 0.45, 0.2)]:
@@ -308,9 +331,15 @@ def b_berry():
     for k in range(5): a = k*TAU/5; S(0.2, (0.25*math.cos(a), 0.25*math.sin(a), 1.5), (1.3, 0.6, 0.35), "green", rot=(0, rad(-20), a))
     RC(0.04, 0.3, (0, 0, 1.65), "dkgreen", lv=1); sface(0.85, 0.2, 0.11, mouth_dz=0.28, mr=0.1); return {}
 def b_bunny():
-    h = quad_meta("white", "cream", "white", (1.0, 0.8, 0.85), ear=None, tail="short", size=0.95)
-    for sx in (-1, 1): RC(0.11, 0.75, (sx*0.24, -0.5, 2.1), "white", (rad(8), rad(sx*10), 0), lv=2); RC(0.055, 0.5, (sx*0.24, -0.585, 2.1), "pink", (rad(8), rad(sx*10), 0), lv=2)
-    S(0.2, (0, 0.95, 0.95), (1, 1, 1), "white"); return h
+    EL = [((0, 0.15, 0.62), 0.62, (1.0, 1.1, 1.0)), ((0, -0.2, 1.35), 0.5, None), ((0, -0.5, 1.22), 0.26, (1.2, 1, 0.8))]
+    metachar(EL, [], ["white", "cream"], lambda cc, n: 1 if (n.y < -0.4 and cc.z < 0.95 and abs(cc.x) < 0.4) else 0, res=0.06)
+    for sx in (-1, 1):
+        RC(0.14, 1.35, (sx*0.24, -0.1, 2.45), "white", (rad(-4), rad(sx*5), 0), lv=2); RC(0.075, 1.05, (sx*0.24, -0.215, 2.45), "pink", (rad(-4), rad(sx*5), 0), lv=2)
+        S(0.24, (sx*0.42, -0.5, 0.14), (0.9, 1.7, 0.55), "white"); S(0.14, (sx*0.22, -0.52, 0.72), (1, 1, 1.2), "white")
+        for k in range(3): Cy(0.008, 0.36, (sx*0.36, -0.68, 1.2 + 0.05*k), "lgrey", (0, rad(sx*80 + k*8), 0), verts=6)
+        BX((sx*0.045, -0.77, 1.05), (0.08, 0.03, 0.12), "white", bevel=0.01)
+    S(0.3, (0.3, 0.72, 0.55), (1, 1, 1), "white"); S(0.08, (0, -0.78, 1.26), (1.3, 0.8, 0.9), "hotpink")
+    sface(1.48, 0.2, 0.1, mouth_dz=0.0, mr=0.01, tongue=False); smile(1.14, surf_y(0, 1.14, -0.7) - 0.015, 0.07, tongue=False); return {}
 def b_camera():
     BX((0, 0, 0.72), (1.7, 0.75, 1.05), "charcoal", bevel=0.1); BX((0, 0, 0.72), (1.72, 0.77, 0.3), "lgrey", bevel=0.03)
     Cy(0.4, 0.3, (0, -0.48, 0.68), "dkgrey", (R90, 0, 0), verts=32); Cy(0.3, 0.32, (0, -0.5, 0.68), "black", (R90, 0, 0), verts=32); S(0.24, (0, -0.6, 0.68), (1, 0.35, 1), "glass"); S(0.06, (-0.08, -0.68, 0.76), (1, 0.4, 1), "white")
@@ -412,11 +441,14 @@ def b_field():
     for sx in (-1, 1): To(0.345, 0.02, (0.3 + sx*0.15, -0.75, 0.55), "wood", (0, R90, 0))
     sface(0.6, 0.13, 0.085, x=0.3, mouth_dz=0.2, mr=0.07); fit(1.5, 2.5); return {}
 def b_finger():
-    RB((0, 0.1, 0.4), (1.3, 0.8, 0.8), "peach", lv=2); RC(0.26, 1.5, (-0.15, 0, 1.25), "peach", lv=2); S(0.18, (-0.15, -0.24, 1.82), (1, 0.3, 1.1), "pink")
-    for z in (1.0, 1.35): To(0.265, 0.012, (-0.15, 0, z), (0.9, 0.62, 0.5))
-    for k in range(3): S(0.2, (0.2 + 0.25*k, -0.25, 0.7 - 0.03*k), (1, 1, 0.9), "peach")
-    RC(0.16, 0.5, (-0.6, -0.2, 0.55), "peach", (0, rad(-40), 0), lv=2)
-    sface(1.2, 0.1, 0.075, x=-0.15, mouth_dz=0.2, mr=0.06); return {}
+    RB((0, 0, 0.75), (1.25, 0.75, 1.0), "peach", lv=2)                                   # fist
+    for k in range(3): S(0.2, (0.02 + 0.3*k, -0.3, 1.2 - 0.03*k), (1, 1, 0.9), "peach"); RC(0.15, 0.4, (0.02 + 0.3*k, -0.36, 0.98 - 0.03*k), "peach", lv=2)
+    RC(0.17, 0.75, (0.15, -0.42, 0.6), "peach", (0, rad(72), 0), lv=2); S(0.12, (-0.2, -0.52, 0.72), (1, 0.4, 0.8), "pink")
+    RC(0.23, 1.25, (-0.38, -0.05, 1.75), "peach", lv=2); S(0.17, (-0.38, -0.25, 2.2), (1, 0.3, 1.15), "pink")     # index finger pointing up
+    for z in (1.55, 1.9): To(0.235, 0.012, (-0.38, -0.05, z), (0.9, 0.62, 0.5))
+    RC(0.5, 0.35, (0, 0, 0.2), "blue", lv=1); To(0.56, 0.04, (0, 0, 0.36), "white")
+    sface(0.72, 0.0, 0.0) if False else None
+    face(0.86, surf_y(0.3, 0.86, -0.4) - 0.0, 0.17, 0.095, x=0.32, mouth_dz=0.0, mr=0.01, tongue=False); smile(0.42, surf_y(0.3, 0.42, -0.4) - 0.015, 0.09, x=0.32); return {}
 def arch(R, r, loc, c, rotz=0.0, zs=1.0, parent=None):
     """half torus standing up (an arch) in the XZ plane, feet at loc.z"""
     import bmesh
@@ -497,7 +529,7 @@ def b_museum():
     for k in range(3): BX((0, -0.72 - 0.12*k, 0.32 - 0.06*k), (2.0 + 0.1*k, 0.14, 0.06), "stone", bevel=0.01)
     for sx, c in ((-1, "red"), (1, "blue")): BX((sx*0.76, -0.47, 0.85), (0.14, 0.03, 0.75), c, bevel=0.01)
     face(0.95, -0.46, 0.2, 0.11, mouth_dz=0.3, mr=0.1); fit(); return {}
-def b_nickel(): coin((0.7, 0.7, 0.74), 0.85, rim="grey", emblem=lambda z: (BX((0, -0.09, z - 0.5), (0.5, 0.03, 0.12), "grey", bevel=0.01), Fp([(-0.3, 0), (0.3, 0), (0, 0.14)], (0, -0.09, z + 0.55), 0.03, "grey"))); return {}
+def b_nickel(): coin((0.7, 0.71, 0.75), 0.85, 0.3, "grey", "5¢", (0.12, 0.13, 0.2)); return {}
 def b_nurse():
     person("sky", "sky", "blonde", style="bun", shoes="white")
     BX((0, -0.31, 0.72), (0.5, 0.04, 0.55), "white", bevel=0.03); BX((0, -0.335, 0.8), (0.16, 0.02, 0.05), "red", bevel=0.0); BX((0, -0.335, 0.8), (0.05, 0.02, 0.16), "red", bevel=0.0)
@@ -507,11 +539,22 @@ def b_olive():
     S(0.6, (0, 0, 0.8), (1, 1, 1.2), (0.45, 0.55, 0.15)); S(0.2, (0, 0, 1.48), (1, 1, 0.5), "red"); RC(0.025, 2.2, (0, 0, 0.9), "wood", (0, rad(35), 0), lv=1)
     sface(0.9, 0.2, 0.11, mouth_dz=0.28, mr=0.1); return {}
 def b_otter():
-    h = quad_meta((0.45, 0.3, 0.2), (0.82, 0.72, 0.58), (0.86, 0.78, 0.64), (0.3, 0.2, 0.12), ear="round", tail="long", size=0.9, leg_h=-0.12, snout_len=0.02)
-    for sx in (-1, 1):
-        for k in range(3): Cy(0.008, 0.35, (sx*0.3, -1.2, 1.08 + 0.05*k), "white", (0, rad(sx*80 + k*8), 0), verts=6)
-    return h
-def b_penny(): coin((0.8, 0.45, 0.25), 0.75, rim=(0.65, 0.33, 0.16), emblem=lambda z: [S(0.045, (0.55*math.cos(rad(200 + 14*k)), -0.09, z + 0.55*math.sin(rad(200 + 14*k))), (1, 0.4, 1), (0.65, 0.33, 0.16)) for k in range(11)]); return {}
+    Bc = (0.45, 0.3, 0.2); L = (0.85, 0.75, 0.6)
+    S(1.0, (0.15, 0, 0.1), (2.0, 1.15, 0.1), "water"); To(1.25, 0.03, (0.15, 0, 0.18), "white", scale=(1.45, 0.85, 1)); To(0.8, 0.025, (0.15, 0, 0.19), "sky", scale=(1.45, 0.85, 1))
+    EL = chain((-0.55, 0, 0.5), (0.95, 0, 0.42), 0.4, 0.3, 6) + [((-1.05, 0, 0.72), 0.4, None)] + chain((1.0, 0, 0.4), (1.9, 0, 0.3), 0.24, 0.12, 4)
+    metachar(EL, [], [Bc, L], lambda cc, n: 1 if (n.z > 0.55 and -0.75 < cc.x < 0.8 and abs(cc.y) < 0.28) else 0, res=0.06)
+    S(0.3, (1.75, 0, 0.3), (1.5, 0.75, 0.3), Bc)                                           # flat tail
+    S(0.24, (-1.12, -0.3, 0.66), (1, 0.8, 0.8), L); S(0.07, (-1.15, -0.5, 0.74), (1.2, 0.8, 0.8), "black")
+    for sx in (-1, 1): S(0.1, (-1.05 + sx*0.26, 0.05, 1.08), (1, 0.6, 1), Bc)
+    for sy in (-1, 1):
+        for k in range(3): Cy(0.01, 0.42, (-1.12 + sy*0.26, -0.42, 0.6 + 0.05*k), "white", (0, rad(sy*78 + k*7), 0), verts=6)
+    S(0.24, (-0.15, 0, 0.98), (1.05, 0.9, 0.35), (1.0, 0.82, 0.8))                          # shell on the tummy
+    for k in range(5): a = rad(-50 + 25*k); RC(0.02, 0.4, (-0.15 + 0.12*math.sin(a), -0.1, 1.05), (1.0, 0.62, 0.6), (R90, 0, a), lv=1)
+    for sy in (-1, 1): RC(0.09, 0.45, (-0.3, sy*0.3, 0.82), Bc, (rad(sy*55), 0, 0), lv=1); S(0.11, (-0.25, sy*0.16, 0.98), (1, 1, 0.8), Bc)
+    for sy in (-1, 1): S(0.16, (1.0, sy*0.22, 0.72), (0.7, 1, 1.2), Bc)
+    eyes(0.86, -0.38, 0.0, 0.0) if False else None
+    sface(0.9, 0.15, 0.085, x=-1.08, mouth_dz=0.0, mr=0.01, tongue=False, fb=-0.4); smile(0.56, -0.5, 0.07, x=-1.12, tongue=False); return {}
+def b_penny(): coin((0.82, 0.47, 0.25), 0.75, 0.14, (0.66, 0.34, 0.16), "1¢", (0.3, 0.12, 0.04)); return {}
 def b_pepper():
     for k in range(4): a = k*TAU/4 + 0.4; S(0.5, (0.28*math.cos(a), 0.28*math.sin(a), 0.75), (1, 1, 1.35), "red")
     S(0.45, (0, 0, 0.9), (1, 1, 1.2), "red"); RC(0.07, 0.4, (0, 0, 1.6), "green", (0, rad(12), 0), lv=1); S(0.22, (0, 0, 1.42), (1, 1, 0.4), "green")
@@ -636,11 +679,17 @@ def b_wagon():
     S(0.25, (0.2, 0.3, 1.1), (1, 1, 1), "yellow", body); BX((-0.25, 0.6, 1.1), (0.4, 0.4, 0.4), "blue", body, bevel=0.05)
     face(0.72, -0.96, 0.24, 0.11, parent=body, mouth_dz=0.0, mr=0.01, tongue=False); smile(0.5, -0.97, 0.1, parent=body); return {"body": body, "wheels": ws}
 def b_walrus():
-    h = quad_meta((0.6, 0.42, 0.32), (0.75, 0.58, 0.45), (0.85, 0.72, 0.6), (0.45, 0.3, 0.22), ear=None, tail="short", size=1.05, leg_h=-0.14, snout_len=0.05)
+    Bc = (0.4, 0.25, 0.17); L = (0.55, 0.38, 0.28)
+    EL = [((0, 0.25, 0.62), 0.78, (1.0, 1.25, 0.8)), ((0, -0.3, 1.0), 0.58, None), ((0, -0.55, 1.5), 0.45, None), ((0, 1.0, 0.4), 0.4, (0.8, 1.3, 0.7))]
+    metachar(EL, [], [Bc, L], lambda cc, n: 1 if (n.y < -0.35 and cc.z < 1.1 and abs(cc.x) < 0.5) else 0, res=0.065)
     for sx in (-1, 1):
-        RK(0.07, 0.6, (sx*0.15, -1.2, 0.85), "ivory", (math.pi, 0, 0), lv=1); S(0.17, (sx*0.16, -1.22, 1.2), (1, 0.8, 0.8), (0.9, 0.78, 0.66))
-        for k in range(3): Cy(0.008, 0.3, (sx*0.32, -1.25, 1.14 + 0.05*k), "white", (0, rad(sx*80 + k*8), 0), verts=6)
-    return h
+        S(0.4, (sx*0.72, -0.55, 0.12), (1.0, 1.5, 0.28), Bc, rot=(0, 0, rad(sx*-28)))        # front flippers
+        S(0.36, (sx*0.4, 1.5, 0.1), (1.0, 1.6, 0.25), Bc, rot=(0, 0, rad(sx*30)))           # rear flippers
+        S(0.23, (sx*0.19, -0.98, 1.36), (1, 0.75, 0.85), (0.8, 0.66, 0.52))                 # whisker pads
+        RK(0.08, 0.85, (sx*0.17, -1.0, 0.86), "white", (math.pi, 0, 0), lv=1)                # tusks
+        for k in range(6): a = rad(-30 + 24*k); Cy(0.012, 0.36, (sx*(0.3 + 0.1*math.cos(a)), -1.12, 1.32 + 0.14*math.sin(a) - 0.05), "white", (0, rad(sx*(70 + 8*k)), 0), verts=6)
+    S(0.09, (0, -1.05, 1.52), (1.4, 0.8, 0.8), "black")
+    sface(1.7, 0.17, 0.09, mouth_dz=0.0, mr=0.01, tongue=False, fb=-0.9); return {}
 def b_zipper():
     for sx in (-1, 1): BX((sx*0.42, 0, 1.0), (0.75, 0.16, 1.9), "blue", bevel=0.05); BX((sx*0.1, -0.02, 1.0), (0.12, 0.16, 1.9), "navy", bevel=0.02)
     for k in range(15): BX((0.05*(1 if k % 2 else -1), -0.08, 0.15 + 0.115*k), (0.16, 0.08, 0.07), "silver", bevel=0.02)
@@ -829,8 +878,7 @@ def b_pretzel():
     import random; random.seed(6)
     for k in range(22): a = random.uniform(0, TAU); S(0.03, (0.78*math.cos(a), -0.12, 0.95 + 0.7*math.sin(a)), (1, 1, 1), "white")
     face(1.26, -0.2, 0.09, 0.06, mouth_dz=0.14, mr=0.05); return {}
-def b_quarter():
-    coin("silver", 0.95, rim="lgrey", emblem=lambda z: [BX((0.97*math.cos(k*TAU/40), 0, z + 0.97*math.sin(k*TAU/40)), (0.05, 0.16, 0.03), "lgrey", rot=(0, -k*TAU/40, 0), bevel=0.0) for k in range(40)]); return {}
+def b_quarter(): coin("silver", 1.0, 0.16, "lgrey", "25¢", (0.12, 0.13, 0.2), ridges=True); return {}
 def b_raccoon():
     h = quad_meta((0.55, 0.55, 0.6), (0.8, 0.8, 0.82), "white", (0.2, 0.2, 0.24), ear="point", tail="bushy", snout_len=0.08, size=0.9)
     for sx in (-1, 1): S(0.2, (sx*0.2, surf_y(sx*0.2, 1.32, -0.9) + 0.04, 1.32), (1.15, 0.3, 0.8), "charcoal")
