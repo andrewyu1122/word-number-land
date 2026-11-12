@@ -61,6 +61,10 @@ and writes animated WebP. Then:
 2. `git add -A && git commit -m "..." && git push` — GitHub Pages updates in ~1 min; the app shows a green
    "New version ready" bar.
 
+## Read mode & reader vocabulary
+- **Read** (home tile): sight words (`SIGHT`, 50 words) — L1 hear & find the word, L2 spell it (reuses the spelling screen with `sight:true`), L3/L4 build a sentence from word tiles (`SENT_EASY` / `SENT_HARD` templates + a picture noun). Progress in `store.sw`, levels in `store.lvl.read1..4`.
+- `EXTRA_WORDS` in index.html lists ~140 picture words from the kids' readers. A word joins the game only when it appears in `ART` (after its 3D art is converted with `--update-art`). Voice: `tools/make_audio8.py`.
+
 ## Parent report, limits, hints
 - `store.log[date]={secs,stars,words[]}` feeds Settings → Parent report (7-day minutes, learned / tricky words, math skill) and the Monday weekly recap.
 - `store.limit` (minutes/day) shows the bedtime overlay; a grown-up holds the button for 5 more minutes.
