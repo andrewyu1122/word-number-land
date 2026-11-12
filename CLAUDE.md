@@ -103,3 +103,9 @@ back to `altKeys`, then to the browser's speechSynthesis.
 Parent dashboard (per-word accuracy, time limits, custom words), toddler mode for Jaden, listening-only spelling,
 find-the-wrong-letter, number-merge animation (3 + 4 walk together → 7), scene "bosses" at the end of each world,
 treasure-chest opening animation, 11–20 as single characters, animated operator symbols, hats/accessories shop.
+
+## Blender pipeline (in the repo since Nov 2026)
+`tools/blender/` holds the headless scripts for the two collections and the night scenes (see its README): `render_char.py`
+renders idle + walk/roar (swim/happy) + **eat / sleep / run** for one character with a single camera; `render_scene.py` renders
+`island_night`, `island_2_night`, `island_3_night`, `reef_night` and their `_fg` layers. Every dino / sea creature now has
+`{name}_eat|sleep|run.webp` in `assets/dino/`. Sleep is a lying-down breathing loop (frame 1 is not idle — cross-fade in/out).
