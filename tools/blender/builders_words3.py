@@ -174,13 +174,15 @@ def b_mall():
     for k in range(5): S(0.07, (-0.56 + 0.28*k, -0.44, 1.45), (1, 0.5, 1), "white")
     for sx in (-1, 1): S(0.16, (sx*1.15, -0.7, 0.36), (1, 1, 1), "green"); RC(0.1, 0.16, (sx*1.15, -0.7, 0.26), "rust", lv=1)
     face(1.08, -0.36, 0.2, 0.1, mouth_dz=0.2, mr=0.08); fit(); return {}
-def b_newt():
-    EL = [((0, 0.1, 0.42), 0.36, (0.85, 1.7, 0.75)), ((0, -0.75, 0.52), 0.34, (1.05, 1.05, 0.8))] + chain((0, 0.6, 0.38), (0.45, 1.75, 0.22), 0.26, 0.09, 6)
+def lizard(c, belly, spot=None, tail=(0.45, 1.75, 0.22), hr=0.34):
+    EL = [((0, 0.1, 0.42), 0.36, (0.85, 1.7, 0.75)), ((0, -0.75, 0.52), hr, (1.05, 1.05, 0.8))] + chain((0, 0.6, 0.38), tail, 0.26, 0.09, 6)
     for sx in (-1, 1): EL += [((sx*0.45, -0.3, 0.22), 0.16, None), ((sx*0.62, -0.42, 0.1), 0.13, (1.2, 1.3, 0.6)), ((sx*0.45, 0.55, 0.22), 0.16, None), ((sx*0.62, 0.62, 0.1), 0.13, (1.2, 1.3, 0.6))]
-    def region(c, n): return 1 if (n.z < -0.3 and c.z < 0.4) else 0
-    metachar(EL, [], ["orange", "yellow"], region, res=0.06)
-    for (x, y) in [(-0.15, 0.0), (0.12, 0.3), (-0.1, 0.6), (0.15, 0.95), (0.25, 1.3), (0.0, -0.4)]: S(0.07, (x, y, 0.66 if y < 0.7 else 0.5), (1, 1, 0.4), "charcoal")
-    sface(0.66, 0.17, 0.1, mouth_dz=0.2, mr=0.09, fb=-1.0); return {}
+    def region(cc, n): return 1 if (n.z < -0.3 and cc.z < 0.4) else 0
+    metachar(EL, [], [c, belly], region, res=0.06)
+    if spot:
+        for (x, y) in [(-0.15, 0.0), (0.12, 0.3), (-0.1, 0.6), (0.15, 0.95), (0.25, 1.3), (0.0, -0.4)]: S(0.07, (x, y, 0.66 if y < 0.7 else 0.5), (1, 1, 0.4), spot)
+    sface(0.66, 0.17, 0.1, mouth_dz=0.2, mr=0.09, fb=-1.0)
+def b_newt(): lizard("orange", "yellow", "charcoal"); return {}
 def b_park():
     BX((0, 0, 0.1), (2.6, 2.2, 0.2), "grass", bevel=0.08); BX((0.2, -0.2, 0.21), (0.5, 2.1, 0.03), "sand", bevel=0.01)
     tree_s(-0.75, 0.4, 1.5); tree_s(1.0, 0.7, 0.9, "lgreen")
@@ -254,4 +256,394 @@ def b_wind():
     for (x, z) in [(1.85, 0.7), (2.0, 1.75)]: S(0.1, (x, 0, z), (1.6, 0.4, 0.7), "lgreen", rot=(0, rad(30), 0))
     for sx in (-1, 1): S(0.12, (sx*0.36, -0.42, 1.02), (1, 0.4, 0.8), "pink")
     eyes(1.3, -0.45, 0.2, 0.11); S(0.1, (0.12, -0.5, 0.98), (1, 0.5, 1), "mouth"); fit(2.0, 2.6); return {}
+# ---------------------------------------------------------------- level 3
+def placed(fn, loc, sc=1.0):
+    """build something with fn() at the origin, then move / scale it as a group"""
+    before = {o.name for o in ROOT.children}; n0 = len(LIDS); fn()
+    e = E((0, 0, 0))
+    for o in [o for o in ROOT.children if o.name not in before and o is not e]: par(o, e)
+    e.location = loc; e.scale = (sc, sc, sc); bpy.context.view_layer.update()
+    for i in range(n0, len(LIDS)):
+        pp, parent, r = LIDS[i]
+        if parent is None: LIDS[i] = (Vector(pp)*sc + Vector(loc), None, r*sc)
+    return e
+def bird(c, belly=None, beak="orange", s=1.0, legh=0.55, legc="orange", beak_len=0.3, beak_r=0.08, neck=0.0, wing=None, wl=0.6, tail=True, crest=None):
+    bz = legh + 0.5*s
+    S(0.4*s, (0, 0.05, bz), (0.9, 1.3, 0.85), c)
+    if belly: S(0.3*s, (0, -0.12, bz - 0.06*s), (0.85, 1.1, 0.8), belly)
+    hz = bz + 0.35*s + neck; hy = -0.42*s - neck*0.25
+    if neck: RC(0.11*s, neck + 0.3*s, (0, (hy - 0.2*s)/2, (bz + hz)/2), c, (rad(14), 0, 0), lv=1)
+    S(0.3*s, (0, hy, hz), (1, 1, 1), c); Co(beak_r*s, beak_len*s, (0, hy - 0.26*s - beak_len*s/2, hz - 0.04*s), beak, (R90, 0, 0))
+    if tail:
+        for k in range(3): S(0.11*s, (0.1*s*(k-1), 0.6*s, bz - 0.05*s), (0.4, 1.2, 1.4), c, rot=(rad(-35), 0, rad(k*12-12)))
+    if crest: S(0.1*s, (0, hy + 0.05*s, hz + 0.3*s), (0.5, 1, 1.2), crest)
+    legs2(legc, 0, legh, 0.03*max(s, 0.8), 0.12*s, foot=legc); eyes(hz + 0.08*s, hy - 0.2*s, 0.13*s, 0.08*s)
+    return {"wings": wingpair(0.0, bz + 0.1*s, wing or c, wl*s, "oval", 0.35*s), "flap": 35}
+def shape(pts, c, c2, thick=0.3):
+    o = Fp(pts, (0, 0, 0), thick, c); bm = o.modifiers.new("Bevel", 'BEVEL'); bm.width = 0.05; bm.segments = 3
+    cx = sum(x for x, z in pts)/len(pts); cz = sum(z for x, z in pts)/len(pts)
+    Fp([(cx + (x - cx)*0.72, cz + (z - cz)*0.72) for x, z in pts], (0, -0.02, 0), thick, c2)
+    return cx, cz
+def b_beach():
+    BX((0, 0, 0.1), (2.6, 2.2, 0.2), "sand", bevel=0.08); BX((0, 0.8, 0.13), (2.6, 0.6, 0.22), "water", bevel=0.06); BX((0, 0.48, 0.2), (2.6, 0.08, 0.06), "white", bevel=0.03)
+    RC(0.04, 1.5, (-0.4, 0.0, 0.9), "wood", (0, rad(8), 0), lv=1); Co(0.85, 0.5, (-0.3, 0, 1.75), "red", (0, rad(8), 0), verts=10)
+    for k in range(5): a = k*TAU/5; S(0.1, (-0.3 + 0.8*math.cos(a), 0.8*math.sin(a), 1.52), (1, 1, 1), "white")
+    BX((0.7, -0.35, 0.22), (0.6, 0.95, 0.04), "hotpink", bevel=0.02, rot=(0, 0, rad(12)))
+    S(0.26, (0.85, 0.2, 0.46), (1, 1, 1), "white"); S(0.262, (0.85, 0.2, 0.46), (1, 0.35, 1), "blue"); S(0.262, (0.85, 0.2, 0.46), (0.35, 1, 1), "yellow")
+    RC(0.16, 0.26, (-1.0, -0.65, 0.33), "blue", lv=1); S(0.1, (0.1, -0.85, 0.24), (1.4, 0.8, 0.6), "coral")
+    sface(1.72, 0.2, 0.1, x=-0.3, mouth_dz=0.0, mr=0.01, tongue=False); fit(); return {}
+def b_beetle():
+    S(0.7, (0, 0.15, 0.6), (1.0, 1.2, 0.75), "green"); S(0.42, (0, -0.7, 0.55), (1.1, 0.9, 0.8), "charcoal")
+    BX((0, 0.2, 1.1), (0.04, 1.3, 0.06), "dkgreen", bevel=0.02)
+    for (x, y) in [(-0.35, -0.1), (0.35, -0.1), (-0.4, 0.45), (0.4, 0.45), (-0.25, 0.85), (0.25, 0.85)]: S(0.1, (x, y, 1.02 - abs(y - 0.2)*0.25), (1, 1, 0.4), "lgreen")
+    for sx in (-1, 1):
+        for k in range(3): RC(0.045, 0.55, (sx*0.75, -0.3 + 0.45*k, 0.28), "charcoal", (0, rad(sx*-50), rad(sx*(k-1)*-18)), lv=1)
+        RC(0.025, 0.5, (sx*0.2, -1.05, 1.0), "charcoal", (rad(40), rad(sx*20), 0), lv=1); S(0.05, (sx*0.26, -1.22, 1.2), (1, 1, 1), "charcoal")
+    sface(0.62, 0.18, 0.1, mouth_dz=0.22, mr=0.09, fb=-1.0); return {}
+def b_berry():
+    import random; random.seed(3)
+    S(0.62, (0, 0, 0.75), (1, 1, 1.15), "hotpink")
+    for k in range(46):
+        a = random.uniform(0, TAU); b_ = random.uniform(0.25, 2.9); S(0.17, (0.6*math.cos(a)*math.sin(b_), 0.6*math.sin(a)*math.sin(b_), 0.75 + 0.7*math.cos(b_)), (1, 1, 1), "hotpink" if k % 3 else (0.85, 0.15, 0.4))
+    for k in range(5): a = k*TAU/5; S(0.2, (0.25*math.cos(a), 0.25*math.sin(a), 1.5), (1.3, 0.6, 0.35), "green", rot=(0, rad(-20), a))
+    RC(0.04, 0.3, (0, 0, 1.65), "dkgreen", lv=1); sface(0.85, 0.2, 0.11, mouth_dz=0.28, mr=0.1); return {}
+def b_bunny():
+    h = quad_meta("white", "cream", "white", (1.0, 0.8, 0.85), ear=None, tail="short", size=0.95)
+    for sx in (-1, 1): RC(0.11, 0.75, (sx*0.24, -0.5, 2.1), "white", (rad(8), rad(sx*10), 0), lv=2); RC(0.055, 0.5, (sx*0.24, -0.585, 2.1), "pink", (rad(8), rad(sx*10), 0), lv=2)
+    S(0.2, (0, 0.95, 0.95), (1, 1, 1), "white"); return h
+def b_camera():
+    BX((0, 0, 0.72), (1.7, 0.75, 1.05), "charcoal", bevel=0.1); BX((0, 0, 0.72), (1.72, 0.77, 0.3), "lgrey", bevel=0.03)
+    Cy(0.4, 0.3, (0, -0.48, 0.68), "dkgrey", (R90, 0, 0), verts=32); Cy(0.3, 0.32, (0, -0.5, 0.68), "black", (R90, 0, 0), verts=32); S(0.24, (0, -0.6, 0.68), (1, 0.35, 1), "glass"); S(0.06, (-0.08, -0.68, 0.76), (1, 0.4, 1), "white")
+    BX((-0.5, 0, 1.33), (0.4, 0.3, 0.16), "red", bevel=0.04); BX((0.2, 0, 1.36), (0.6, 0.5, 0.22), "dkgrey", bevel=0.05)
+    fl = BX((0.55, -0.39, 1.05), (0.4, 0.05, 0.22), "white", bevel=0.02); gm = mat((1.0, 0.95, 0.7), 0.3, 1.2); fl.data.materials[0] = gm
+    eyes(1.08, -0.39, 0.0, 0.0) if False else None
+    for sx in (-1, 1):
+        pass
+    face(1.05, -0.39, 0.16, 0.085, x=-0.5, mouth_dz=0.0, mr=0.01, tongue=False); smile(0.24, -0.39, 0.09, x=-0.5); return {"glow": [gm]}
+def b_canoe():
+    S(1.0, (0, 0, 0.38), (1.5, 0.48, 0.42), "rust"); S(0.9, (0, 0, 0.52), (1.5, 0.42, 0.22), "dkbrown")
+    for x in (-0.55, 0.55): BX((x, 0, 0.62), (0.16, 0.75, 0.05), "wood", bevel=0.02)
+    To(0.0, 0.0, (0, 0, 0), "rust") if False else None
+    for (x, r) in [(-0.2, 62), (0.3, 118)]:
+        RC(0.035, 1.5, (x, -0.25, 0.95), "wood", (0, rad(r - 90), 0), lv=1)
+    S(0.2, (-0.85, -0.25, 1.28), (0.6, 0.3, 1.3), "wood", rot=(0, rad(-28), 0)); S(0.2, (0.95, -0.25, 1.26), (0.6, 0.3, 1.3), "wood", rot=(0, rad(28), 0))
+    sface(0.36, 0.22, 0.11, mouth_dz=0.2, mr=0.09); return {}
+def b_celery():
+    for (x, y, hh, t) in [(-0.3, 0.05, 1.5, -6), (0, -0.05, 1.7, 0), (0.3, 0.05, 1.45, 6)]:
+        RC(0.17, hh, (x, y, hh/2 + 0.05), "lgreen", (0, rad(t), 0), lv=1)
+        for k in range(3): Cy(0.012, hh*0.8, (x - 0.08 + 0.08*k + t*0.004, y - 0.165, hh/2), "green", (0, rad(t), 0), verts=6)
+        tx = x + math.sin(rad(t))*hh*0.55
+        for (dx, dz, r) in [(0, 0.15, 0.24), (-0.2, 0.0, 0.18), (0.2, 0.02, 0.18)]: S(r, (tx + dx, y, hh + dz), (1, 0.7, 1), "green")
+    RC(0.36, 0.2, (0, 0, 0.12), (0.85, 0.92, 0.7), lv=1); sface(0.8, 0.14, 0.085, mouth_dz=0.22, mr=0.07); return {}
+def b_chair():
+    BX((0, 0, 0.85), (1.2, 1.1, 0.14), "wood", bevel=0.04)
+    for (x, y) in [(-0.5, -0.45), (0.5, -0.45), (-0.5, 0.45), (0.5, 0.45)]: BX((x, y, 0.4), (0.13, 0.13, 0.8), "brown", bevel=0.03)
+    for sx in (-1, 1): BX((sx*0.5, 0.48, 1.45), (0.13, 0.13, 1.2), "brown", bevel=0.03)
+    BX((0, 0.48, 1.6), (1.0, 0.1, 0.6), "wood", bevel=0.04); BX((0, 0.48, 2.0), (1.15, 0.14, 0.14), "brown", bevel=0.04)
+    BX((0, -0.02, 0.95), (1.0, 0.9, 0.1), "red", bevel=0.05)
+    face(1.68, 0.42, 0.2, 0.1, mouth_dz=0.26, mr=0.09); return {}
+def b_cheese():
+    o = Fp([(-1.1, 0), (1.1, 0), (1.1, 0.95), (-1.1, 0.45)], (0, 0, 0.02), 1.1, "yellow"); bm = o.modifiers.new("Bevel", 'BEVEL'); bm.width = 0.06; bm.segments = 3
+    for (x, z, r) in [(-0.7, 0.22, 0.12), (0.75, 0.25, 0.14), (0.15, 0.18, 0.09), (0.8, 0.68, 0.1)]: S(r, (x, -0.55, z), (1, 0.3, 1), "gold")
+    for (x, y, r) in [(-0.4, 0.1, 0.13), (0.4, -0.15, 0.1), (0.7, 0.25, 0.12)]: S(r, (x, y, 0.47 + (x + 1.1)*0.227 + 0.01), (1, 1, 0.3), "gold", rot=(0, rad(-12.8), 0))
+    face(0.52, -0.56, 0.2, 0.1, x=0.15, mouth_dz=0.24, mr=0.09); return {}
+def b_chick():
+    S(0.55, (0, 0.05, 0.75), (1, 1.1, 0.95), "yellow"); S(0.42, (0, -0.25, 1.35), (1, 1, 1), "yellow"); Co(0.1, 0.22, (0, -0.72, 1.3), "orange", (R90, 0, 0))
+    for sx in (-1, 1): S(0.22, (sx*0.52, 0.1, 0.8), (0.4, 1, 0.8), "gold", rot=(0, rad(sx*-15), 0))
+    for k in range(3): S(0.07, (0.06*(k-1), -0.2, 1.8), (0.6, 0.6, 1.5), "yellow", rot=(0, rad((k-1)*25), 0))
+    S(0.14, (0, 0.6, 0.85), (0.6, 1, 1.2), "gold", rot=(rad(-40), 0, 0))
+    legs2("orange", 0, 0.3, 0.035, 0.18, foot="orange"); eyes(1.45, -0.6, 0.17, 0.09); return {}
+def b_circle():
+    Cy(0.9, 0.3, (0, 0, 0.95), "blue", (R90, 0, 0), verts=64); Cy(0.68, 0.34, (0, 0, 0.95), "sky", (R90, 0, 0), verts=64)
+    face(1.05, -0.18, 0.22, 0.12, mouth_dz=0.32, mr=0.11); return {}
+def b_coach():
+    person("red", "navy", "hairb", shoes="white", sleeves="red")
+    S(0.45, (0, 0.04, 1.52), (1, 1, 0.8), "blue"); BX((0, -0.42, 1.6), (0.5, 0.35, 0.05), "blue", bevel=0.02, rot=(rad(12), 0, 0)); S(0.05, (0, 0.04, 1.89), (1, 1, 0.6), "white")
+    for sx in (-1, 1): BX((sx*0.39, -0.02, 0.75), (0.04, 0.5, 0.6), "white", bevel=0.01)
+    To(0.22, 0.015, (0, -0.1, 1.05), "black", (rad(50), 0, 0)); S(0.07, (0, -0.36, 0.86), (1.3, 0.8, 1), "silver")
+    BX((0.62, -0.2, 0.62), (0.34, 0.05, 0.44), "wood", bevel=0.02); BX((0.62, -0.23, 0.6), (0.27, 0.02, 0.33), "white", bevel=0.01); return {}
+def b_crayon():
+    Cy(0.25, 1.5, (0, 0, 0.8), "red", verts=32); Co(0.25, 0.45, (0, 0, 1.77), "red", r2=0.07, verts=32); S(0.07, (0, 0, 2.0), (1, 1, 0.8), "red"); Cy(0.265, 0.9, (0, 0, 0.75), (1.0, 0.45, 0.45), verts=32)
+    for z in (0.42, 1.08): To(0.265, 0.02, (0, 0, z), "black");
+    for k in range(7): a = k*TAU/7; S(0.035, (0.27*math.cos(a), 0.27*math.sin(a), 1.08 - 0.06 - 0.03*(k % 2)), (1, 1, 1), "black")
+    sface(0.82, 0.11, 0.07, mouth_dz=0.2, mr=0.06); return {}
+def b_desert():
+    BX((0, 0, 0.1), (2.6, 2.2, 0.2), "sand", bevel=0.08); S(0.7, (-0.45, 0.45, 0.15), (1.2, 1, 0.45), "straw"); S(0.7, (0.75, 0.6, 0.15), (1.2, 1, 0.45), "sand")
+    RC(0.24, 1.3, (0.1, -0.1, 0.85), "green", lv=2)
+    for sx, z, hh in [(-1, 0.85, 0.5), (1, 1.05, 0.45)]: RC(0.12, 0.45, (0.1 + sx*0.4, -0.1, z), "green", (0, R90, 0), lv=1); RC(0.12, hh, (0.1 + sx*0.55, -0.1, z + hh/2), "green", lv=2)
+    S(0.09, (0.1, -0.1, 1.58), (1, 1, 0.7), "hotpink")
+    for (x, y, r) in [(-1.0, -0.7, 0.16), (0.95, -0.75, 0.2), (1.1, -0.45, 0.11)]: S(r, (x, y, 0.2 + r*0.5), (1.2, 1, 0.7), "rust")
+    S(0.28, (-0.9, -0.2, 0.4), (1, 1, 0.9), "lgreen"); S(0.06, (-0.9, -0.2, 0.68), (1, 1, 1), "yellow")
+    sface(1.0, 0.1, 0.075, x=0.1, mouth_dz=0.2, mr=0.07); fit(); return {}
+def b_doctor():
+    person("white", "aqua", "hairb", skin="skin2", shoes="white")
+    BX((0, -0.3, 0.9), (0.2, 0.04, 0.4), "aqua", bevel=0.01); To(0.24, 0.022, (0, -0.08, 1.05), "charcoal", (rad(55), 0, 0)); Cy(0.015, 0.3, (0.12, -0.34, 0.8), "charcoal", verts=6); S(0.07, (0.12, -0.36, 0.63), (1, 0.4, 1), "silver")
+    BX((-0.2, -0.31, 0.62), (0.16, 0.03, 0.14), "white", bevel=0.01); To(0.44, 0.02, (0, 0, 1.6), "lgrey", (rad(-12), 0, 0)); Cy(0.13, 0.03, (0, -0.4, 1.7), "silver", (rad(78), 0, 0)); return {}
+def b_dollar():
+    G = (0.45, 0.72, 0.42)
+    BX((0, 0, 1.0), (2.1, 0.1, 1.05), G, bevel=0.04); BX((0, -0.01, 1.0), (1.9, 0.1, 0.85), (0.72, 0.88, 0.66), bevel=0.02); S(0.38, (0, -0.04, 1.0), (1.1, 0.12, 1.1), G)
+    for sx in (-1, 1):
+        for sz in (-1, 1): S(0.1, (sx*0.78, -0.05, 1.0 + sz*0.28), (1, 0.3, 1), G)
+    face(1.06, -0.085, 0.14, 0.08, mouth_dz=0.2, mr=0.07); return {}
+def b_eraser():
+    o = Fp([(-0.95, 0), (0.75, 0), (1.0, 0.7), (-0.7, 0.7)], (0, 0, 0.02), 0.7, "pink"); bm = o.modifiers.new("Bevel", 'BEVEL'); bm.width = 0.06; bm.segments = 3
+    Fp([(-0.25, -0.01), (0.8, -0.01), (1.05, 0.71), (0.0, 0.71)], (0, 0, 0.02), 0.74, "blue"); Fp([(0.1, 0.25), (0.55, 0.25), (0.62, 0.45), (0.17, 0.45)], (0, -0.36, 0.02), 0.04, "white")
+    face(0.45, -0.36, 0.14, 0.085, x=-0.5, mouth_dz=0.2, mr=0.07); return {}
+def b_family():
+    def kid(): person("yellow", "blue", "ginger", shoes="red"); S(0.07, (0.3, -0.1, 1.85), (1, 1, 1), "ginger")
+    placed(lambda: person("blue", "navy", "hairb"), (-0.72, 0.15, 0), 1.0); placed(lambda: (person("hotpink", "hotpink", "brown", style="long", shoes="red"), RK(0.58, 0.55, (0, 0, 0.5), "hotpink", lv=2, r2=0.3)), (0.72, 0.15, 0), 0.95)
+    placed(kid, (0, -0.3, 0), 0.68); fit(2.0, 2.6); return {}
+def b_farmer():
+    person("red", "blue", "ginger", shoes="dkbrown")
+    BX((0, -0.3, 0.72), (0.5, 0.06, 0.5), "blue", bevel=0.03)
+    for sx in (-1, 1): BX((sx*0.2, -0.26, 1.02), (0.08, 0.1, 0.3), "blue", bevel=0.02); S(0.04, (sx*0.2, -0.34, 0.93), (1, 0.5, 1), "gold")
+    Cy(0.7, 0.05, (0, 0.02, 1.72), "straw", (rad(-6), 0, 0), verts=32); RC(0.36, 0.3, (0, 0.04, 1.86), "straw", lv=1); To(0.38, 0.03, (0, 0.03, 1.78), "red", (rad(-6), 0, 0))
+    RC(0.03, 1.5, (0.62, -0.12, 0.85), "wood", lv=1); BX((0.62, -0.12, 1.6), (0.36, 0.04, 0.05), "dkgrey", bevel=0.01)
+    for k in (-1, 0, 1): RC(0.02, 0.32, (0.62 + k*0.15, -0.12, 1.78), "dkgrey", lv=1)
+    return {}
+def b_field():
+    BX((0, 0, 0.1), (2.6, 2.2, 0.2), "grass", bevel=0.08)
+    for r in range(4):
+        y = 0.75 - 0.42*r; BX((-0.3, y, 0.21), (1.9, 0.26, 0.04), "brown", bevel=0.02)
+        for k in range(7): x = -1.1 + 0.27*k; RC(0.02, 0.4, (x, y, 0.42), "lgreen", lv=1); S(0.07, (x, y, 0.68), (0.8, 0.8, 1.7), "gold")
+    for k in range(4): BX((1.15, -0.85 + 0.55*k, 0.42), (0.08, 0.08, 0.45), "wood", bevel=0.02)
+    for z in (0.38, 0.56): BX((1.15, 0, z), (0.05, 1.9, 0.06), "wood", bevel=0.01)
+    RC(0.34, 0.6, (0.3, -0.75, 0.55), "straw", (0, R90, 0), lv=1)
+    for sx in (-1, 1): To(0.345, 0.02, (0.3 + sx*0.15, -0.75, 0.55), "wood", (0, R90, 0))
+    sface(0.6, 0.13, 0.085, x=0.3, mouth_dz=0.2, mr=0.07); fit(1.5, 2.5); return {}
+def b_finger():
+    RB((0, 0.1, 0.4), (1.3, 0.8, 0.8), "peach", lv=2); RC(0.26, 1.5, (-0.15, 0, 1.25), "peach", lv=2); S(0.18, (-0.15, -0.24, 1.82), (1, 0.3, 1.1), "pink")
+    for z in (1.0, 1.35): To(0.265, 0.012, (-0.15, 0, z), (0.9, 0.62, 0.5))
+    for k in range(3): S(0.2, (0.2 + 0.25*k, -0.25, 0.7 - 0.03*k), (1, 1, 0.9), "peach")
+    RC(0.16, 0.5, (-0.6, -0.2, 0.55), "peach", (0, rad(-40), 0), lv=2)
+    sface(1.2, 0.1, 0.075, x=-0.15, mouth_dz=0.2, mr=0.06); return {}
+def arch(R, r, loc, c, rotz=0.0, zs=1.0, parent=None):
+    """half torus standing up (an arch) in the XZ plane, feet at loc.z"""
+    import bmesh
+    bpy.ops.mesh.primitive_torus_add(major_radius=R, minor_radius=r, location=loc, major_segments=32, minor_segments=12)
+    o = bpy.context.active_object; bm = bmesh.new(); bm.from_mesh(o.data)
+    bmesh.ops.delete(bm, geom=[v for v in bm.verts if v.co.y < -0.001], context='VERTS'); bm.to_mesh(o.data); bm.free()
+    o.scale = (1, zs, 1); return _fin(o, c, parent, (R90, 0, rotz), "Arch")
+def dome(r, loc, c, zs=1.0, parent=None):
+    import bmesh
+    o = S(r, loc, (1, 1, zs), c, parent); bm = bmesh.new(); bm.from_mesh(o.data)
+    bmesh.ops.delete(bm, geom=[v for v in bm.verts if v.co.z < -0.001], context='VERTS'); bm.to_mesh(o.data); bm.free(); return o
+def b_forest():
+    BX((0, 0, 0.1), (2.6, 2.2, 0.2), "grass", bevel=0.08)
+    def pine(x, y, sc, c="dkgreen"):
+        RC(0.08*sc, 0.5*sc, (x, y, 0.2 + 0.25*sc), "brown", lv=1)
+        for k in range(3): Co((0.5 - 0.11*k)*sc, 0.6*sc, (x, y, 0.2 + (0.65 + 0.38*k)*sc), c, verts=16)
+    pine(-0.8, 0.5, 1.3); pine(0.75, 0.6, 1.1, "green"); pine(0.0, 0.75, 1.6, (0.2, 0.55, 0.3)); pine(-1.0, -0.4, 0.8, "green"); pine(1.0, -0.2, 0.9)
+    tree_s(0.1, -0.3, 1.5, "green")
+    for (x, y, c) in [(-0.45, -0.8, "red"), (0.7, -0.85, "red")]: RC(0.04, 0.14, (x, y, 0.27), "cream", lv=1); S(0.1, (x, y, 0.38), (1, 1, 0.6), c)
+    sface(1.5, 0.19, 0.105, x=0.1, mouth_dz=0.26, mr=0.1); fit(); return {}
+def b_fruit():
+    Cy(1.0, 0.08, (0, 0, 0.06), "white", verts=48); To(0.95, 0.05, (0, 0, 0.1), "sky")
+    S(0.55, (-0.1, -0.1, 0.65), (1, 1, 0.92), "red"); RC(0.03, 0.2, (-0.1, -0.1, 1.2), "brown", lv=1); S(0.12, (0.03, -0.1, 1.25), (1.5, 0.6, 0.4), "green")
+    S(0.42, (0.62, 0.2, 0.52), (1, 1, 1), "orange"); S(0.05, (0.62, 0.2, 0.94), (1, 1, 0.5), "green")
+    for k in range(7): a = k*0.9; S(0.15, (-0.65 + 0.14*math.cos(a), 0.35 + 0.14*math.sin(a), 0.25 + 0.09*k), (1, 1, 1), "purple")
+    for k in range(6): a = rad(-50 + 20*k); S(0.14, (-0.75 - 0.05 + 0.75*math.cos(a)*0.0 + 0.0, -0.55, 0.0) , (1, 1, 1), "yellow") if False else S(0.15, (0.25 + 0.55*math.sin(a), -0.72, 0.2 + 0.25*(1 - math.cos(a))), (1.3, 1, 1), "yellow")
+    sface(0.72, 0.18, 0.1, x=-0.1, mouth_dz=0.26, mr=0.09); return {}
+def b_glove():
+    RB((0, 0, 0.95), (1.2, 0.45, 1.0), "blue", lv=2)
+    for (x, hh, z) in [(-0.42, 0.6, 1.6), (-0.14, 0.78, 1.7), (0.14, 0.72, 1.67), (0.42, 0.55, 1.58)]: RC(0.14, hh, (x, 0, z), "blue", lv=2)
+    RC(0.15, 0.6, (-0.75, -0.05, 1.0), "blue", (0, rad(-35), 0), lv=2); RC(0.42, 0.4, (0, 0, 0.3), "red", lv=1)
+    for z in (0.18, 0.3, 0.42): To(0.47, 0.03, (0, 0, z), "roof")
+    face(1.05, -0.24, 0.2, 0.11, mouth_dz=0.3, mr=0.1); return {}
+def b_goose(): h = bird("white", None, "orange", s=1.3, legh=0.45, neck=0.55, beak_len=0.32, beak_r=0.1); return {}
+def b_heron(): return bird((0.62, 0.7, 0.8), "white", "yellow", s=1.05, legh=1.0, legc="dkgrey", neck=0.6, beak_len=0.7, beak_r=0.06, crest="navy", wl=0.75)
+def b_hotdog():
+    for sy in (-1, 1): RC(0.3, 1.9, (0, sy*0.24, 0.42), "tan", (0, R90, 0), lv=2)
+    RC(0.24, 2.3, (0, 0, 0.68), "rust", (0, R90, 0), lv=2)
+    for k in range(13): S(0.07, (-0.9 + 0.15*k, 0.09*(1 if k % 2 else -1), 0.93), (1.3, 1, 0.7), "yellow")
+    sface(0.44, 0.2, 0.1, mouth_dz=0.2, mr=0.08); return {}
+def b_igloo():
+    dome(1.0, (0, 0.15, 0), "white", 0.95); RC(0.42, 0.7, (0, -0.85, 0.36), "white", (R90, 0, 0), lv=1); Cy(0.3, 0.05, (0, -1.24, 0.34), "navy", (R90, 0, 0), verts=24); pass
+    for z, r in [(0.3, 0.955), (0.6, 0.8), (0.82, 0.55)]: To(r, 0.012, (0, 0.15, z), "sky")
+    for k in range(10): a = k*TAU/10; Cy(0.012, 0.32, (0.9*math.cos(a), 0.15 + 0.9*math.sin(a), 0.15), "sky", verts=6)
+    for k in range(8): a = k*TAU/8 + 0.3; Cy(0.012, 0.3, (0.72*math.cos(a), 0.15 + 0.72*math.sin(a), 0.72), "sky", (rad(40*math.sin(a)), rad(-40*math.cos(a)), 0), verts=6)
+    BX((0, -0.1, 0.02), (2.3, 2.6, 0.04), (0.9, 0.95, 1.0), bevel=0.01)
+    sface(0.82, 0.2, 0.1, mouth_dz=0.0, mr=0.01, tongue=False); fit(1.25, 2.4); return {}
+def b_iguana():
+    lizard("green", "lgreen", None, tail=(0.4, 1.9, 0.2), hr=0.38)
+    for k in range(9): y = -0.55 + 0.26*k; Co(0.07, 0.24 - 0.012*k, (0.0 + max(0, y - 0.6)*0.38, y, (0.86 if y < 0.6 else 0.86 - (y - 0.6)*0.36)), "dkgreen", verts=8)
+    S(0.16, (0, -0.8, 0.25), (0.5, 1, 1), "lime"); return {}
+def b_insect():
+    S(0.34, (0, -0.55, 1.0), (1, 1, 1), "purple"); S(0.36, (0, -0.05, 0.95), (1, 1.1, 0.95), "violet"); S(0.3, (0, 0.6, 0.9), (0.9, 1.6, 0.85), "purple")
+    for k in range(3): To(0.27 - 0.03*k, 0.03, (0, 0.4 + 0.25*k, 0.9), "yellow", (R90, 0, 0))
+    for sx in (-1, 1):
+        RC(0.02, 0.4, (sx*0.14, -0.75, 1.4), "charcoal", (rad(25), rad(sx*20), 0), lv=1); S(0.05, (sx*0.2, -0.84, 1.6), (1, 1, 1), "charcoal")
+        for k in range(3): RC(0.025, 0.6, (sx*0.36, -0.25 + 0.25*k, 0.55), "charcoal", (0, rad(sx*-35), 0), lv=1)
+    eyes(1.08, -0.84, 0.14, 0.09); smile(0.88, -0.87, 0.07, tongue=False)
+    w = wingpair(-0.05, 1.2, "sky", 0.75, "oval", 0.25); return {"wings": w, "flap": 40}
+def b_jaguar():
+    h = quad_meta("gold", "cream", "cream", (0.75, 0.5, 0.1), ear="round", tail="long", snout_len=0.06)
+    for (x, y) in [(-0.3, 0.0), (0.3, 0.15), (0.0, 0.35), (-0.3, 0.6), (0.3, 0.7), (0.0, -0.2), (0.5, -0.1), (-0.5, 0.3), (0.52, 0.45), (-0.55, -0.05), (-0.6, 0.6), (0.6, 0.75), (0.0, 0.75), (-0.62, -0.4), (0.62, -0.4)]:
+        bpy.context.view_layer.update(); dg = bpy.context.evaluated_depsgraph_get(); hit, loc, nrm, idx, ob, mw = scene.ray_cast(dg, Vector((x*1.6, y, 3.0)), Vector((-x*0.5, 0, -1)).normalized())
+        if hit: S(0.1, tuple(loc), (1, 1, 0.3), "dkbrown", rot=tuple(nrm.to_track_quat('Z', 'Y').to_euler()))
+    return h
+def b_juice():
+    BX((0, 0, 0.75), (1.0, 0.7, 1.4), "orange", bevel=0.06); BX((0, 0, 1.4), (1.02, 0.72, 0.16), "white", bevel=0.04); BX((0, -0.01, 0.3), (1.02, 0.7, 0.3), "green", bevel=0.04)
+    RC(0.04, 0.8, (0.25, 0.1, 1.75), "red", (0, rad(12), 0), lv=1); RC(0.04, 0.3, (0.45, 0.1, 2.12), "red", (0, rad(75), 0), lv=1)
+    Cy(0.2, 0.03, (-0.2, -0.36, 0.55), (1.0, 0.7, 0.2), (R90, 0, 0), verts=24); Cy(0.16, 0.035, (-0.2, -0.365, 0.55), "yellow", (R90, 0, 0), verts=24); S(0.12, (0.25, -0.36, 0.5), (1, 0.3, 1.2), "sky")
+    face(1.05, -0.36, 0.2, 0.1, mouth_dz=0.24, mr=0.09); return {}
+def b_kitten(): return quad_meta("orange", "cream", "white", (0.8, 0.4, 0.1), ear="point", tail="long", size=0.8, stripes=True)
+def b_marker():
+    Cy(0.3, 1.3, (0, 0, 0.7), "white", verts=32); Cy(0.305, 0.5, (0, 0, 0.75), "blue", verts=32); Cy(0.32, 0.5, (0, 0, 1.55), "blue", verts=32); RC(0.2, 0.2, (0, 0, 1.85), "blue", lv=1); BX((0.3, 0, 1.55), (0.06, 0.12, 0.45), "navy", bevel=0.02)
+    Cy(0.31, 0.06, (0, 0, 0.06), "blue", verts=32); sface(1.2, 0.12, 0.075, mouth_dz=0.0, mr=0.01, tongue=False); smile(0.75, -0.32, 0.08); return {}
+def b_museum():
+    base(2.5, 1.9, "lgrey"); BX((0, 0.15, 0.8), (2.1, 1.2, 1.2), "sand"); BX((0, 0.1, 1.43), (2.3, 1.45, 0.12), "stone"); dome(0.55, (0, 0.15, 1.49), "aqua", 0.9); S(0.07, (0, 0.15, 2.02), (1, 1, 1.5), "gold")
+    for x in (-0.9, -0.62, 0.62, 0.9): Cy(0.08, 1.16, (x, -0.52, 0.79), "white", verts=16)
+    for k in range(3): BX((0, -0.72 - 0.12*k, 0.32 - 0.06*k), (2.0 + 0.1*k, 0.14, 0.06), "stone", bevel=0.01)
+    for sx, c in ((-1, "red"), (1, "blue")): BX((sx*0.76, -0.47, 0.85), (0.14, 0.03, 0.75), c, bevel=0.01)
+    face(0.95, -0.46, 0.2, 0.11, mouth_dz=0.3, mr=0.1); fit(); return {}
+def b_nickel(): coin((0.7, 0.7, 0.74), 0.85, rim="grey", emblem=lambda z: (BX((0, -0.09, z - 0.5), (0.5, 0.03, 0.12), "grey", bevel=0.01), Fp([(-0.3, 0), (0.3, 0), (0, 0.14)], (0, -0.09, z + 0.55), 0.03, "grey"))); return {}
+def b_nurse():
+    person("sky", "sky", "blonde", style="bun", shoes="white")
+    BX((0, -0.31, 0.72), (0.5, 0.04, 0.55), "white", bevel=0.03); BX((0, -0.335, 0.8), (0.16, 0.02, 0.05), "red", bevel=0.0); BX((0, -0.335, 0.8), (0.05, 0.02, 0.16), "red", bevel=0.0)
+    BX((0, -0.2, 1.8), (0.55, 0.3, 0.22), "white", bevel=0.05); BX((0, -0.36, 1.8), (0.14, 0.02, 0.045), "red", bevel=0.0); BX((0, -0.36, 1.8), (0.045, 0.02, 0.14), "red", bevel=0.0)
+    BX((0.62, -0.2, 0.62), (0.34, 0.05, 0.44), "wood", bevel=0.02); BX((0.62, -0.23, 0.6), (0.27, 0.02, 0.33), "white", bevel=0.01); return {}
+def b_olive():
+    S(0.6, (0, 0, 0.8), (1, 1, 1.2), (0.45, 0.55, 0.15)); S(0.2, (0, 0, 1.48), (1, 1, 0.5), "red"); RC(0.025, 2.2, (0, 0, 0.9), "wood", (0, rad(35), 0), lv=1)
+    sface(0.9, 0.2, 0.11, mouth_dz=0.28, mr=0.1); return {}
+def b_otter():
+    h = quad_meta((0.45, 0.3, 0.2), (0.82, 0.72, 0.58), (0.86, 0.78, 0.64), (0.3, 0.2, 0.12), ear="round", tail="long", size=0.9, leg_h=-0.12, snout_len=0.02)
+    for sx in (-1, 1):
+        for k in range(3): Cy(0.008, 0.35, (sx*0.3, -1.2, 1.08 + 0.05*k), "white", (0, rad(sx*80 + k*8), 0), verts=6)
+    return h
+def b_penny(): coin((0.8, 0.45, 0.25), 0.75, rim=(0.65, 0.33, 0.16), emblem=lambda z: [S(0.045, (0.55*math.cos(rad(200 + 14*k)), -0.09, z + 0.55*math.sin(rad(200 + 14*k))), (1, 0.4, 1), (0.65, 0.33, 0.16)) for k in range(11)]); return {}
+def b_pepper():
+    for k in range(4): a = k*TAU/4 + 0.4; S(0.5, (0.28*math.cos(a), 0.28*math.sin(a), 0.75), (1, 1, 1.35), "red")
+    S(0.45, (0, 0, 0.9), (1, 1, 1.2), "red"); RC(0.07, 0.4, (0, 0, 1.6), "green", (0, rad(12), 0), lv=1); S(0.22, (0, 0, 1.42), (1, 1, 0.4), "green")
+    sface(0.85, 0.2, 0.11, mouth_dz=0.28, mr=0.1); return {}
+def b_pilot():
+    person("navy", "navy", "hairb", shoes="black")
+    S(0.45, (0, 0.03, 1.55), (1, 1, 0.6), "navy"); BX((0, -0.4, 1.6), (0.56, 0.3, 0.05), "black", bevel=0.02, rot=(rad(14), 0, 0)); Cy(0.46, 0.1, (0, 0.03, 1.8), "navy", verts=32); S(0.07, (0, -0.4, 1.72), (1.3, 0.5, 1), "gold")
+    RK(0.06, 0.3, (0, -0.33, 0.85), "black", (math.pi, 0, 0), lv=1); BX((0, -0.3, 1.0), (0.3, 0.05, 0.1), "white", bevel=0.02)
+    for sx in (-1, 1): To(0.09, 0.02, (sx*0.5, -0.07, 0.6), "gold", (0, rad(sx*15), 0)); S(0.05, (-0.2 + sx*0.07, -0.33, 0.9), (1.4, 0.4, 0.7), "gold")
+    for sx in (-1, 1): BX((sx*0.36, 0, 1.08), (0.2, 0.3, 0.05), "gold", bevel=0.02)
+    return {}
+def b_puppy():
+    h = quad_meta("tan", "cream", "cream", "brown", ear="floppy", tail="short", size=0.8)
+    S(0.2, (0.2, -0.75, 1.3), (1, 0.6, 1), "brown"); To(0.3, 0.05, (0, -0.4, 0.92), "red", (rad(60), 0, 0)); S(0.07, (0, -0.62, 0.74), (1, 1, 1), "gold"); return h
+def b_quail():
+    h = bird("brown", "tan", "dkgrey", s=1.05, legh=0.28, legc="dkgrey", beak_len=0.16, beak_r=0.07)
+    RC(0.03, 0.3, (0, -0.5, 1.3), "charcoal", (rad(35), 0, 0), lv=1); S(0.08, (0, -0.62, 1.42), (0.7, 1.3, 1), "charcoal")
+    for k in range(5): S(0.05, (-0.28, -0.2 + 0.14*k, 0.72 + 0.04*(k % 2)), (1, 1, 1), "cream"); S(0.05, (0.28, -0.2 + 0.14*k, 0.72 + 0.04*(k % 2)), (1, 1, 1), "cream")
+    return {}
+def b_queen():
+    person("purple", "purple", "blonde", style="long", shoes="gold"); RK(0.68, 0.75, (0, 0, 0.42), "purple", lv=2, r2=0.3)
+    S(0.6, (0, 0.28, 0.75), (1.05, 0.5, 1.15), "red"); To(0.3, 0.06, (0, -0.02, 1.08), "white")
+    Cy(0.3, 0.2, (0, 0.03, 1.9), "gold", verts=24)
+    for k in range(6): a = k*TAU/6; Co(0.08, 0.22, (0.27*math.cos(a), 0.03 + 0.27*math.sin(a), 2.08), "gold", verts=8); S(0.045, (0.31*math.cos(a + 0.5), 0.03 + 0.31*math.sin(a + 0.5), 1.9), (1, 1, 1), "red" if k % 2 else "aqua")
+    RC(0.03, 1.1, (0.62, -0.12, 0.9), "gold", lv=1); S(0.11, (0.62, -0.12, 1.5), (1, 1, 1), "hotpink")
+    To(0.6, 0.05, (0, 0, 0.12), "white"); return {}
+def b_quilt():
+    BX((0, 0, 1.0), (2.1, 0.22, 1.6), "white", bevel=0.08)
+    cols = ["red", "sky", "yellow", "lgreen", "hotpink", "orange", "lavender", "aqua"]
+    for i in range(4):
+        for j in range(3): BX((-0.75 + 0.5*i, -0.1, 0.5 + 0.5*j), (0.46, 0.06, 0.46), cols[(i*3 + j*5) % 8], bevel=0.04)
+    for (i, j) in [(0, 2), (3, 0), (2, 1)]: S(0.1, (-0.75 + 0.5*i, -0.14, 0.5 + 0.5*j), (1, 0.3, 1), "white")
+    face(1.08, -0.14, 0.2, 0.1, x=-0.25, mouth_dz=0.24, mr=0.09); return {}
+def b_raisin():
+    C = (0.36, 0.16, 0.3); S(0.6, (0, 0, 0.62), (1.1, 0.9, 1.0), C)
+    for (x, z, r) in [(-0.45, 0.9, 0.3), (0.45, 0.85, 0.32), (-0.4, 0.35, 0.3), (0.42, 0.33, 0.3), (0, 1.05, 0.3)]: S(r, (x, 0.05, z), (1, 0.9, 1), C)
+    for k in range(5): To(0.45, 0.035, (0, 0, 0.3 + 0.16*k), (0.27, 0.1, 0.22), (rad(8*(k % 2) - 4), rad(6*(k % 3) - 6), 0), scale=(1.3, 1.05, 1))
+    RC(0.03, 0.2, (0, 0, 1.38), "brown", lv=1); sface(0.72, 0.2, 0.11, mouth_dz=0.28, mr=0.1); return {}
+def b_river():
+    BX((0, 0, 0.1), (2.6, 2.2, 0.2), "grass", bevel=0.08)
+    for k in range(9): t = k/8; S(0.42, (-0.9 + 1.7*t + 0.35*math.sin(t*5), 0.95 - 1.9*t, 0.17), (1.1, 1, 0.22), "water")
+    for k in range(4): t = 0.15 + 0.22*k; S(0.1, (-0.9 + 1.7*t + 0.35*math.sin(t*5), 0.95 - 1.9*t, 0.26), (1.6, 0.5, 0.15), "white")
+    BX((0.05, 0.0, 0.42), (1.3, 0.4, 0.08), "wood", bevel=0.03, rot=(0, 0, rad(35)))
+    for sx in (-1, 1): BX((0.05 + sx*0.5, sx*0.35, 0.3), (0.12, 0.42, 0.2), "brown", bevel=0.02, rot=(0, 0, rad(35)))
+    tree_s(-0.95, -0.5, 1.0); tree_s(1.0, 0.65, 0.9, "lgreen"); S(0.32, (0.75, -0.75, 0.42), (1.1, 1, 0.9), "stone")
+    sface(0.46, 0.12, 0.075, x=0.75, mouth_dz=0.16, mr=0.06); fit(1.6, 2.5); return {}
+def b_sandal():
+    RB((0, 0, 0.16), (0.95, 2.0, 0.26), "tan", lv=2); RB((0, 0, 0.3), (0.85, 1.85, 0.06), "wood", lv=2)
+    arch(0.44, 0.08, (0, -0.45, 0.26), "red", zs=0.85); arch(0.42, 0.07, (0, 0.4, 0.26), "red", zs=0.9)
+    RC(0.05, 0.85, (0, -0.02, 0.62), "red", (R90, 0, 0), lv=1); S(0.1, (0, -0.45, 0.66), (1, 1, 1), "yellow")
+    face(0.19, -1.0, 0.2, 0.085, mouth_dz=0.0, mr=0.01, tongue=False); return {}
+def b_school():
+    base(2.6, 1.9, "grass"); BX((0, 0.2, 0.8), (2.2, 1.1, 1.2), "brick"); Fp([(-1.2, 0), (1.2, 0), (1.0, 0.3), (-1.0, 0.3)], (0, 0.2, 1.4), 1.25, "roof")
+    BX((0, 0.1, 1.75), (0.6, 0.6, 1.0), "brick"); Fp([(-0.4, 0), (0.4, 0), (0, 0.4)], (0, 0.1, 2.25), 0.7, "roof"); Cy(0.2, 0.04, (0, -0.21, 1.95), "white", (R90, 0, 0)); S(0.1, (0, 0.1, 1.55), (1, 1, 1), "gold")
+    BX((0, -0.36, 0.5), (0.5, 0.05, 0.6), "dkbrown", bevel=0.02)
+    for sx in (-1, 1): BX((sx*0.7, -0.36, 0.95), (0.4, 0.05, 0.36), "glass", bevel=0.02)
+    Cy(0.02, 1.2, (1.15, -0.6, 0.8), "lgrey", verts=8); Fp([(0, 0), (0.4, 0.1), (0, 0.24)], (1.15, -0.6, 1.15), 0.03, "red")
+    face(1.08, -0.35, 0.16, 0.085, mouth_dz=0.0, mr=0.01, tongue=False); fit(); return {}
+def b_shell():
+    S(0.95, (0, 0, 0.95), (1.05, 0.28, 0.95), (1.0, 0.8, 0.75)); BX((0, 0, 0.12), (0.7, 0.3, 0.2), (1.0, 0.7, 0.65), bevel=0.06)
+    for k in range(9): a = rad(-64 + 16*k); RC(0.04, 1.45, (0.72*math.sin(a), -0.22 + abs(math.sin(a))*0.08, 0.2 + 0.72*math.cos(a)), (1.0, 0.62, 0.6), (0, a, 0), lv=1)
+    sface(0.75, 0.2, 0.11, mouth_dz=0.28, mr=0.1); return {}
+def b_shirt():
+    BX((0, 0, 0.9), (1.3, 0.42, 1.55), "sky", bevel=0.12)
+    for sx in (-1, 1): BX((sx*0.85, 0, 1.38), (0.75, 0.4, 0.48), "sky", rot=(0, rad(sx*30), 0), bevel=0.1); BX((sx*1.13, 0, 1.22), (0.1, 0.42, 0.5), "blue", rot=(0, rad(sx*30), 0), bevel=0.03)
+    To(0.28, 0.07, (0, 0, 1.68), "blue", (rad(15), 0, 0))
+    for z in (0.4, 0.62): BX((0, 0, z), (1.32, 0.44, 0.1), "white", bevel=0.02)
+    S(0.18, (0.32, -0.21, 0.98), (1, 0.2, 1), "yellow"); face(1.25, -0.22, 0.2, 0.1, x=-0.1, mouth_dz=0.24, mr=0.09); return {}
+def b_slide():
+    o = Fp([(-1.5, 0.1), (-1.2, 0.04), (0.5, 1.3), (0.5, 1.42), (-1.2, 0.2), (-1.5, 0.25)], (0, 0, 0), 0.6, "red")
+    for sy in (-1, 1): Fp([(-1.5, 0.25), (-1.2, 0.2), (0.5, 1.42), (0.5, 1.6), (-1.2, 0.38), (-1.5, 0.4)], (0, sy*0.32, 0), 0.05, "yellow")
+    BX((0.8, 0, 1.4), (0.65, 0.7, 0.08), "blue", bevel=0.03)
+    for sy in (-1, 1):
+        for x in (0.52, 1.08): RC(0.04, 1.4, (x, sy*0.3, 0.7), "blue", lv=1)
+        RC(0.03, 0.55, (0.8, sy*0.33, 1.9), "yellow", (0, R90, 0), lv=1); RC(0.03, 0.5, (0.52, sy*0.33, 1.66), "yellow", lv=1); RC(0.03, 0.5, (1.08, sy*0.33, 1.66), "yellow", lv=1)
+    for k in range(4): Cy(0.03, 0.6, (1.1, 0, 0.25 + 0.3*k), "lgrey", (R90, 0, 0), verts=8)
+    BX((0.8, -0.3, 0.7), (0.5, 0.04, 0.9), "yellow", bevel=0.03); face(0.85, -0.32, 0.14, 0.08, x=0.8, mouth_dz=0.2, mr=0.07); fit(2.0, 2.6); return {}
+def ball(c, r=0.8):
+    return S(r, (0, 0, r), (1, 1, 1), c, seg=48, ring=24)
+def b_soccer():
+    ball("white")
+    import random; random.seed(2)
+    dirs = [Vector((0, 0, 1)), Vector((0, 0, -1))] + [Vector((math.cos(k*TAU/5), math.sin(k*TAU/5), 0.45)).normalized() for k in range(5)] + [Vector((math.cos(k*TAU/5 + 0.63), math.sin(k*TAU/5 + 0.63), -0.45)).normalized() for k in range(5)]
+    for d in dirs:
+        if d.y < -0.75: continue
+        Co(0.27, 0.05, tuple(Vector((0, 0, 0.8)) + d*0.785), "black", tuple(d.to_track_quat('Z', 'Y').to_euler()), r2=0.25, verts=5)
+    sface(0.9, 0.2, 0.11, mouth_dz=0.28, mr=0.1); return {}
+def b_square():
+    cx, cz = shape([(-0.85, 0.05), (0.85, 0.05), (0.85, 1.75), (-0.85, 1.75)], "red", (1.0, 0.45, 0.45)); face(cz + 0.1, -0.19, 0.22, 0.12, x=cx, mouth_dz=0.32, mr=0.11); return {}
+def b_steps():
+    for k in range(4): BX((0, -0.6 + 0.42*k, 0.21*(k + 1)), (1.7, 0.44, 0.42*(k + 1)), "stone", bevel=0.03); BX((0, -0.6 + 0.42*k - 0.01, 0.42*(k + 1) + 0.005), (0.7, 0.44, 0.03), "red", bevel=0.01); BX((0, -0.6 + 0.42*k - 0.225, 0.42*k + 0.21), (0.7, 0.02, 0.42), "red", bevel=0.0)
+    for sx in (-1, 1): BX((sx*0.95, 0.05, 1.1), (0.14, 1.75, 0.1), "brown", bevel=0.03, rot=(rad(45), 0, 0)); BX((sx*0.95, -0.75, 0.5), (0.14, 0.14, 1.0), "brown", bevel=0.03)
+    eyes(0.3, -0.83, 0.55, 0.085); smile(0.2, -0.83, 0.08, x=-0.55 + 0.0); return {}
+def b_street():
+    body = E((0, 0, 0))
+    BX((0, 0, 0.12), (2.2, 3.0, 0.24), "grey", body, bevel=0.04); BX((0, 0, 0.26), (1.4, 3.0, 0.04), "dkgrey", body, bevel=0.01)
+    for k in range(4): BX((0, -1.0 + 0.7*k, 0.285), (0.1, 0.36, 0.01), "yellow", body, bevel=0.0)
+    for k in range(5): BX((-0.52 + 0.26*k, -1.25, 0.285), (0.14, 0.4, 0.01), "white", body, bevel=0.0)
+    RC(0.04, 1.5, (0.9, -0.6, 1.0), "dkgrey", parent=body, lv=1); S(0.16, (0.9, -0.6, 1.8), (1, 1, 1), "yellow", body); BX((0.9, -0.6, 1.93), (0.3, 0.3, 0.06), "dkgrey", body, bevel=0.02)
+    BX((-0.9, 0.6, 0.55), (0.3, 0.3, 0.6), "red", body, bevel=0.05); S(0.17, (-0.9, 0.6, 0.9), (1, 1, 0.6), "red", body)
+    BX((-0.9, -0.5, 0.8), (0.04, 0.04, 1.1), "lgrey", body, bevel=0.0); Cy(0.2, 0.04, (-0.9, -0.53, 1.35), "red", (R90, 0, 0), body, verts=8)
+    face(0.2, -1.5, 0.3, 0.085, parent=body, mouth_dz=0.0, mr=0.01, tongue=False); return {"body": body}
+def b_stripe():
+    for k in range(8): Cy(0.36, 0.2, (0, 0.3, 0.75 + 0.2*k), "red" if k % 2 else "white", verts=32)
+    RC(0.37, 0.25, (0, 0.3, 2.35), "red", lv=1); S(0.42, (0, 0.2, 0.45), (1, 1.2, 1), "white")
+    for k in range(5): S(0.4 - 0.012*k, (0, -0.05 - 0.2*k, 0.4 - 0.01*k), (1, 0.35, 0.95), "red" if k % 2 == 0 else "white")
+    S(0.36, (0, -1.0, 0.36), (1, 0.8, 0.95), "red"); sface(1.5, 0.15, 0.09, mouth_dz=0.24, mr=0.08, fb=0.0); return {}
+def b_tennis():
+    ball((0.8, 0.92, 0.2))
+    for sx in (-1, 1): To(0.62, 0.035, (sx*0.52, 0, 0.8), "white", (0, R90, 0))
+    sface(0.9, 0.2, 0.11, mouth_dz=0.28, mr=0.1); return {}
+def b_violet():
+    RC(0.05, 1.0, (0, 0.1, 0.5), "green", lv=1)
+    for sx in (-1, 1): S(0.32, (sx*0.35, 0.05, 0.35), (1.3, 0.5, 0.45), "green", rot=(0, rad(sx*-28), 0))
+    for k in range(5): a = k*TAU/5 + R90; S(0.38, (0.42*math.cos(a), -0.05, 1.35 + 0.42*math.sin(a)), (1, 0.3, 1), "violet" if k < 2 else "purple")
+    S(0.3, (0, -0.12, 1.35), (1, 0.5, 1), "yellow"); face(1.4, -0.26, 0.11, 0.07, mouth_dz=0.16, mr=0.06); return {}
+def b_wagon():
+    body = E((0, 0, 0))
+    BX((0, 0.1, 0.65), (1.3, 2.1, 0.55), "red", body, bevel=0.08); BX((0, 0.1, 0.9), (1.1, 1.9, 0.08), "roof", body, bevel=0.02)
+    ws = wheelset(body, [(sx*0.72, y, 0.32) for sx in (-1, 1) for y in (-0.6, 0.8)], 0.32, 0.16, "black", "white")
+    RC(0.04, 1.0, (0, -1.38, 0.82), "black", (rad(55), 0, 0), body, lv=1); RC(0.05, 0.4, (0, -1.8, 1.12), "black", (0, R90, 0), body, lv=1)
+    S(0.25, (0.2, 0.3, 1.1), (1, 1, 1), "yellow", body); BX((-0.25, 0.6, 1.1), (0.4, 0.4, 0.4), "blue", body, bevel=0.05)
+    face(0.72, -0.96, 0.24, 0.11, parent=body, mouth_dz=0.0, mr=0.01, tongue=False); smile(0.5, -0.97, 0.1, parent=body); return {"body": body, "wheels": ws}
+def b_walrus():
+    h = quad_meta((0.6, 0.42, 0.32), (0.75, 0.58, 0.45), (0.85, 0.72, 0.6), (0.45, 0.3, 0.22), ear=None, tail="short", size=1.05, leg_h=-0.14, snout_len=0.05)
+    for sx in (-1, 1):
+        RK(0.07, 0.6, (sx*0.15, -1.2, 0.85), "ivory", (math.pi, 0, 0), lv=1); S(0.17, (sx*0.16, -1.22, 1.2), (1, 0.8, 0.8), (0.9, 0.78, 0.66))
+        for k in range(3): Cy(0.008, 0.3, (sx*0.32, -1.25, 1.14 + 0.05*k), "white", (0, rad(sx*80 + k*8), 0), verts=6)
+    return h
+def b_zipper():
+    for sx in (-1, 1): BX((sx*0.42, 0, 1.0), (0.75, 0.16, 1.9), "blue", bevel=0.05); BX((sx*0.1, -0.02, 1.0), (0.12, 0.16, 1.9), "navy", bevel=0.02)
+    for k in range(15): BX((0.05*(1 if k % 2 else -1), -0.08, 0.15 + 0.115*k), (0.16, 0.08, 0.07), "silver", bevel=0.02)
+    BX((0, -0.14, 1.15), (0.3, 0.1, 0.3), "lgrey", bevel=0.05); BX((0, -0.2, 0.85), (0.16, 0.04, 0.5), "lgrey", bevel=0.03); To(0.07, 0.025, (0, -0.2, 0.62), "lgrey", (R90, 0, 0))
+    face(1.3, -0.085, 0.14, 0.085, x=-0.5, mouth_dz=0.2, mr=0.07); return {}
 BUILD = {k[2:]: v for k, v in dict(globals()).items() if k.startswith("b_")}
