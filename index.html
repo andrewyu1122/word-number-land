@@ -278,6 +278,8 @@ body.xmas #world .hills,body.xmas #world .hills2{background:#f4f9ff}
 .actor .em{height:170px;max-width:360px;object-fit:contain;filter:grayscale(.8) brightness(1.05) drop-shadow(0 6px 0 rgba(0,0,0,.18));transition:filter .4s;display:block}
 .actor .emoji{font-size:118px;line-height:1;filter:grayscale(.85);transition:filter .4s}
 .actor .shadow{width:120px;height:22px;border-radius:50%;background:rgba(0,0,0,.2);filter:blur(3px);margin-top:-8px}
+.sightTip{position:absolute;left:50%;top:10px;transform:translateX(-50%);z-index:4;background:rgba(255,255,255,.95);color:var(--ink);font-weight:700;font-size:16px;padding:8px 14px;border-radius:999px;box-shadow:0 4px 0 rgba(0,0,0,.14);white-space:nowrap}
+.stage.alive .sightTip{display:none}
 .actor .zz{position:absolute;top:-10px;right:-20px;font-size:30px;animation:zz 2.2s ease-in-out infinite}
 @keyframes zz{0%{opacity:0;transform:translate(0,10px) scale(.6)}30%{opacity:1}100%{opacity:0;transform:translate(14px,-40px) scale(1.2)}}
 .stage.alive .actor .em{filter:drop-shadow(0 6px 0 rgba(0,0,0,.18))}
@@ -344,6 +346,13 @@ body.xmas #world .hills,body.xmas #world .hills2{background:#f4f9ff}
 /* read (sight words) */
 #readStage{height:230px}
 #readStage .bigword{position:absolute;inset:0;display:grid;place-items:center;z-index:2;font-size:64px;font-weight:700;color:#fff;-webkit-text-stroke:2px var(--ink);text-shadow:0 4px 0 rgba(0,0,0,.25)}
+#readStage .listen{position:absolute;right:5%;top:50%;transform:translateY(-50%);width:54%;z-index:3;background:rgba(255,255,255,.95);border-radius:22px;padding:12px 10px;display:flex;align-items:center;gap:10px;box-shadow:0 6px 0 rgba(0,0,0,.14);text-align:left}
+#readStage .listen::before{content:"";position:absolute;left:-14px;top:50%;margin-top:-10px;border:10px solid transparent;border-right-color:rgba(255,255,255,.95);border-left:0}
+#readStage .listen .spk{font-size:40px;line-height:1;flex:none;width:58px;height:58px;border-radius:50%;background:var(--coral);display:grid;place-items:center;box-shadow:0 4px 0 #c84a2c}
+#readStage .listen .txt{font-size:17px;font-weight:700;color:var(--ink);line-height:1.25}
+#readStage .listen.ping .spk{animation:ping .9s ease-out}
+@keyframes ping{0%{transform:scale(1);box-shadow:0 4px 0 #c84a2c,0 0 0 0 rgba(255,107,74,.6)}50%{transform:scale(1.18)}100%{transform:scale(1);box-shadow:0 4px 0 #c84a2c,0 0 0 22px rgba(255,107,74,0)}}
+@media (min-width:760px){#readStage .listen .txt{font-size:24px}#readStage .listen .spk{width:84px;height:84px;font-size:54px}}
 #readStage .sentence{position:absolute;left:8px;right:8px;top:10px;z-index:4;background:rgba(255,255,255,.92);border-radius:16px;padding:8px 12px;font-size:24px;font-weight:700;text-align:center;color:var(--ink);box-shadow:0 4px 0 rgba(0,0,0,.12)}
 .wslots{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;min-height:58px}
 .wslot{min-width:64px;height:54px;padding:0 12px;border-radius:14px;border:3px dashed var(--slotline);background:var(--slot);display:grid;place-items:center;font-size:26px;font-weight:700;color:var(--ink)}
@@ -1240,7 +1249,7 @@ function renderWord(){
   const stage=$('#stageWrap');stage.className='stage';stage.innerHTML='';
   stage.appendChild(img(sceneArt(w.sight?pick(['meadow','sky','room']):sceneFor(w.word,w.anim)),'bg'));
   const actor=document.createElement('div');actor.className='actor';actor.id='actor';
-  if(w.sight){const em=img(A+'mascot/mascot_think.webp','em');em.id='stageEm';em.style.filter='none';actor.appendChild(em);}
+  if(w.sight){const em=img(A+'mascot/mascot_think.webp','em');em.id='stageEm';em.style.filter='none';actor.appendChild(em);const tip=document.createElement('button');tip.className='sightTip';tip.innerHTML='🔊 Listen and spell the word';tip.onclick=()=>say(['w_'+w.word],w.word);stage.appendChild(tip);}
   else if(ART[w.word]){const em=img(wordArt(w.word,'sleep'),'em');em.id='stageEm';actor.appendChild(em);preload(wordArt(w.word,'anim'));}
   else{const em=document.createElement('span');em.className='emoji';em.id='stageEm';em.textContent=w.emoji;actor.appendChild(em);}
   const sh=document.createElement('span');sh.className='shadow';actor.appendChild(sh);
@@ -1336,11 +1345,13 @@ function renderRead(){
   const st=$('#readStage'),sl=$('#wslots'),tl=$('#wtiles');st.className='stage';st.innerHTML='';sl.innerHTML='';tl.innerHTML='';
   const COLORS=['#ff6b4a','#3aa6ff','#38d47a','#ffb02e','#9b6bff','#ff4f8b','#2fcfc0'];
   if(R.level===1){
-    const target=R.queue[R.idx];R.target=target;st.appendChild(img(sceneArt(pick(['meadow','sky','room'])),'bg'));const m=img(A+'mascot/mascot_think.webp');m.style.cssText='position:absolute;left:50%;bottom:20px;height:70%;transform:translateX(-50%);z-index:2';st.appendChild(m);
+    const target=R.queue[R.idx];R.target=target;st.appendChild(img(sceneArt(pick(['meadow','sky','room'])),'bg'));const m=img(A+'mascot/mascot_think.webp');m.style.cssText='position:absolute;left:22%;bottom:16px;height:62%;transform:translateX(-50%);z-index:2';st.appendChild(m);
+    const bub=document.createElement('button');bub.className='listen';bub.innerHTML='<span class="spk">🔊</span><span class="txt">Listen!<br>Tap the word you hear</span>';bub.onclick=()=>{bub.classList.remove('ping');void bub.offsetWidth;bub.classList.add('ping');R.say();};st.appendChild(bub);R.bub=bub;
     const others=shuffle(SIGHT.filter(w=>w!==target&&Math.abs(w.length-target.length)<=2)).slice(0,store.lvl&&(store.lvl.read1||0)>=2?4:3);
     shuffle([target].concat(others)).forEach((w,i)=>{const b=document.createElement('button');b.className='wtile pick';b.textContent=w==='i'?'I':w;b.style.setProperty('--c',COLORS[i%COLORS.length]);
-      b.onclick=()=>{if(R.done)return;if(w===target){b.style.setProperty('--c','#38d47a');const bw=document.createElement('div');bw.className='bigword';bw.textContent=w==='i'?'I':w;st.appendChild(bw);m.src=A+'mascot/mascot_happy.webp';readDone([wkey(w)],w);}else{R.mistakes++;sfxWrong();b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');say([wkey(w)],w);if(R.mistakes>=2){[...tl.children].find(x=>x.textContent.toLowerCase()===target).classList.add('glow');}}};tl.appendChild(b);});
-    R.say=()=>say([wkey(target)],target);
+      b.onclick=()=>{if(R.done)return;hideHand();if(w===target){if(tutNeeded('read1'))tutDone('read1');if(R.bub)R.bub.remove();b.style.setProperty('--c','#38d47a');const bw=document.createElement('div');bw.className='bigword';bw.textContent=w==='i'?'I':w;st.appendChild(bw);m.src=A+'mascot/mascot_happy.webp';readDone([wkey(w)],w);}else{R.mistakes++;sfxWrong();b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');say([wkey(w)],w);if(R.mistakes>=2){[...tl.children].find(x=>x.textContent.toLowerCase()===target).classList.add('glow');}}};tl.appendChild(b);});
+    R.say=()=>{if(R.bub){R.bub.classList.remove('ping');void R.bub.offsetWidth;R.bub.classList.add('ping');}say(['p_findword',wkey(target),wkey(target)],target+'. '+target+'.',[wkey(target),wkey(target)]);};
+    if(tutNeeded('read1'))setTimeout(()=>{if(!R.done)pointAt(bub);setTimeout(()=>{if(!R.done&&tutNeeded('read1'))pointAt([...tl.children].find(x=>x.textContent.toLowerCase()===target));},2600);},1200);
   }else{
     const hard=R.level===4;const tpl=pick(hard?SENT_HARD:SENT_EASY);let noun;const nouns=readNouns();do{noun=pick(nouns);}while((R.usedNouns||[]).includes(noun)&&nouns.length>10);R.usedNouns=(R.usedNouns||[]).concat([noun]);
     const words=tpl.map(x=>x==='{n}'?noun:x);R.words=words;R.noun=noun;
@@ -1348,6 +1359,7 @@ function renderRead(){
     words.forEach((w,i)=>{const d=document.createElement('div');d.className='wslot'+(i===0?' now':'');d.dataset.i=i;sl.appendChild(d);});
     const extra=hard?shuffle(SIGHT.filter(w=>!words.map(x=>x.toLowerCase()).includes(w))).slice(0,2).map(w=>w==='i'?'I':w):[];
     shuffle(words.concat(extra)).forEach((w,i)=>{const b=document.createElement('button');b.className='wtile';b.textContent=w;b.dataset.w=w;b.style.setProperty('--c',COLORS[i%COLORS.length]);b.onclick=()=>tapWord(b);tl.appendChild(b);});
+    const chip=document.createElement('button');chip.className='sightTip';chip.innerHTML='🔊 Listen, then tap the words in order';chip.onclick=()=>R.say();st.appendChild(chip);
     R.say=()=>say(words.map(wkey),words.join(' ')+'.');
   }
   setTimeout(()=>R.say(),250);
