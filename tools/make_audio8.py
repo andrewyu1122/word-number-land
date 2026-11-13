@@ -16,6 +16,7 @@ jobs.append(("p_findword","Find the word"))
 for v in ['run','jump','swim','sit','read','kick','catch','hug']:
     jobs.append((f"w_{v}", v + "."))
 jobs.append(("p_medal","You won a medal!"))
+jobs.append(("p_hatched_sea","A new sea friend hatched!"))
 async def one(name,text,sem):
     path=f"{OUT}/{name}.mp3"
     if os.path.exists(path) and os.path.getsize(path)>500: return
