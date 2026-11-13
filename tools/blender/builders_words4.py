@@ -491,4 +491,126 @@ def b_mountain():
         Cy(0.06*s, 0.2*s, (x, y, 0.14 + 0.1*s), "brown", verts=8); Co(0.26*s, 0.5*s, (x, y, 0.14 + 0.42*s), "dkgreen", verts=10); Co(0.19*s, 0.4*s, (x, y, 0.14 + 0.7*s), "green", verts=10)
     sface(0.95, 0.27, 0.14, x=0.1, mouth_dz=0.33, mr=0.12)
     return finish(2.6, 3.3)
+# ================================================================ batch 5
+def checker(o, fn):
+    """two-material pattern on a primitive: fn(center) -> 0/1 (slot 1 must already be appended)"""
+    for p in o.data.polygons: p.material_index = fn(p.center)
+    return o
+def b_crab():
+    R = "red"; claws = []
+    S(0.85, (0, 0, 0.75), (1.3, 0.95, 0.62), R); S(0.7, (0, -0.1, 0.62), (1.25, 0.9, 0.5), (1.0, 0.55, 0.4))
+    for sx in (-1, 1): Cy(0.07, 0.5, (sx*0.32, -0.42, 1.4), R); S(0.18, (sx*0.32, -0.4, 1.74), (1, 1, 1), R)
+    eyes(1.74, -0.5, 0.32, 0.19); smile(0.78, -0.8, 0.2, tongue=False)
+    for sx in (-1, 1):
+        for k in range(3):
+            y = -0.1 + 0.32*k; tube(spline([(sx*0.9, y, 0.62), (sx*1.42, y + 0.03, 0.78), (sx*1.62, y + 0.08, 0.02)], 10), lerpr(0.15, 0.07, 10), R, seg=10)
+        c = E((sx*0.95, -0.35, 0.9))
+        tube(spline([(sx*0.95, -0.35, 0.9), (sx*1.5, -0.5, 1.25), (sx*1.32, -0.55, 1.8)], 10), lerpr(0.16, 0.14, 10), R, seg=12, parent=c)
+        S(0.38, (sx*1.3, -0.55, 2.02), (0.95, 0.6, 1.1), R, c)
+        tube(spline([(sx*1.44, -0.55, 2.15), (sx*1.54, -0.55, 2.55), (sx*1.3, -0.55, 2.9)], 10), [0.21, 0.21, 0.2, 0.19, 0.18, 0.16, 0.14, 0.12, 0.09, 0.06, 0.03], R, seg=12, parent=c)
+        tube(spline([(sx*1.1, -0.55, 2.2), (sx*0.98, -0.55, 2.5), (sx*1.1, -0.55, 2.74)], 8), [0.16, 0.15, 0.14, 0.13, 0.11, 0.09, 0.07, 0.05, 0.03], R, seg=12, parent=c); claws.append(c)
+    return finish(2.3, 3.1, turn=-25, H={"claws": claws, "sway": 4, "yawaxis": 1})
+def b_ham():
+    Pk = (1.0, 0.55, 0.6); Gl = (0.85, 0.42, 0.2); n = 30; z0 = 0.9
+    Rf = lambda x: 0.72 + 0.14*math.sin(math.pi*min(1.0, (x + 1.0)/1.3)) if x < 0.3 else 0.72 - 0.52*((x - 0.3)/0.9)**0.8
+    xs = [-1.0 + 2.2*k/n for k in range(n + 1)]
+    tube([(x, 0, z0) for x in xs], [Rf(x) for x in xs], Pk, seg=32, ref=(0, 0, 1), mats=[Pk, Gl], cfun=lambda i, j: 1 if math.cos(TAU*(j + 0.5)/32) > -0.2 else 0)
+    Cy(0.725, 0.03, (-1.0, 0, z0), "cream", (0, R90, 0), verts=32); Cy(0.62, 0.04, (-1.0, 0, z0), (1.0, 0.62, 0.66), (0, R90, 0), verts=32); Cy(0.12, 0.06, (-1.0, 0, z0), "white", (0, R90, 0), verts=16)
+    Cy(0.12, 0.75, (1.5, 0, z0), "white", (0, R90, 0), verts=16)
+    for dy in (-0.11, 0.11): S(0.17, (1.9, dy, z0), (1, 1, 1), "white")
+    sp = lambda x, a: (x, -(Rf(x) + 0.012)*math.sin(a), z0 + (Rf(x) + 0.012)*math.cos(a))
+    d = rad(36); c = rad(55)
+    for s in (-1, 1):
+        for m in range(-6, 12):
+            seg = []
+            for k in range(41):
+                x = -0.95 + 1.9*k/40; a = m*d + s*c*x
+                if -rad(62) < a < rad(100): seg.append(sp(x, a))
+                elif len(seg) > 1: tube(seg, [0.022]*len(seg), "dkbrown", seg=6); seg = []
+                else: seg = []
+            if len(seg) > 1: tube(seg, [0.022]*len(seg), "dkbrown", seg=6)
+    for m in range(-6, 12):
+        for q in range(-6, 12):
+            a = (m + q)*d/2; x = (m - q)*d/(2*c)
+            if -0.9 < x < 0.85 and -rad(55) < a < rad(95): S(0.055, sp(x, a), (1, 1, 1), "dkbrown", seg=10, ring=8)
+    sface(0.62, 0.2, 0.11, x=-0.25, mouth_dz=0.24, mr=0.09)
+    return finish(1.9, 2.9, turn=-18, roll=-14)
+def b_jam():
+    J = (0.85, 0.06, 0.12); Gs = (0.82, 0.93, 1.0); zs = [0.0, 0.04, 0.12, 0.25, 0.4, 0.55, 0.7, 0.85, 1.0, 1.15, 1.3, 1.42, 1.5, 1.58, 1.66, 1.74, 1.8]
+    rr = [0.5, 0.62, 0.69, 0.72, 0.72, 0.72, 0.72, 0.72, 0.72, 0.72, 0.72, 0.72, 0.71, 0.66, 0.57, 0.52, 0.52]
+    def cf(i, j):
+        if 3 <= i <= 6 and 11 <= j <= 20: return 1
+        return 2 if i >= 11 else 0
+    tube([(0, 0, z) for z in zs], rr, J, seg=32, mats=[J, "white", Gs], cfun=cf)
+    S(0.06, (-0.5, -0.52, 1.1), (0.6, 0.6, 3.2), "white", rot=(0, 0, rad(-44)))
+    S(0.17, (0, -0.74, 0.6), (1.0, 0.45, 1.2), "red", rot=(math.pi, 0, 0));
+    for sx in (-1, 0, 1): S(0.07, (sx*0.09, -0.76, 0.78), (1.3, 0.4, 0.7), "green", rot=(0, rad(sx*35), 0))
+    for (x, z) in [(-0.06, 0.62), (0.06, 0.6), (0.0, 0.52), (-0.05, 0.7), (0.07, 0.69)]: S(0.018, (x, -0.815, z), (1, 1, 1), "yellow", seg=8, ring=6)
+    sface(1.22, 0.2, 0.11, mouth_dz=0.22, mr=0.09)
+    Bl = "blue"; ck = lambda c: (int((math.atan2(c.y, c.x) + math.pi)/TAU*16) + int(c.z*9)) % 2
+    o = S(0.56, (0, 0, 1.86), (1, 1, 0.5), "white", seg=32, ring=16); o.data.materials.append(mat(Bl)); checker(o, ck)
+    o = tube([(0, 0, 1.9), (0, 0, 1.78), (0, 0, 1.66), (0, 0, 1.54), (0, 0, 1.44)], [0.56, 0.535, 0.62, 0.74, 0.84], "white", seg=32, mats=["white", Bl], cfun=lambda i, j: (i + j//2) % 2, cap=False)
+    for v in o.data.vertices:
+        if v.co.z < 1.75: th = math.atan2(v.co.y, v.co.x); f = 1 + 0.1*math.sin(9*th)*(1.75 - v.co.z)/0.3; v.co.x *= f; v.co.y *= f
+    To(0.54, 0.035, (0, 0, 1.77), "straw")
+    for sx in (-1, 1): To(0.1, 0.03, (sx*0.11, -0.57, 1.76), "straw", (R90, 0, rad(sx*20)), scale=(1.2, 0.8, 1)); tube([(0, -0.56, 1.76), (sx*0.1, -0.62, 1.55)], [0.03, 0.03], "straw", seg=6)
+    return finish(2.2, 2.6)
+def b_pony():
+    Bn = (0.62, 0.36, 0.17); Gd = (1.0, 0.8, 0.3); Mz = (0.9, 0.7, 0.5)
+    body = E((0, 0, 0)); head = E((0, -0.45, 1.25), body); tail = E((0, 0.95, 1.25), body)
+    S(0.62, (0, 0.1, 1.05), (0.92, 1.4, 0.9), Bn, body)
+    lg = legs4(Bn, 0, 0.55, 0.15, 0.3, 0.55, parent=body, foot="dkbrown")
+    tube([(0, -0.45, 1.2), (0, -0.88, 1.8)], [0.34, 0.27], Bn, seg=16, ref=(1, 0, 0), parent=head)
+    S(0.37, (0, -0.98, 1.95), (0.92, 1.2, 1.0), Bn, head); S(0.27, (0, -1.34, 1.8), (0.95, 1.1, 0.85), Mz, head)
+    for sx in (-1, 1):
+        Co(0.11, 0.3, (sx*0.2, -0.85, 2.35), Bn, (0, rad(sx*12), 0), head, verts=12); S(0.03, (sx*0.09, -1.6, 1.84), (1, 0.6, 1.3), "dkbrown", head)
+    for k in range(9):
+        t = k/8.0; S(0.24 - 0.03*abs(k - 3)/3, (0.06*math.sin(k*2.1), -1.12 + 0.95*t, 2.32 - 0.1*t - 0.75*t*t), (1.15, 1, 1), Gd, head, name="Mane")
+    for k in range(3): S(0.17, (0.1*(k - 1), -1.22, 2.2 - 0.03*abs(k - 1)), (1, 1, 1.2), Gd, head, name="Mane")
+    for k in range(6): t = k/5.0; S(0.2 + 0.06*math.sin(math.pi*t), (0.04*math.sin(k*2), 1.0 + 0.3*math.sin(math.pi*t*0.7), 1.25 - 0.85*t), (1, 1, 1.15), Gd, tail, name="Tail")
+    eyes(2.02, -1.26, 0.2, 0.1, parent=head); smile(1.68, -1.6, 0.07, parent=head, tongue=False)
+    return finish(2.35, 2.9, turn=18, H={"body": body, "legs": lg, "head": head, "tail": tail, "legamp": 30})
+def b_lemon():
+    Y = (1.0, 0.86, 0.05); n = 28; g = E((0, 0, 0.72))
+    tube([(-1.05 + 2.1*k/n, 0, 0.72) for k in range(n + 1)], [0.07 + 0.6*math.sin(math.pi*k/n)**0.6 for k in range(n + 1)], Y, seg=32, ref=(0, 0, 1), parent=g)
+    for sx in (-1, 1): S(0.09, (sx*1.06, 0, 0.72), (1.2, 1, 1), Y, g)
+    S(0.2, (-1.2, 0.05, 0.92), (1.6, 0.6, 0.25), "green", g, rot=(0, rad(35), 0)); Cy(0.03, 0.14, (-1.12, 0, 0.78), "brown", (0, rad(60), 0), g, verts=8)
+    sface(0.78, 0.2, 0.11, mouth_dz=0.26, mr=0.09, parent=g); swing(g, (0, rad(-13), 0))
+    h = E((0.75, -1.0, 0.5)); c = Vector((0.75, -1.0, 0.5)); m = 12
+    tube([(c.x, c.y + 0.6*k/m, c.z) for k in range(m + 1)], [0.52*math.sqrt(max(0.0, 1 - (k/m)**2)) + 0.07*(1 - k/m)**0 * (1 if k < m else 0) + (0.05 if k == m else 0) for k in range(m + 1)], Y, seg=32, ref=(1, 0, 0), parent=h)
+    Cy(0.56, 0.03, (c.x, c.y, c.z), "white", (R90, 0, 0), h, verts=32); Cy(0.48, 0.04, (c.x, c.y, c.z), (1.0, 0.95, 0.45), (R90, 0, 0), h, verts=32)
+    for k in range(4): B((c.x, c.y - 0.022, c.z), (0.94, 0.012, 0.035), "white", h, (0, rad(45*k), 0))
+    S(0.06, (c.x, c.y - 0.02, c.z), (1, 0.3, 1), "white", h)
+    swing(h, (rad(-28), 0, rad(22)))
+    return finish(1.8, 2.9, turn=-18)
+def b_toad():
+    T = (0.52, 0.47, 0.2); Td = (0.36, 0.31, 0.1); C = (0.95, 0.88, 0.6)
+    S(0.85, (0, 0.2, 0.78), (1.15, 1.2, 0.88), T); S(0.72, (0, -0.42, 1.05), (1.2, 1.0, 0.75), T); S(0.66, (0, -0.4, 0.62), (1.15, 1.0, 0.72), C)
+    for sx in (-1, 1):
+        S(0.27, (sx*0.44, -0.6, 1.52), (1, 1, 0.95), T); S(0.03, (sx*0.12, -1.1, 1.22), (1, 0.6, 1), Td)
+        tube([(sx*0.62, -0.6, 0.6), (sx*0.74, -0.95, 0.12)], [0.19, 0.15], T, seg=12); S(0.2, (sx*0.76, -1.05, 0.08), (1.25, 1.3, 0.4), T)
+        S(0.48, (sx*0.9, 0.35, 0.45), (0.8, 1.35, 0.92), T); S(0.26, (sx*1.02, -0.3, 0.09), (0.95, 1.9, 0.38), T)
+    eyes(1.57, -0.8, 0.44, 0.17)
+    tube(spline([(-0.82, -0.6, 1.08), (-0.45, -0.98, 0.93), (0, -1.11, 0.88), (0.45, -0.98, 0.93), (0.82, -0.6, 1.08)], 20), [0.04]*21, "mouth", seg=8)
+    import random; random.seed(7)
+    for k in range(34):
+        th = random.uniform(0, TAU); ph = random.uniform(0.15, 1.35); r = random.uniform(0.07, 0.13)
+        if k % 3: p = (0.85*1.15*math.sin(ph)*math.cos(th), 0.2 + 0.85*1.2*math.sin(ph)*math.sin(th), 0.78 + 0.85*0.88*math.cos(ph))
+        else: p = (0.72*1.2*math.sin(ph)*math.cos(th), -0.42 + 0.72*math.sin(ph)*math.sin(th)*(0.5 if math.sin(th) < 0 else 1), 1.05 + 0.72*0.75*math.cos(ph))
+        if abs(p[0]) < 0.75 and p[1] < -0.3 and p[2] > 1.3: continue
+        S(r, p, (1, 1, 0.75), Td, seg=12, ring=8)
+    return finish(1.9, 3.0, turn=6)
+def b_candy():
+    Rc = "hotpink"; g = E((0, 0, 0.85))
+    o = S(0.62, (0, 0, 0.85), (1.2, 1, 1), "white", g, seg=40, ring=24); o.data.materials.append(mat(Rc))
+    checker(o, lambda c: int((c.x*1.3 + math.atan2(c.z, c.y)/TAU*2 + 10)*2) % 2)
+    for sx in (-1, 1):
+        n = 12; o = tube([(sx*(0.6 + 0.9*k/n), 0, 0.85) for k in range(n + 1)], [(0.3 - 0.17*math.sin(math.pi*min(1.0, k/3.0)/1.0)*(1 if k < 3 else 1) + 0.52*max(0.0, (k - 2)/10.0)**0.8, 0.26 - 0.13*min(1.0, k/3.0) + 0.14*max(0.0, (k - 2)/10.0)) for k in range(n + 1)],
+                        "white", seg=24, ref=(0, 0, 1), parent=g, mats=["white", Rc], cfun=lambda i, j: (j//2) % 2, cap=False)
+        for v in o.data.vertices:
+            w = max(0.0, (abs(v.co.x) - 1.0)/0.5)
+            if w > 0: a = math.atan2(v.co.z - 0.85, v.co.y); f = 1 + 0.12*w*math.sin(8*a); v.co.y *= f; v.co.z = 0.85 + (v.co.z - 0.85)*f
+        To(0.14, 0.035, (sx*0.82, 0, 0.85), "gold", (0, R90, 0), g)
+    sface(0.9, 0.2, 0.11, mouth_dz=0.26, mr=0.09, parent=g); swing(g, (0, rad(-16), 0))
+    return finish(1.7, 2.9, turn=-15)
 BUILD = {k[2:]: v for k, v in dict(globals()).items() if k.startswith("b_")}
