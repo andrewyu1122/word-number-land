@@ -631,6 +631,7 @@ body.xmas #world .hills,body.xmas #world .hills2{background:#f4f9ff}
     <h2>New player</h2>
     <input class="namein" id="newName" maxlength="12" placeholder="Name">
     <div class="avgrid" id="avgrid"></div>
+    <div class="setrow" style="justify-content:center;gap:8px;font-size:16px">Collect: <button class="chk" id="themeDino" type="button">🦕 Dinosaurs</button><button class="chk" id="themeHorse" type="button">🐴 Horses</button></div>
     <label class="setrow" style="justify-content:center;gap:10px;font-size:17px"><input type="checkbox" id="littleChk" style="width:24px;height:24px"> Little one mode (ages 2–3)</label>
     <div class="row"><button class="quiet" id="newCancel">Cancel</button><button id="newOk">Let’s go!</button></div>
   </div></div>
@@ -816,9 +817,12 @@ const ART={'ant':'drive','bag':'wiggle','ball':'hop','bat':'fly','bear':'hop','b
 const OBJECTS=['apple', 'balloon', 'car', 'chick', 'cookie', 'cupcake', 'fish', 'flower', 'star', 'strawberry', 'acorn', 'ball', 'crayon', 'crown', 'donut', 'drum', 'feather', 'gem', 'icecream', 'kite', 'lollipop', 'medal', 'pencil', 'pinecone', 'pretzel', 'seashell', 'shell', 'teddy', 'trophy'];
 const DINOS=[['trex','T-rex','🦖'],['triceratops','Triceratops','🦕'],['stegosaurus','Stegosaurus','🦕'],['brachiosaurus','Brachiosaurus','🦕'],['pterodactyl','Pterodactyl','🦅'],['velociraptor','Velociraptor','🦖'],['ankylosaurus','Ankylosaurus','🦕'],['parasaurolophus','Parasaurolophus','🦕'],['spinosaurus','Spinosaurus','🦖'],['diplodocus','Diplodocus','🦕'],['pachycephalosaurus','Pachycephalosaurus','🦖'],['plesiosaurus','Plesiosaurus','🦕'],['iguanodon','Iguanodon','🦕'],['allosaurus','Allosaurus','🦖'],['dilophosaurus','Dilophosaurus','🦖'],['archaeopteryx','Archaeopteryx','🦅']];
 const SEA=[['clownfish','Clownfish','🐠'],['seahorse','Seahorse','🐴'],['jellyfish','Jellyfish','🪼'],['starfish','Starfish','⭐'],['turtle','Sea Turtle','🐢'],['octopus','Octopus','🐙'],['crab','Crab','🦀'],['dolphin','Dolphin','🐬'],['whale','Whale','🐳'],['shark','Shark','🦈'],['pufferfish','Pufferfish','🐡'],['lobster','Lobster','🦞'],['seal','Seal','🦭'],['penguin','Penguin','🐧'],['narwhal','Narwhal','🦄'],['manta','Manta Ray','🐟']];
-const SETS=[{id:'dino',title:'Dino Island',emoji:'🦕',list:DINOS,egg:'egg',scenes:['island','island_2','island_3'],move:'walk',happy:'roar',voice:'d_'},
-            {id:'sea',title:'Coral Reef',emoji:'🐠',list:SEA,egg:'seaegg',scenes:['reef','reef','reef'],move:'swim',happy:'happy',voice:'sea_'}];
-const DINO_BY={};DINOS.forEach(d=>DINO_BY[d[0]]=d);SEA.forEach(d=>DINO_BY[d[0]]=d);
+const HORSES=[['chestnut','Brown Horse','🐴'],['blackhorse','Black Horse','🐴'],['whitehorse','White Horse','🐴'],['palomino','Golden Horse','🐴'],['pinto','Patchy Horse','🐴'],['appaloosa','Spotty Horse','🐴'],['dapple','Grey Horse','🐴'],['clydesdale','Big Horse','🐴'],['shetland','Little Pony','🐴'],['foal','Baby Foal','🐴'],['mustang','Wild Horse','🐎'],['arabian','Fast Horse','🐎'],['zebrah','Zebra','🦓'],['donkey','Donkey','🫏'],['unicornh','Unicorn','🦄'],['pegasus','Pegasus','🦄']];
+const SET_DINO={id:'dino',title:'Dino Island',emoji:'🦕',list:DINOS,egg:'egg',scenes:['island','island_2','island_3'],move:'walk',happy:'roar',voice:'d_',joined:'A new dinosaur joined your island!'};
+const SET_SEA={id:'sea',title:'Coral Reef',emoji:'🐠',list:SEA,egg:'seaegg',scenes:['reef','reef','reef'],move:'swim',happy:'happy',voice:'sea_',joined:'A new friend joined your reef!'};
+const SET_HORSE={id:'horse',title:'Horse Ranch',emoji:'🐴',list:HORSES,egg:'barn',scenes:['ranch','ranch_2','ranch_3'],move:'walk',happy:'happy',voice:'horse_',joined:'A new horse joined your ranch!'};
+let SETS=[SET_DINO,SET_SEA,SET_HORSE];   /* reordered after the profile loads: the profile's theme comes first */
+const DINO_BY={};DINOS.forEach(d=>DINO_BY[d[0]]=d);SEA.forEach(d=>DINO_BY[d[0]]=d);HORSES.forEach(d=>DINO_BY[d[0]]=d);
 const DINO_MISSING={};
 function dinoEl(name,state,cls){const d=DINO_BY[name];const wrap=document.createElement('span');wrap.className=cls||'';
   if(DINO_MISSING[name]){const e=document.createElement('span');e.className='emoji';e.textContent=d[2];wrap.appendChild(e);return wrap;}
@@ -870,6 +874,8 @@ let store=root.profiles.find(x=>x.id===root.current)||root.profiles[0];root.curr
 ['sr','mr','map','treasures'].forEach(k=>{if(store[k]==null)store[k]=k==='treasures'?[]:{};});
 Object.defineProperty(store,'sound',{get(){return root.settings.sound;},set(v){root.settings.sound=v;},enumerable:false,configurable:true});
 Object.defineProperty(store,'music',{get(){return root.settings.music;},set(v){root.settings.music=v;},enumerable:false,configurable:true});
+if(!root.seeded4){root.seeded4=true;root.profiles.forEach(x=>{if(x.name==='Jaden'&&!x.theme)x.theme='horse';});}
+if(store.theme==='horse')SETS=[SET_HORSE,SET_DINO,SET_SEA];
 function save(){try{localStorage.setItem(KEY,JSON.stringify(root));}catch(e){}if(typeof pushCloud==='function')pushCloud();}
 function switchProfile(id){const pr=root.profiles.find(x=>x.id===id);if(!pr)return;root.current=id;save();location.reload();}
 
@@ -928,7 +934,7 @@ const synthWrong=()=>{tone(180,.18,'sawtooth',.06);tone(140,.25,'square',.05,.08
 const synthWin=()=>[523,659,784,1047,1319].forEach((f,i)=>{tone(f,.3,'triangle',.22,i*.09);tone(f/2,.3,'sine',.12,i*.09);});
 const synthWhoosh=()=>{if(!store.sound)return;try{const c=audio();const o=c.createOscillator(),g=c.createGain();o.type='sine';o.frequency.setValueAtTime(300,c.currentTime);o.frequency.exponentialRampToValueAtTime(1200,c.currentTime+.25);g.gain.setValueAtTime(.15,c.currentTime);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+.3);o.connect(g).connect(c.destination);o.start();o.stop(c.currentTime+.32);}catch(e){}};
 /* sampled sound effects (assets/sfx/*.mp3) — fall back to the synth versions above until the files exist */
-const SFX_NAMES=['pop','wrong','win','whoosh','combo','crack','hatch','chest','star','tap','roar','splash'];
+const SFX_NAMES=['pop','wrong','win','whoosh','combo','crack','hatch','chest','star','tap','roar','splash','neigh'];
 const SFX_BUF={},SFX_FAIL={};
 function loadSfx(){try{const c=audio();SFX_NAMES.forEach(n=>{fetch(A+'sfx/'+n+'.mp3').then(r=>{if(!r.ok)throw 0;return r.arrayBuffer();}).then(b=>c.decodeAudioData(b)).then(buf=>{SFX_BUF[n]=buf;}).catch(()=>{SFX_FAIL[n]=true;});});}catch(e){}}
 function playSfx(n,rate=1,vol=1){if(!store.sound)return true;const buf=SFX_BUF[n];if(!buf)return false;try{const c=audio();const src=c.createBufferSource();src.buffer=buf;src.playbackRate.value=rate;const g=c.createGain();g.gain.value=vol;src.connect(g).connect(c.destination);src.start();return true;}catch(e){return false;}}
@@ -977,7 +983,7 @@ function setSync(st){lastSync=st;const b=$('#syncBadge');if(b)b.textContent=SYNC
 function loadScript(src){return new Promise((res,rej)=>{const sc=document.createElement('script');sc.src=src;sc.onload=res;sc.onerror=rej;document.head.appendChild(sc);});}
 async function fbInit(){if(fdb)return fdb;setSync('connecting');const v='10.12.0';for(const n of ['app','auth','firestore'])await loadScript('https://www.gstatic.com/firebasejs/'+v+'/firebase-'+n+'-compat.js');
   const app=firebase.apps.length?firebase.app():firebase.initializeApp(FB_CFG);await firebase.auth().signInAnonymously();fdb=firebase.firestore();try{fdb.enablePersistence({synchronizeTabs:true});}catch(e){}return fdb;}
-const PROG_KEYS=['name','avatar','little','sea','log','limit','ll','sw','medals','viewSet','stars','words','lvl','album','daily','treasures','map','sr','mr','dino','bossSeen','recent','resetAt'];
+const PROG_KEYS=['name','avatar','little','sea','horse','theme','log','limit','ll','sw','medals','viewSet','stars','words','lvl','album','daily','treasures','map','sr','mr','dino','bossSeen','recent','resetAt'];
 function profDoc(pr){const o={};PROG_KEYS.forEach(k=>{if(pr[k]!==undefined&&pr[k]!==null)o[k]=pr[k];});o.updatedAt=Date.now();return o;}
 const maxMap=(a,b)=>{const o=Object.assign({},a||{});for(const k in (b||{}))if((b[k]||0)>(o[k]||0))o[k]=b[k];return o;};
 function mergeProfile(loc,cl){ // returns merged profile; both are plain objects
@@ -993,7 +999,8 @@ function mergeProfile(loc,cl){ // returns merged profile; both are plain objects
   if(cl.log||loc.log){const L=Object.assign({},cl.log||{});for(const k in (loc.log||{})){const a=loc.log[k],b=L[k];L[k]=b?{secs:Math.max(a.secs||0,b.secs||0),stars:Math.max(a.stars||0,b.stars||0),words:[...new Set([...(a.words||[]),...(b.words||[])])]}:a;}const keys=Object.keys(L).sort().slice(-60);m.log={};keys.forEach(k=>m.log[k]=L[k]);}
   if(cl.limit!==undefined&&(cl.updatedAt||0)>(loc.updatedAt||0))m.limit=cl.limit;
   m.medals=Object.assign({},cl.medals||{},loc.medals||{});m.ll=maxMap(loc.ll,cl.ll);m.sw=maxMap(loc.sw,cl.sw);
-  ['dino','sea'].forEach(k=>{if(cl[k]||loc[k]){const ld=loc[k]||{hatched:[],prog:0},cd=cl[k]||{hatched:[],prog:0};m[k]={hatched:[...new Set([...(cd.hatched||[]),...(ld.hatched||[])])],prog:Math.max(ld.prog||0,cd.prog||0),order:cd.order||ld.order};}});
+  if(cl.theme&&(cl.updatedAt||0)>(loc.updatedAt||0))m.theme=cl.theme;
+  ['dino','sea','horse'].forEach(k=>{if(cl[k]||loc[k]){const ld=loc[k]||{hatched:[],prog:0},cd=cl[k]||{hatched:[],prog:0};m[k]={hatched:[...new Set([...(cd.hatched||[]),...(ld.hatched||[])])],prog:Math.max(ld.prog||0,cd.prog||0),order:cd.order||ld.order};}});
   if(cl.daily&&(!loc.daily||cl.daily.date>loc.daily.date))m.daily=cl.daily;else if(loc.daily&&cl.daily&&loc.daily.date===cl.daily.date)m.daily={date:loc.daily.date,spelled:Math.max(loc.daily.spelled,cl.daily.spelled),solved:Math.max(loc.daily.solved,cl.daily.solved),done:loc.daily.done||cl.daily.done};
   if((cl.updatedAt||0)>(loc.updatedAt||0)){m.name=cl.name||loc.name;m.avatar=cl.avatar||loc.avatar;m.recent=cl.recent||loc.recent;}
   return m;
@@ -1075,7 +1082,7 @@ function medalEarned(k){const sr=store.sr||{},sw=store.sw||{},lv=store.lvl||{};c
   if(k==='words50')return nW>=50;if(k==='words100')return nW>=100;if(k==='words200')return nW>=200;
   if(k==='math')return [1,2,3,4].every(l=>(lv['math'+l]||0)>=2);if(k==='hunt')return [1,2,3,4].every(l=>(lv['hunt'+l]||0)>=2);
   if(k==='read')return SIGHT.filter(w=>(sw[w]||0)>=2).length>=40;
-  if(k==='dino')return setState(SETS[0]).hatched.length>=SETS[0].list.length;if(k==='sea')return setState(SETS[1]).hatched.length>=SETS[1].list.length;
+  if(k==='dino')return setState(SET_DINO).hatched.length>=SET_DINO.list.length;if(k==='sea')return setState(SET_SEA).hatched.length>=SET_SEA.list.length;
   if(k==='streak7'){const L=store.log||{};for(let i=0;i<7;i++){const d=new Date(Date.now()-i*86400000);const key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');if(!L[key]||!(L[key].secs>0||L[key].stars>0))return false;}return true;}
   if(k==='map')return currentStation()>=STATIONS.length;return false;}
 let medalQueue=[];
@@ -1112,7 +1119,7 @@ function renderReport(){const el=$('#repBody');const days=[];const now=Date.now(
 /* ============ collections: dino island -> coral reef ============ */
 function setState(st){const k=st.id;if(!store[k]){store[k]={hatched:[],prog:0,order:shuffle(st.list.map(d=>d[0]))};save();}if(!store[k].order)store[k].order=shuffle(st.list.map(d=>d[0]));return store[k];}
 function curSet(){for(const st of SETS){if(setState(st).hatched.length<st.list.length)return st;}return SETS[SETS.length-1];}
-function dino(){return setState(SETS[0]);}
+function dino(){return setState(SET_DINO);}
 function setUnlocked(i){return i===0||setState(SETS[i-1]).hatched.length>=SETS[i-1].list.length;}
 function viewSet(){const v=SETS.find(x=>x.id===store.viewSet);if(v&&setUnlocked(SETS.indexOf(v)))return v;return curSet();}
 function eggGoal(st){st=st||curSet();return Math.min(20,10+2*setState(st).hatched.length);}
@@ -1121,10 +1128,10 @@ function dinoProgress(n){const st=curSet();const d=setState(st);if(d.hatched.len
 function showHatch(){if(!hatchQueue.length||$('#hatch').classList.contains('on'))return;if($('#treasure').classList.contains('on')||$('#summary').classList.contains('on')){setTimeout(showHatch,1500);return;}
   const [sid,name]=hatchQueue.shift();store.viewSet=sid;const st=SETS.find(x=>x.id===sid);const info=DINO_BY[name];const d=setState(st);
   const stg=$('#hatchStage');stg.innerHTML='<div class="bigegg"><div class="shell"></div></div>';const eggIm=img(A+'dino/'+st.egg+'_s3.webp');eggIm.style.cssText='height:170px;filter:drop-shadow(0 8px 0 rgba(0,0,0,.15))';eggIm.onload=()=>{const be=stg.querySelector('.bigegg');if(be){be.innerHTML='';be.appendChild(eggIm);}};
-  $('#hatchTitle').textContent='It’s hatching!';$('#hatchText').textContent='Your egg is wobbling…';$('#hatchOk').style.display='none';$('#hatch').classList.add('on');
+  $('#hatchTitle').textContent=st.id==='horse'?'Someone is coming!':'It’s hatching!';$('#hatchText').textContent=st.id==='horse'?'The barn door is opening…':'Your egg is wobbling…';$('#hatchOk').style.display='none';$('#hatch').classList.add('on');
   sfxPop(1);setTimeout(()=>sfxPop(3),400);setTimeout(()=>sfxPop(5),800);
   setTimeout(()=>{const be=stg.querySelector('.bigegg');const hi=be.querySelector('img');if(hi){hi.src=A+'dino/'+st.egg+'_hatch.webp';be.style.animation='none';setTimeout(()=>be.classList.add('pop'),600);}else be.classList.add('pop');sfxNamed('hatch',synthWin);celebrate(3);
-    setTimeout(()=>{stg.innerHTML='';stg.appendChild(dinoEl(name,st.happy,'newdino'));$('#hatchTitle').textContent=info[1]+'!';$('#hatchText').textContent=(st.id==='dino'?'A new dinosaur joined your island!':'A new friend joined your reef!')+' ('+d.hatched.length+' of '+st.list.length+')';$('#hatchOk').style.display='';if(st.id==='dino')say(['p_hatched',st.voice+name],'A new dinosaur hatched! '+info[1]+'!');else say(['p_hatched_sea',st.voice+name],'A new friend hatched! '+info[1]+'!',['p_wow',st.voice+name]);
+    setTimeout(()=>{stg.innerHTML='';stg.appendChild(dinoEl(name,st.happy,'newdino'));$('#hatchTitle').textContent=info[1]+'!';$('#hatchText').textContent=st.joined+' ('+d.hatched.length+' of '+st.list.length+')';$('#hatchOk').style.display='';if(st.id==='dino')say(['p_hatched',st.voice+name],'A new dinosaur hatched! '+info[1]+'!');else say(['p_hatched_'+st.id,st.voice+name],(st.id==='horse'?'A new horse is here! ':'A new friend hatched! ')+info[1]+'!',['p_wow',st.voice+name]);
       if(d.hatched.length===st.list.length&&SETS.indexOf(st)<SETS.length-1){$('#hatchText').textContent+=' You found them all — a new world opens: '+SETS[SETS.indexOf(st)+1].title+'!';store.viewSet=SETS[SETS.indexOf(st)+1].id;save();setTimeout(()=>say(['p_newworld'],'You found them all! A new world is open!'),2500);}},450);},1300);}
 function renderIsland(){const el=$('#island');if(!el)return;const st=viewSet();const d=setState(st);el.innerHTML='';
   const night=isNight();const stageN=st.scenes[d.hatched.length>=12?2:d.hatched.length>=6?1:0]+(night?'_night':'');const bg=img(A+'scenes/'+stageN+'.webp','bg');bg.onerror=()=>{bg.src=A+'scenes/island.webp';};el.appendChild(bg);const fgI=img(A+'scenes/'+stageN+'_fg.webp','fg');fgI.onerror=()=>fgI.remove();el.appendChild(fgI);
@@ -1140,7 +1147,7 @@ function renderIsland(){const el=$('#island');if(!el)return;const st=viewSet();c
 let nightOverride=null;
 function isNight(){if(nightOverride!==null)return nightOverride;const h=new Date().getHours();return h>=20||h<6;}
 const FLY_MISSING={};
-const SKY_DINOS=['pterodactyl','archaeopteryx'];
+const SKY_DINOS=['pterodactyl','archaeopteryx','pegasus'];
 /* ---- island life: creatures wander, pause, meet, eat, sleep, chase, react ---- */
 let islandRun=0;
 function startIslandLife(el,st,names){
@@ -1156,12 +1163,12 @@ function startIslandLife(el,st,names){
   if(night)cs.forEach(c=>{c.art='';setArt(c,'sleep');});
   const bubble=(c,ch)=>{const s2=document.createElement('span');s2.className='ibub';s2.textContent=ch;s2.style.left=(c.x*100)+'%';s2.style.bottom=(c.y+ (W()>=700?100:70))+'px';el.appendChild(s2);setTimeout(()=>s2.remove(),1400);};
   const now=()=>performance.now();
-  const poke=c=>{if(night){c.state='woke';c.until=now()+3500;setArt(c,st.happy);sfxNamed(sea?'splash':'roar',synthWhoosh);say([st.voice+c.name],DINO_BY[c.name][1]);bubble(c,'😴');return;}
-    c.state='happy';c.until=now()+1300;setArt(c,st.happy);sfxNamed(sea?'splash':'roar',synthWhoosh);vib(40);say([st.voice+c.name],DINO_BY[c.name][1]);bubble(c,'❤️');
+  const poke=c=>{if(night){c.state='woke';c.until=now()+3500;setArt(c,st.happy);sfxNamed(sea?'splash':st.id==='horse'?'neigh':'roar',synthWhoosh);say([st.voice+c.name],DINO_BY[c.name][1]);bubble(c,'😴');return;}
+    c.state='happy';c.until=now()+1300;setArt(c,st.happy);sfxNamed(sea?'splash':st.id==='horse'?'neigh':'roar',synthWhoosh);vib(40);say([st.voice+c.name],DINO_BY[c.name][1]);bubble(c,'❤️');
     cs.forEach(o=>{if(o!==c&&Math.abs(o.x-c.x)<0.35){o.dir=c.x>o.x?1:-1;o.state='look';o.until=now()+900;setArt(o,'idle');o.b.classList.remove('hopit');void o.b.offsetWidth;o.b.classList.add('hopit');}});};
   // food: tap the ground
   let food=null;
-  el.onclick=e=>{if(night||e.target.closest('.egg')||e.target.closest('.dino')||e.target.closest('.daynight'))return;const r=el.getBoundingClientRect();const fx=(e.clientX-r.left)/r.width;if(food)food.el.remove();const f=document.createElement('span');f.className='ifood';f.textContent=sea?'🦐':pick(['🍃','🍖','🍎']);f.style.left=(fx*100)+'%';el.appendChild(f);food={x:fx,el:f};sfxPop(2);
+  el.onclick=e=>{if(night||e.target.closest('.egg')||e.target.closest('.dino')||e.target.closest('.daynight'))return;const r=el.getBoundingClientRect();const fx=(e.clientX-r.left)/r.width;if(food)food.el.remove();const f=document.createElement('span');f.className='ifood';f.textContent=sea?'🦐':st.id==='horse'?pick(['🥕','🍎','🌾']):pick(['🍃','🍖','🍎']);f.style.left=(fx*100)+'%';el.appendChild(f);food={x:fx,el:f};sfxPop(2);
     let best=null;cs.forEach(c=>{if(!best||Math.abs(c.x-fx)<Math.abs(best.x-fx))best=c;});if(best){best.state='tofood';best.tx=fx;setArt(best,st.move);}};
   const eggEl=el.querySelector('.egg');const eggHot=eggEl&&eggEl.dataset.stage==='3';
   let last=now();
@@ -1188,7 +1195,7 @@ function startIslandLife(el,st,names){
 }
 function renderDex(){const el=$('#dex');el.innerHTML='';let tot=0,has=0;
   SETS.forEach(st=>{const d=setState(st);tot+=st.list.length;has+=d.hatched.length;
-    if(SETS.indexOf(st)>0&&setState(SETS[SETS.indexOf(st)-1]).hatched.length<SETS[SETS.indexOf(st)-1].list.length){const hd=document.createElement('div');hd.className='empty';hd.style.gridColumn='1/-1';hd.textContent=st.emoji+' '+st.title+' opens after Dino Island is complete';el.appendChild(hd);return;}
+    if(SETS.indexOf(st)>0&&setState(SETS[SETS.indexOf(st)-1]).hatched.length<SETS[SETS.indexOf(st)-1].list.length){const hd=document.createElement('div');hd.className='empty';hd.style.gridColumn='1/-1';hd.textContent=st.emoji+' '+st.title+' opens after '+SETS[SETS.indexOf(st)-1].title+' is complete';el.appendChild(hd);return;}
     const hd=document.createElement('div');hd.style.cssText='grid-column:1/-1;color:#fff;font-weight:700;text-shadow:0 2px 0 rgba(0,0,0,.2);font-size:18px';hd.textContent=st.emoji+' '+st.title+' · '+d.hatched.length+'/'+st.list.length;el.appendChild(hd);
     st.list.forEach(([name,label])=>{const c=document.createElement('button');const ok=d.hatched.includes(name);c.className='dexcard'+(ok?'':' locked');c.appendChild(dinoEl(name,'idle'));const sm=document.createElement('small');sm.textContent=ok?label:'???';c.appendChild(sm);
       c.onclick=()=>{if(ok){sfxPop(2);say([st.voice+name],label);const im=c.firstChild;const r=dinoEl(name,st.happy);im.replaceWith(r);setTimeout(()=>{if(r.isConnected)r.replaceWith(dinoEl(name,'idle'));},1200);}else sfxPop(0);};el.appendChild(c);});});
@@ -1257,8 +1264,9 @@ function renderMap(){
 }
 function renderProfileBtn(){const sl=$('#avatarSlot');sl.innerHTML='';sl.appendChild(avatarEl(store.avatar||'dog'));$('#avatarName').textContent=store.name||'';}
 function renderProfiles(){const el=$('#plist');el.innerHTML='';root.profiles.forEach(pr=>{const b=document.createElement('button');b.className='prow'+(pr.id===store.id?' cur':'');b.appendChild(avatarEl(pr.avatar||'dog'));b.insertAdjacentHTML('beforeend','<b>'+pr.name+'</b><small>⭐ '+pr.stars+'</small>');b.onclick=()=>{if(pr.id!==store.id){sfxWhoosh();switchProfile(pr.id);}else $('#profiles').classList.remove('on');};el.appendChild(b);});}
-let newAvatar='cat',editing=false;
-function openNewProfile(edit){editing=!!edit;$('#profiles').classList.remove('on');$('#settings').classList.remove('on');$('#newProfile h2').textContent=editing?'Edit player':'New player';$('#newOk').textContent=editing?'Save':'Let’s go!';$('#newName').value=editing?store.name:'';$('#littleChk').checked=editing?!!store.little:false;newAvatar=editing?(store.avatar||'dog'):AVATARS[(root.profiles.length)%AVATARS.length];const g=$('#avgrid');g.innerHTML='';AVATARS.forEach(a=>{const b=document.createElement('button');b.className=a===newAvatar?'sel':'';b.appendChild(avatarEl(a));b.onclick=()=>{newAvatar=a;g.querySelectorAll('button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');sfxPop(2);};g.appendChild(b);});$('#newProfile').classList.add('on');setTimeout(()=>$('#newName').focus(),100);}
+let newAvatar='cat',editing=false,newTheme='dino';
+function paintTheme(){$('#themeDino').style.outline=newTheme==='dino'?'3px solid var(--sun)':'none';$('#themeHorse').style.outline=newTheme==='horse'?'3px solid var(--sun)':'none';}
+function openNewProfile(edit){editing=!!edit;$('#profiles').classList.remove('on');$('#settings').classList.remove('on');$('#newProfile h2').textContent=editing?'Edit player':'New player';$('#newOk').textContent=editing?'Save':'Let’s go!';$('#newName').value=editing?store.name:'';$('#littleChk').checked=editing?!!store.little:false;newTheme=editing?(store.theme||'dino'):'dino';paintTheme();newAvatar=editing?(store.avatar||'dog'):AVATARS[(root.profiles.length)%AVATARS.length];const g=$('#avgrid');g.innerHTML='';AVATARS.forEach(a=>{const b=document.createElement('button');b.className=a===newAvatar?'sel':'';b.appendChild(avatarEl(a));b.onclick=()=>{newAvatar=a;g.querySelectorAll('button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');sfxPop(2);};g.appendChild(b);});$('#newProfile').classList.add('on');setTimeout(()=>$('#newName').focus(),100);}
 function renderHome(){renderProfileBtn();const little=!!store.little;$('#littleHome').style.display=little?'':'none';if(little)renderLittleHome();$('#advBtn').style.display=little?'none':'';document.querySelectorAll('#home > .duo').forEach(d=>d.style.display=little?'none':'');renderAdvCard();renderIsland();$('#homeStars').textContent=store.stars;renderLevels();renderQuest();const c=Object.keys(store.album).length;$('#albumCount').textContent=c?c+' collected':'Spell to collect';$('#soundBtn').textContent=store.sound?'🔊':'🔇';$('#soundBtn').classList.toggle('off',!store.sound);$('#musicBtn').classList.toggle('off',!store.music);}
 
 /* ============ spelling ============ */
@@ -1727,10 +1735,11 @@ $('#sayBtn5').onclick=()=>R.say&&R.say();$('#hintBtn5').onclick=()=>readHint(tru
 $('#sayBtn3').onclick=()=>{const q=H.q;if(q.promptWord)say(['p_whichlike','w_'+q.promptWord],'Which ones start like '+q.promptWord+'?');else say(['p_which','l_'+q.L],'Which ones start with '+q.L.toUpperCase()+'?');};$('#hintBtn3').onclick=()=>huntHint(true);$('#nextBtn3').onclick=()=>{sfxWhoosh();nextHunt();};$('#sheetClose').onclick=()=>$('#levelSheet').classList.remove('on');
 $('#profileBtn').onclick=()=>{sfxPop(2);renderProfiles();$('#profiles').classList.add('on');};
 $('#profilesClose').onclick=()=>$('#profiles').classList.remove('on');
+$('#themeDino').onclick=()=>{newTheme='dino';paintTheme();sfxPop(1);};$('#themeHorse').onclick=()=>{newTheme='horse';paintTheme();sfxPop(3);};
 $('#addProfile').onclick=()=>openNewProfile(false);
 $('#editBtn').onclick=()=>openNewProfile(true);
 $('#newCancel').onclick=()=>$('#newProfile').classList.remove('on');
-$('#newOk').onclick=()=>{const name=($('#newName').value||'').trim()||('Player '+(root.profiles.length+1));if(editing){store.name=name;store.avatar=newAvatar;store.little=$('#littleChk').checked;save();sfxPop(4);$('#newProfile').classList.remove('on');renderHome();return;}const pr=freshProfile(name,newAvatar);pr.little=$('#littleChk').checked;root.profiles.push(pr);root.current=pr.id;save();sfxWin();location.reload();};
+$('#newOk').onclick=()=>{const name=($('#newName').value||'').trim()||('Player '+(root.profiles.length+1));if(editing){const themeChanged=(store.theme||'dino')!==newTheme;store.name=name;store.avatar=newAvatar;store.little=$('#littleChk').checked;store.theme=newTheme;store.viewSet=null;save();sfxPop(4);$('#newProfile').classList.remove('on');if(themeChanged){location.reload();return;}renderHome();return;}const pr=freshProfile(name,newAvatar);pr.little=$('#littleChk').checked;pr.theme=newTheme;root.profiles.push(pr);root.current=pr.id;save();sfxWin();location.reload();};
 $('#reportBtn').onclick=()=>{$('#settings').classList.remove('on');$('#repWho').textContent=store.name;renderReport();$('#report').classList.add('on');};
 $('#repClose').onclick=()=>$('#report').classList.remove('on');$('#recapOk').onclick=()=>$('#recap').classList.remove('on');
 {let hold=null;const bm=$('#bedMore');const st=()=>{hold=setTimeout(()=>{logDay().secs=Math.max(0,(store.limit||0)*60-300);save();$('#bedtime').classList.remove('on');},1500);};const en=()=>clearTimeout(hold);bm.addEventListener('pointerdown',st);bm.addEventListener('pointerup',en);bm.addEventListener('pointerleave',en);}
@@ -1745,7 +1754,7 @@ $('#treasureOk').onclick=()=>{$('#treasure').classList.remove('on');if($('#home'
 $('#resetNo').onclick=()=>$('#resetDlg').classList.remove('on');
 $('#resetYes').onclick=async()=>{
   $('#resetDlg').classList.remove('on');
-  store.stars=0;store.words={};store.lvl={};store.album={};store.daily=null;store.treasures=[];store.map={};store.sr={};store.mr={};store.bossSeen={};store.dino=null;store.sea=null;store.ll={};store.sw={};store.medals={};store.resetAt=Date.now();save();refreshStars();renderHome();
+  store.stars=0;store.words={};store.lvl={};store.album={};store.daily=null;store.treasures=[];store.map={};store.sr={};store.mr={};store.bossSeen={};store.dino=null;store.sea=null;store.horse=null;store.viewSet=null;store.ll={};store.sw={};store.medals={};store.resetAt=Date.now();save();refreshStars();renderHome();
   if(fdb&&root.settings.family){try{await fdb.collection('families').doc(root.settings.family).collection('profiles').doc(store.id).set(profDoc(store));}catch(e){}}
   sfxWhoosh();say(['p_allclear'],'All clear! Let’s start again!');
 };
