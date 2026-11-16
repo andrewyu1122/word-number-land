@@ -73,6 +73,8 @@ Read-mode action sentences use `assets/mascot/mascot_{verb}.webp` (`VERBS`).
 - `store.log[date]={secs,stars,words[]}` feeds Settings → Parent report (7-day minutes, learned / tricky words, math skill) and the Monday weekly recap.
 - `store.limit` (minutes/day) shows the bedtime overlay; a grown-up holds the button for 5 more minutes.
 - First-time hand hints: `root.tut.{home,spell,math,hunt}`; `pointAt(el)` / `tutDone(k)`.
+- Auto-advance: `autoNext(btnId)` runs after every success (spell, count, read, hunt, little). It shows the Next button and then clicks it by itself once the voice is done
+  (min 2.4 s, waits while any `.overlay.on` popup is open, 12 s cap). Tapping Next still skips ahead.
 - `readyGo()` plays a "Ready? Go!" before each round. `celebrate(level)` picks one of four celebration effects.
 
 ## Sound effects & music

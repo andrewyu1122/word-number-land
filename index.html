@@ -920,6 +920,21 @@ function say(keys,fallback,alt){
   try{speechSynthesis.cancel();}catch(e){}
   player.pause();q=keys.slice();qAlt=alt?alt.slice():null;qFallback=fallback||'';playNext();
 }
+/* ---- auto-advance: after a success the game goes on by itself once the voice has finished (the Next button still shows: tapping it skips ahead) ---- */
+let autoT=null;
+function voiceBusy(){try{return q.length>0||(!player.paused&&!player.ended&&!!player.src)||(('speechSynthesis' in window)&&speechSynthesis.speaking);}catch(e){return false;}}
+function autoNext(id,delay){
+  const b=$('#'+id);clearInterval(autoT);const t0=Date.now();let quiet=0;
+  setTimeout(()=>b.classList.add('show'),delay||800);
+  autoT=setInterval(()=>{
+    const dt=Date.now()-t0;const sc=b.closest('.screen');
+    if(dt>(delay||800)+200&&(!b.classList.contains('show')||(sc&&!sc.classList.contains('on')))){clearInterval(autoT);return;}   /* already moved on, or left the game */
+    if(document.querySelector('.overlay.on')||document.hidden){quiet=0;return;}                                               /* a popup (new horse, treasure, bedtime...) is open: wait */
+    if(voiceBusy()&&dt<12000){quiet=0;return;}
+    quiet+=200;
+    if(dt>=2400&&quiet>=600){clearInterval(autoT);b.click();}
+  },200);
+}
 const mkey=p=>p.a+(p.op==='+'?'p':p.op==='-'?'m':'x')+p.b;
 const spellOut=w=>w.charAt(0).toUpperCase()+w.slice(1)+'! '+[...w].map(c=>c.toUpperCase()).join(', ')+'. '+w+'!';
 const OPKEY={'+':'p_plus','-':'p_minus','×':'p_times'};
@@ -1366,7 +1381,7 @@ function wordDone(voiceOnly){
   stage.classList.add('alive');
   startParticles(stage,em,ART[w.word]||w.anim);buddyPlay('happy');
   sfxWin();celebrate(STREAK.spell>=5?3:STREAK.spell>=3?2:1);
-  setTimeout(()=>$('#nextBtn').classList.add('show'),800);
+  autoNext('nextBtn',800);
 }
 function nextWord(){S.idx++;if(S.idx>=S.queue.length)return finishRound('spell');renderWord();}
 
@@ -1422,7 +1437,7 @@ function tapWord(b){if(R.done)return;const need=R.words[R.pos];document.querySel
   else{R.mistakes++;R.miss=(R.miss||0)+1;sfxWrong();b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');if(R.miss>=2)readHint(false);}}
 function readHint(counts){if(R.done)return;if(counts)R.mistakes++;if(R.level===1){const t=[...$('#wtiles').children].find(x=>x.textContent.toLowerCase()===R.target);if(t)t.classList.add('glow');R.say();return;}const need=R.words[R.pos];const t=[...document.querySelectorAll('.wtile:not(.used)')].find(x=>x.dataset.w===need);if(t)t.classList.add('glow');say([wkey(need)],need);}
 function readDone(keys,text){R.done=true;const stars=R.mistakes===0?3:R.mistakes<=2?2:1;R.total+=stars;addStars(stars);questProgress('spelled');if(!store.sw)store.sw={};(R.level===1?[R.target]:R.words.map(w=>w.toLowerCase()).filter(w=>SIGHT.includes(w))).forEach(w=>{store.sw[w]=(store.sw[w]||0)+(R.mistakes===0?1:0);});save();
-  const c=streakUp('read');sfxWin();celebrate(STREAK.read>=5?3:STREAK.read>=3?2:1);say(keys.concat(c?[c]:(R.mistakes===0?[pick(PRAISE)[0]]:[])),text);setTimeout(()=>$('#nextBtn5').classList.add('show'),800);}
+  const c=streakUp('read');sfxWin();celebrate(STREAK.read>=5?3:STREAK.read>=3?2:1);say(keys.concat(c?[c]:(R.mistakes===0?[pick(PRAISE)[0]]:[])),text);autoNext('nextBtn5',800);}
 function nextRead(){R.idx++;if(R.idx>=ROUND)return finishRound('read');renderRead();}
 
 /* ============ little mode (toddler) — 6 activities × 5 levels, auto level-up ============ */
@@ -1494,7 +1509,7 @@ function renderLittle(){
   }
   setTimeout(()=>L.say&&L.say(),300);
 }
-function littleDone(quiet){L.done=true;const stars=L.mistakes===0?2:1;addStars(stars);L.total+=stars;if(!quiet){sfxWin();celebrate(1);}setTimeout(()=>$('#nextBtn4').classList.add('show'),700);}
+function littleDone(quiet){L.done=true;const stars=L.mistakes===0?2:1;addStars(stars);L.total+=stars;if(!quiet){sfxWin();celebrate(1);}autoNext('nextBtn4',700);}
 function nextLittle(){L.idx++;if(L.idx<LROUND){renderLittle();return;}
   const before=L.lv;let msg='';if(L.roundMiss<=1&&L.lv<5){store.ll[L.kind]=L.lv+1;msg=' Level up! ⭐';}else if(L.roundMiss>=6&&L.lv>1){store.ll[L.kind]=L.lv-1;}else{if(!store.ll[L.kind])store.ll[L.kind]=L.lv;}save();
   $('#sumStars').innerHTML=starsText(L.roundMiss<=1?3:L.roundMiss<=4?2:1);$('#sumMascot').src=mascotArt('wave');$('#sumTitle').textContent=msg?'Level up!':'Well done!';$('#sumText').textContent='You earned '+L.total+' stars.'+msg;$('#sumWords').innerHTML='';$('#againBtn').textContent='Play again';lastGame='little';$('#summary').classList.add('on');sfxWin();celebrate(msg?3:2);say(msg?['p_levelup','p_welldone']:['p_welldone'],msg?'Level up! Well done!':'Well done!');}
@@ -1559,7 +1574,7 @@ function huntDone(){
   H.done=true;const stars=H.mistakes===0?3:H.mistakes<=2?2:1;H.total+=stars;addStars(stars);questProgress('spelled');
   const c=streakUp('hunt');sfxWin();celebrate(STREAK.hunt>=5?3:STREAK.hunt>=3?2:1);
   say(['x_'+H.q.good.length].concat(H.q.good.map(w=>'w_'+w)).concat(c?[c]:[]),H.q.good.join(', ')+'!');
-  setTimeout(()=>$('#nextBtn3').classList.add('show'),800);
+  autoNext('nextBtn3',800);
 }
 function nextHunt(){H.idx++;if(H.idx>=ROUND)return finishRound('hunt');renderHunt();}
 
@@ -1666,7 +1681,7 @@ function answer(n,el){
     const r=el.getBoundingClientRect();burstAt(r.left+r.width/2,r.top+r.height/2,['⭐','✨','🌟']);
     buddyPlay('happy');sfxWin();celebrate(STREAK.math>=5?3:STREAK.math>=3?2:1);
     {const pieces=['x_'+p.ans].concat(exprPieces(p),['p_is','n_'+p.ans]);const whole=(!p.chain&&p.op!=='×'&&p.a<=20&&p.b<=20&&p.ans<=20);const comboKey=streakUp('math');if(comboKey){pieces.push(comboKey);}say(whole?['a_'+mkey(p)].concat(comboKey?[comboKey]:[]):pieces,p.ans+'! '+exprText(p)+' is '+p.ans+'!',whole?pieces:null);}
-    setTimeout(()=>$('#nextBtn2').classList.add('show'),800);
+    autoNext('nextBtn2',800);
   }else{
     M.mistakes++;sfxWrong();buddyPlay('cheer');
     el.classList.remove('no');void el.offsetWidth;el.classList.add('no');setTimeout(()=>el.classList.remove('no'),500);
