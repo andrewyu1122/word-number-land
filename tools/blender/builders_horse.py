@@ -120,7 +120,7 @@ def horse(coat, mane, belly=None, muzzle=None, hoof=HOOF, legz=0.85, legr=0.125,
         for k in range(4): To(0.075 - 0.014 * k, 0.018, (0, hb.y - 0.035 - 0.05 * k, hb.z + 0.06 + 0.12 * k), (1.0, 0.9, 0.45), (rad(22), 0, 0), hp, name="HornRing")
     if star:
         sp = surf((0, hy - 0.2, hz + 3), (0, 0, -1)) or Vector((0, hy - 0.2, hz + 0.4))
-        st = Fp(starpts(0.2, 0.09), (0, sp.y - 0.06, sp.z - 0.01), 0.06, "white", hp, (rad(55), 0, 0), name="Star")
+        st = Fp(starpts(0.27, 0.12), (0, sp.y - 0.03, sp.z + 0.015), 0.06, "white", hp, (rad(-58), 0, 0), name="Star")   # lies on the forehead, facing up and forward
     if blaze:
         for k in range(5):
             yy = hy - 0.12 - 0.13 * k; sp = surf((0, yy, hz + 3), (0, 0, -1))
