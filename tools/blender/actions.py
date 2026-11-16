@@ -2,7 +2,7 @@
 # exec'd inside the wb.py globals AFTER the builders, BEFORE BUILD[NAME]().  Needs KIND ("dino"|"sea").
 import numpy as np
 from mathutils import Euler, Matrix
-IS_DINO = (KIND == "dino")
+IS_DINO = (KIND in ("dino", "horse"))      # horses use the dino leg rig (LegPiv) with their own actions (builders_horse.py)
 N = NFRAMES
 # screen axes of the fixed 3/4 camera (ortho, so only the orientation matters)
 _q = (Vector((0, 0, 1.2)) - Vector((-9, -9, 6.8))).to_track_quat('-Z', 'Y')

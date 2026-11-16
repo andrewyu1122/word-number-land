@@ -39,3 +39,19 @@ python tools/blender/sheet_words.py <preview dir> out.png dad,gym       # contac
 - `builders_mascot3.py` — mascot props + the 12 action verbs. `builders_medals.py` — the 10 medals.
 - `tools/slim_reconvert.py <png roots>` re-converts every character whose original PNGs still reproduce the committed WebP
   (used after changing HEIGHT / quality in `convert_assets.py`); anything without matching PNGs is left untouched.
+
+## Horse Ranch (third collection)
+
+```
+# one horse: idle + walk / happy / eat / sleep / run with ONE camera (use an ABSOLUTE out dir — a relative one lands in C:\)
+"$BL" -b --python tools/blender/render_char.py -- chestnut horse full "$PWD/incoming/horse"       # or: preview (8 frames per action, 256px)
+# the barn door "egg": barn_s0..s3 + barn_hatch_001..024
+"$BL" -b --python tools/blender/render_barn.py -- "$PWD/incoming/horse"
+# scenes: ranch, ranch_2, ranch_3 and their _night versions, bg + fg
+"$BL" -b --python tools/blender/render_scene.py -- ranch_2_night bg "$PWD/incoming/scenes"
+python tools/convert_assets.py dino ./incoming/horse
+```
+
+- `builders_horse.py` — ONE parametric `horse()` (body blob, neck pivot, head + jaw, 4 leg pivots, tail pivot) and the 16 variants as parameter sets
+  (colours, proportions, mane / tail style, coat pattern painted per polygon, wings, horn, ankle feathers), the horse actions
+  (`HORSE_ACTS`: walk, happy = rear up and neigh, eat, sleep = lying down, run = gallop; pegasus flies) and the barn (`b_barn`, `barn_hatch`).

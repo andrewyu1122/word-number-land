@@ -43,7 +43,7 @@ def fit_camera(bounds, feet=0.2, top_margin=0.05, side_margin=0.04):
         v=w2c(scene,cam,_V(GP))
     return S, v.y
 
-OLD = ["walk", "roar"] if IS_DINO else ["swim", "happy"]; NEW = ["eat", "sleep", "run"]
+OLD = ["walk", "happy"] if KIND == "horse" else (["walk", "roar"] if IS_DINO else ["swim", "happy"]); NEW = ["eat", "sleep", "run"]
 FR = range(1, NFRAMES+1)
 SNAP_REST = {o.name: (tuple(o.location), tuple(o.rotation_euler), tuple(o.scale)) for o in bpy.data.objects}
 def restore():
@@ -114,7 +114,7 @@ if MODE != "check":
         if hasattr(scene.eevee,kk): setattr(scene.eevee,kk,v)
     scene.camera=cam
     if PREV:
-        for a in NEW:
+        for a in (ACTIONS if KIND == "horse" else NEW):
             apply(a)
             for f in (1, 4, 7, 10, 13, 16, 19, 22):
                 scene.frame_set(f); scene.render.filepath=f"{OUTDIR}/{PREFIX}_{a}_{f:03d}.png"; bpy.ops.render.render(write_still=True)
