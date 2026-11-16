@@ -88,7 +88,7 @@ A 6-letter family code typed into Settings on each device shares all profiles. M
 `resetAt` lets a reset win over older data. The Firebase SDK (compat, gstatic CDN) is loaded only when a code is set.
 
 ## Modes added later
-- **Little mode** (profile flag `little`, Jaden default): 6 activities (Colors, Shapes, Count, ABC, Words, Match) × 5 levels each, `store.ll[kind]`; a round of 6 with ≤1 miss levels up, ≥6 misses levels down. See `renderLittle()`.
+- **Little mode** (profile flag `little`, Jaden default): 6 activities (Colors, Shapes, Count, ABC, Words, Match) × 5 levels each, `store.ll[kind]`; a round of 6 with ≤1 miss levels up, ≥6 misses levels down. See `renderLittle()`. Little home also has a Stickers tile; a correct answer in Words / Match adds that word to `store.album`.
 - **Christmas** (`root.settings.xmas` auto/on/off; auto = Dec 1–Jan 6): `sceneArt()`/`mascotArt()` pick `_xmas` variants, `body.xmas` adds Santa hats via CSS and snow.
 - **Collections**: `SETS` in index.html — Dino Island (16) then Coral Reef (16, `assets/dino/{sea name}_*`, egg `seaegg`, scene `reef`). State in `store.dino` / `store.sea`. Add a set = push to `SETS` + art + voice (`tools/make_audio5.py` pattern).
 - **Horse Ranch** (`SET_HORSE`, 16 horses in `HORSES`): a third collection. Each profile has `theme` ('dino' | 'horse', chosen in Edit player; Jaden = horse) which decides which collection comes first in `SETS`. Art lives in `assets/dino/` like the others: `{id}_idle/walk/happy/eat/sleep/run`, the "egg" is a barn door `barn_s0..s3` + `barn_hatch`, scenes `ranch`, `ranch_2`, `ranch_3` (+ `_night`, `_fg`). Voice `horse_{id}` + `p_hatched_horse` (`tools/make_audio9.py`), sound `assets/sfx/neigh.mp3`.

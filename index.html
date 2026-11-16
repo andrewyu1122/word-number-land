@@ -1449,7 +1449,7 @@ const LKINDS=[['colors','Colors','#ff4f8b','objects/red_idle'],['shapes','Shapes
 const LROUND=6;
 let L={};
 function llv(kind){if(!store.ll)store.ll={};return store.ll[kind]||1;}
-function renderLittleHome(){const el=$('#littleTiles');el.innerHTML='';LKINDS.forEach(([k,title,color,art])=>{const b=document.createElement('button');b.className='mini big pressable';b.style.setProperty('--c',color);b.innerHTML='<img src="'+A+art+'.webp" alt=""><div><h2>'+title+'</h2><p><span class="st">'+'★'.repeat(llv(k))+'</span><span class="st off" style="opacity:.25">'+'★'.repeat(5-llv(k))+'</span></p></div>';b.onclick=()=>{sfxWhoosh();startLittle(k);};el.appendChild(b);});}
+function renderLittleHome(){const el=$('#littleTiles');el.innerHTML='';LKINDS.forEach(([k,title,color,art])=>{const b=document.createElement('button');b.className='mini big pressable';b.style.setProperty('--c',color);b.innerHTML='<img src="'+A+art+'.webp" alt=""><div><h2>'+title+'</h2><p><span class="st">'+'★'.repeat(llv(k))+'</span><span class="st off" style="opacity:.25">'+'★'.repeat(5-llv(k))+'</span></p></div>';b.onclick=()=>{sfxWhoosh();startLittle(k);};el.appendChild(b);});const sb=document.createElement('button');sb.className='mini big pressable';sb.style.setProperty('--c','var(--grape)');sb.style.gridColumn='1 / -1';const sc=Object.keys(store.album).length;sb.innerHTML='<span class="emoji">📒</span><div><h2>Stickers</h2><p>'+(sc?sc+' collected':'Find words to collect')+'</p></div>';sb.onclick=()=>{sfxWhoosh();renderAlbum();show('album');};el.appendChild(sb);}
 function startLittle(kind){L={kind,lv:llv(kind),idx:0,total:0,roundMiss:0};$('#littleStars').textContent=store.stars;show('little');$('#littleBar').innerHTML='';$('#littleGrid').innerHTML='';$('#nextBtn4').classList.remove('show');readyGo('#littleBar',renderLittle);}
 const lcard=(src,key,emoji)=>{const c=document.createElement('button');c.className='lcard';c.dataset.k=key;if(src)c.appendChild(img(src));else{const e=document.createElement('span');e.className='emoji';e.style.cssText='position:absolute;inset:0;display:grid;place-items:center;font-size:56px';e.textContent=emoji;c.appendChild(e);}return c;};
 const wArt=w=>ART[w]?wordArt(w,'idle'):null;
@@ -1494,17 +1494,17 @@ function renderLittle(){
   }else if(k==='words'){
     const pool=(lv<=3?WORDS[1]:lv===4?WORDS[1].concat(WORDS[2]):WORDS[1].concat(WORDS[2],WORDS[3])).map(w=>w[0]).filter(w=>ART[w]&&!(L.seenWords||[]).includes(w));const n=[2,3,4,6,6][lv-1];const opts=shuffle(pool.slice()).slice(0,n);const t=pick(opts);L.seenWords=(L.seenWords||[]).concat([t]);
     lbar(A+'mascot/mascot_think.webp','<h2>Where is the <b>'+t+'</b>?</h2>');
-    pickOne(g,opts.map(w=>({key:w,el:lcard(wordArt(w,'idle'),w)})),t,(ok,o,c)=>{if(ok){c.firstChild.src=wordArt(o.key,'anim');say(['w_'+o.key,'p_welldone'],o.key+'! Well done!');}else say(['w_'+o.key],o.key);});
+    pickOne(g,opts.map(w=>({key:w,el:lcard(wordArt(w,'idle'),w)})),t,(ok,o,c)=>{if(ok){store.album[o.key]=true;c.firstChild.src=wordArt(o.key,'anim');say(['w_'+o.key,'p_welldone'],o.key+'! Well done!');}else say(['w_'+o.key],o.key);});
     L.say=()=>say(['p_whereis','w_'+t],'Where is the '+t+'?');
   }else{ // match
     const pool=WORDS[1].concat(WORDS[2]).map(w=>w[0]).filter(w=>ART[w]);
     if(lv<=3){const n=[2,3,4][lv-1];const opts=shuffle(pool.slice()).slice(0,n);const t=pick(opts);lbar(wordArt(t,'idle'),'<h2>Find my <b>shadow</b>!</h2>');
-      pickOne(g,opts.map(w=>{const c=lcard(wordArt(w,'idle'),w);c.firstChild.style.filter='brightness(0) opacity(.55)';return {key:w,el:c};}),t,(ok,o,c)=>{if(ok){c.firstChild.style.filter='';c.firstChild.src=wordArt(o.key,'anim');say(['w_'+o.key,'p_welldone'],o.key+'! Well done!');}else say(['p_tryagain'],'Try again!');});
+      pickOne(g,opts.map(w=>{const c=lcard(wordArt(w,'idle'),w);c.firstChild.style.filter='brightness(0) opacity(.55)';return {key:w,el:c};}),t,(ok,o,c)=>{if(ok){store.album[o.key]=true;c.firstChild.style.filter='';c.firstChild.src=wordArt(o.key,'anim');say(['w_'+o.key,'p_welldone'],o.key+'! Well done!');}else say(['p_tryagain'],'Try again!');});
       L.say=()=>say(['p_shadow'],'Find my shadow!');}
     else{const pairs=lv===4?2:3;const ws=shuffle(pool.slice()).slice(0,pairs);const cards=shuffle(ws.concat(ws));lbar(A+'mascot/mascot_think.webp','<h2>Find the <b>pairs</b>!</h2>');g.style.setProperty('--cols',lv===4?2:3);let open=[],found=0,lock=false;
       cards.forEach(w=>{const c=document.createElement('button');c.className='lcard mem';c.dataset.k=w;const im=img(wordArt(w,'idle'));im.style.visibility='hidden';c.appendChild(im);const q=document.createElement('span');q.className='q';q.textContent='?';c.appendChild(q);
         c.onclick=()=>{if(lock||L.done||c.classList.contains('ok')||open.includes(c))return;im.style.visibility='';q.style.display='none';sfxPop(open.length+2);say(['w_'+w],w);open.push(c);
-          if(open.length===2){lock=true;const [x,y]=open;if(x.dataset.k===y.dataset.k){setTimeout(()=>{x.classList.add('ok');y.classList.add('ok');open=[];lock=false;found++;if(found===pairs){littleDone();say(['p_welldone'],'Well done!');}},500);}else{L.mistakes++;setTimeout(()=>{[x,y].forEach(z=>{z.firstChild.style.visibility='hidden';z.querySelector('.q').style.display='';});open=[];lock=false;},900);}}};g.appendChild(c);});
+          if(open.length===2){lock=true;const [x,y]=open;if(x.dataset.k===y.dataset.k){setTimeout(()=>{x.classList.add('ok');y.classList.add('ok');store.album[x.dataset.k]=true;open=[];lock=false;found++;if(found===pairs){littleDone();say(['p_welldone'],'Well done!');}},500);}else{L.mistakes++;setTimeout(()=>{[x,y].forEach(z=>{z.firstChild.style.visibility='hidden';z.querySelector('.q').style.display='';});open=[];lock=false;},900);}}};g.appendChild(c);});
       L.say=()=>say(['p_pairs'],'Find the pairs!');}
   }
   setTimeout(()=>L.say&&L.say(),300);
@@ -1719,7 +1719,7 @@ function renderAlbum(){
   $('#albumStars').textContent=store.stars;
   const el=$('#stickers');el.innerHTML='';
   const words=Object.keys(store.album);
-  if(!words.length)el.innerHTML='<div class="empty">Spell a word to earn your first sticker</div>';
+  if(!words.length)el.innerHTML='<div class="empty">'+(store.little?'Find a word to earn your first sticker':'Spell a word to earn your first sticker')+'</div>';
   words.sort().forEach((w,i)=>{const d=EMOJI_BY_WORD[w];if(!d)return;
     const s=document.createElement('button');s.className='sticker';s.style.setProperty('--r',(i%5)-2);
     if(ART[w])s.appendChild(img(wordArt(w,'idle')));else{const e=document.createElement('div');e.className='emoji';e.textContent=d.e;s.appendChild(e);}
