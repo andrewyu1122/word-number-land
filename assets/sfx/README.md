@@ -13,3 +13,4 @@ star.mp3    0.3 s   single twinkle
 tap.mp3     0.08 s  tiny UI click
 roar.mp3    0.8 s   cute cartoon dinosaur roar (friendly, high-pitched, not scary)
 splash.mp3  0.6 s   water splash / bubbles
+neigh.mp3   0.8 s   cute cartoon horse whinny (high, fluttery, friendly — not realistic or scary)

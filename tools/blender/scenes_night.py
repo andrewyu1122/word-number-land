@@ -2,7 +2,7 @@ import bpy, math, random
 from mathutils import Vector
 SC = "__SCENE__"; OUT = "__OUT__"
 NIGHT = SC.endswith("_night"); XMAS = False; BASE = SC.replace("_night", ""); LEVEL = 1
-if BASE.startswith("island_"): LEVEL = int(BASE.split("_")[1]); BASE = "island"
+if BASE.startswith(("island_", "ranch_")): LEVEL = int(BASE.split("_")[1]); BASE = BASE.split("_")[0]
 import os; os.makedirs(OUT, exist_ok=True)
 for o in list(bpy.data.objects): bpy.data.objects.remove(o, do_unlink=True)
 for coll in (bpy.data.meshes, bpy.data.materials, bpy.data.lights, bpy.data.cameras, bpy.data.curves, bpy.data.worlds):
@@ -238,6 +238,69 @@ elif BASE == "night":
     for (x, y, r) in [(-10, 40, 9), (9, 44, 10), (0, 52, 11)]: S(r, (x, y, -r*0.6), (1, 0.7, 1), mat((0.1, 0.25, 0.2)))
     fm = mat((1, 0.95, 0.4), 0.3, 6.0)
     for k in range(18): S(0.09, (random.uniform(-12, 12), random.uniform(3, 20), random.uniform(0.5, 3.5)), (1,1,1), fm)
+elif BASE == "ranch":   # Horse Ranch: pasture, white fence, red barn far away, hay bales (levels 2/3 add more)
+    sky((0.82, 0.94, 1.0), (0.35, 0.68, 1.0)); ground((0.46, 0.78, 0.33)); sun.energy = 2.3
+    for (x, y, r, c) in [(-24, 62, 15, (0.4, 0.72, 0.33)), (8, 70, 18, (0.44, 0.76, 0.36)), (36, 60, 13, (0.38, 0.7, 0.32))]: S(r, (x, y, -r*0.55), (1.5, 0.7, 1), mat(c))
+    for k in range(16): S(random.uniform(1.5, 3.0), (random.uniform(-30, 30), random.uniform(10, 40), -0.05), (1.6, 1, 0.03), mat((0.5, 0.82, 0.36)))   # lighter grass patches
+    cm = mat((1, 1, 1), 0.9); cloud(-12, 55, 17, 1.7, cm); cloud(6, 60, 21, 1.5, cm); cloud(20, 52, 15, 1.3, cm)
+    S(1.6, (-15, 70, 25), (1, 1, 1), mat((1, 0.95, 0.6), 0.5, 3.0))
+    WIN = mat((1.0, 0.62, 0.18), 0.5, 1.7) if NIGHT else mat((0.5, 0.72, 0.92), 0.3)
+    def prism(x, y, z, w, hgt, d, m):
+        bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=1, depth=d, location=(x, y, z + hgt/3), rotation=(rad(90), 0, 0)); o = bpy.context.active_object
+        o.scale = (w/1.732, hgt/1.5, 1); o.data.materials.append(m); return o
+    def barn(x, y, s=1.0):
+        red = mat((0.82, 0.14, 0.1)); wh = mat((1, 1, 0.97)); rf = mat((0.4, 0.3, 0.27))
+        B((x, y, 3.0*s), (9*s, 7*s, 6*s), red); prism(x, y + 0.3*s, 6.25*s, 10.2*s, 4.0*s, 7.6*s, rf); prism(x, y - 0.05*s, 6*s, 9*s, 3.6*s, 7.1*s, red)
+        B((x, y - 3.55*s, 2.0*s), (3.6*s, 0.2*s, 4.0*s), wh); B((x, y - 3.65*s, 1.9*s), (3.0*s, 0.2*s, 3.6*s), mat((0.6, 0.09, 0.07)))
+        for a in (35, -35): B((x, y - 3.78*s, 1.9*s), (4.3*s, 0.1*s, 0.22*s), wh, (0, rad(a), 0))
+        for sx in (-1, 1):
+            B((x + sx*3.2*s, y - 3.55*s, 3.6*s), (1.5*s, 0.2*s, 1.7*s), wh); B((x + sx*3.2*s, y - 3.65*s, 3.6*s), (1.1*s, 0.2*s, 1.3*s), WIN)
+            B((x + sx*4.45*s, y - 3.55*s, 3.0*s), (0.25*s, 0.25*s, 6*s), wh)
+        B((x, y - 3.55*s, 7.3*s), (1.6*s, 0.2*s, 1.6*s), wh); B((x, y - 3.65*s, 7.3*s), (1.2*s, 0.2*s, 1.2*s), WIN)
+        B((x, y - 3.55*s, 6.0*s), (9*s, 0.25*s, 0.25*s), wh)
+        Cy(1.5*s, 6.5*s, (x + 6.6*s, y + 1*s, 3.25*s), mat((0.75, 0.76, 0.8))); S(1.5*s, (x + 6.6*s, y + 1*s, 6.5*s), (1, 1, 0.7), mat((0.62, 0.64, 0.7)))   # silo
+    barn(9.5, 46, 0.9)
+    wm = mat((1, 1, 0.97))
+    for k in range(-13, 14):                                   # white fence across the pasture
+        B((k*3.0, 30, 0.85), (0.3, 0.3, 1.7), wm); S(0.22, (k*3.0, 30, 1.75), (1, 1, 0.7), wm)
+    for z in (0.65, 1.3): B((0, 30, z), (80, 0.12, 0.26), wm)
+    hm = mat((0.95, 0.8, 0.42)); hm2 = mat((0.85, 0.66, 0.3))
+    def bale(x, y, s=1.0, a=0):
+        Cy(1.0*s, 1.5*s, (x, y, 1.0*s), hm, (0, rad(90), rad(a)), 28)
+        for k in (-1, 1): To(1.0*s, 0.05*s, (x + k*0.4*s*math.cos(rad(a)), y + k*0.4*s*math.sin(rad(a)), 1.0*s), hm2, (0, rad(90), rad(a)))
+    bale(-12.5, 21, 1.1, 25); bale(-15.5, 24.5, 1.0, -20); bale(14, 23, 1.1, -30)
+    B((-9.6, 23.5, 0.45), (1.6, 1.0, 0.9), hm, (0, 0, rad(12))); B((-9.6, 23.5, 0.45), (0.2, 1.02, 0.92), hm2, (0, 0, rad(12)))
+    for (x, y, s) in [(-19, 34, 1.9), (22, 36, 2.1), (-27, 40, 2.3)]: tree(x, y, s)
+    for k in range(18):
+        x = random.choice([-1, 1]) * random.uniform(5, 14); y = random.uniform(5, 15); c = random.choice([(1, 1, 1), (1, 0.85, 0.2), (1, 0.5, 0.6)])
+        Cy(0.03, 0.3, (x, y, 0.15), mat((0.3, 0.6, 0.25))); S(0.12, (x, y, 0.33), (1, 1, 0.6), mat(c))
+    if LEVEL >= 2:   # water trough, apple tree, jump
+        B((-10.5, 14.5, 0.55), (3.4, 1.4, 1.1), mat((0.55, 0.36, 0.2))); B((-10.5, 14.5, 1.08), (3.0, 1.0, 0.08), mat((0.4, 0.75, 0.95), 0.2))
+        for sx in (-1, 1): B((-10.5 + sx*1.5, 14.5, 0.3), (0.3, 1.6, 0.6), mat((0.45, 0.28, 0.15)))
+        tree(12.5, 17, 2.0, (0.3, 0.66, 0.28))
+        for k in range(9):
+            a = k*2.4; S(0.24, (12.5 + 1.5*math.cos(a), 17 - 0.9 - 0.5*abs(math.sin(a*1.7)), 3.4 + 1.1*math.sin(a*0.9)), (1, 1, 0.95), mat((0.92, 0.14, 0.12)))
+        for x in (11.2, 13.4, 14.2): S(0.22, (x, 15.2 + 0.3*math.sin(x), 0.2), (1, 1, 0.9), mat((0.92, 0.14, 0.12)))
+        for sx in (-1, 1):                                     # jump with striped rails
+            B((-4.5 + sx*2.2, 24, 1.0), (0.3, 0.3, 2.0), wm); S(0.26, (-4.5 + sx*2.2, 24, 2.1), (1, 1, 1), mat((0.9, 0.2, 0.2)))
+        for z in (0.8, 1.45):
+            for k in range(6): B((-4.5 - 1.75 + 0.7*k, 24, z), (0.7, 0.16, 0.2), mat((0.9, 0.2, 0.2)) if k % 2 == 0 else wm)
+    if LEVEL >= 3:   # windmill, flower beds, colourful flags
+        Co(2.6, 11, (-13, 44, 5.5), mat((0.97, 0.95, 0.9))); Co(2.2, 2.2, (-13, 44, 11.6), mat((0.75, 0.25, 0.2)))
+        B((-13, 41.9, 2.0), (1.3, 0.2, 2.6), mat((0.5, 0.33, 0.2))); S(0.5, (-13, 42.4, 9.6), (1, 1, 1), mat((0.5, 0.33, 0.2)))
+        for k in range(4): B((-13 + 2.6*math.cos(rad(25 + 90*k)), 42.2, 9.6 + 2.6*math.sin(rad(25 + 90*k))), (4.8, 0.12, 1.0), mat((1, 0.97, 0.85)), (0, -rad(25 + 90*k), 0))
+        cols = [(1, 0.35, 0.4), (1, 0.8, 0.2), (0.7, 0.45, 0.95), (1, 0.55, 0.2), (1, 1, 1)]
+        for (x0, y0) in [(-9.5, 9.5), (9.5, 10.5)]:
+            S(1.0, (x0, y0, 0.05), (2.6, 1.3, 0.25), mat((0.5, 0.33, 0.2)))
+            for k in range(14):
+                x = x0 + random.uniform(-2.0, 2.0); y = y0 + random.uniform(-0.8, 0.8)
+                Cy(0.04, 0.6, (x, y, 0.45), mat((0.3, 0.6, 0.25))); S(0.22, (x, y, 0.8), (1, 1, 0.7), mat(random.choice(cols)))
+        fc = [(0.95, 0.25, 0.3), (1, 0.8, 0.2), (0.3, 0.7, 0.95), (0.4, 0.8, 0.4), (0.95, 0.5, 0.8), (1, 0.55, 0.15)]
+        for sx in (-1, 1): Cy(0.15, 7.5, (sx*15, 28, 3.75), mat((0.6, 0.42, 0.25)))
+        for k in range(19):
+            x = -15 + 30*k/18; z = 7.3 - 1.6*math.sin(math.pi*k/18)
+            bpy.ops.mesh.primitive_cone_add(vertices=3, radius1=0.75, depth=0.06, location=(x, 28, z - 0.45), rotation=(rad(90), 0, rad(180))); o = bpy.context.active_object; o.data.materials.append(mat(fc[k % 6]))
+        for k in range(18): Cy(0.03, 30/18*1.03, (-15 + 30*(k + 0.5)/18, 28, 7.3 - 1.6*math.sin(math.pi*(k + 0.5)/18)), mat((0.3, 0.3, 0.3)), (0, rad(90) + math.atan(1.6*math.pi/30*math.cos(math.pi*(k + 0.5)/18)), 0))
 
 if XMAS:
     sun.energy = max(sun.energy, 2.8)

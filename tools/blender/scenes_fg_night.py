@@ -2,7 +2,7 @@ import bpy, math, random
 from mathutils import Vector
 SC = "__SCENE__"; OUT = "__OUT__"
 NIGHT = SC.endswith("_night"); XMAS = False; BASE = SC.replace("_night", ""); LEVEL = 1
-if BASE.startswith("island_"): LEVEL = int(BASE.split("_")[1]); BASE = "island"
+if BASE.startswith(("island_", "ranch_")): LEVEL = int(BASE.split("_")[1]); BASE = BASE.split("_")[0]
 import os; os.makedirs(OUT, exist_ok=True)
 for o in list(bpy.data.objects): bpy.data.objects.remove(o, do_unlink=True)
 for coll in (bpy.data.meshes, bpy.data.materials, bpy.data.lights, bpy.data.cameras, bpy.data.curves, bpy.data.worlds):
@@ -122,6 +122,19 @@ elif BASE == "reef":
         for k in range(5): a = k*TAU/5; Cy(0.05, 0.45, (x + 0.1*math.cos(a), -4.4 + 0.1*math.sin(a), 0.22), mat(c), (rad(20*math.cos(a)), rad(20*math.sin(a)), 0)); S(0.07, (x + 0.18*math.cos(a), -4.4 + 0.18*math.sin(a), 0.44), (1, 1, 1), mat(c))
     for x in (-1.1, 1.3):
         for k in range(4): Cy(0.03, 0.55, (x + 0.08*k, -4.2, 0.27), mat((0.2, 0.65, 0.35)), (rad(random.uniform(-25, 25)), rad(random.uniform(-15, 15)), 0))
+elif BASE == "ranch":   # Horse Ranch: fence pieces left and right (the middle stays open), hay, flowers
+    wm = mat((1, 1, 0.97)); hm = mat((0.95, 0.8, 0.42)); hm2 = mat((0.85, 0.66, 0.3))
+    for x0 in (-2.8, 1.8):
+        for k in range(3): B((x0 + k*0.5, -4.15, 0.2), (0.08, 0.08, 0.4), wm); S(0.05, (x0 + k*0.5, -4.15, 0.41), (1, 1, 0.7), wm)
+        for z in (0.14, 0.29): B((x0 + 0.5, -4.15, z), (1.12, 0.04, 0.07), wm)
+    Cy(0.2, 0.34, (-1.35, -4.5, 0.2), hm, (0, rad(90), rad(20)), 20); To(0.2, 0.012, (-1.35, -4.5, 0.2), hm2, (0, rad(90), rad(20)))
+    B((1.2, -4.6, 0.12), (0.42, 0.28, 0.24), hm, (0, 0, rad(-15))); B((1.2, -4.6, 0.12), (0.06, 0.29, 0.25), hm2, (0, 0, rad(-15)))
+    for x in (-2.2, -0.5, 0.4, 2.5): tuft(x + random.uniform(-0.15, 0.15), random.uniform(-4.9, -4.4), random.uniform(0.6, 0.85), (0.3, 0.66, 0.26))
+    for x, c in [(-1.9, (1, 1, 1)), (-0.75, (1, 0.85, 0.2)), (0.7, (1, 0.45, 0.55)), (2.1, (1, 1, 1))]: flowerfg(x, -4.75, c, 0.9)
+    if LEVEL >= 2:
+        for x in (-0.15, 0.1): S(0.07, (x, -4.7, 0.07), (1, 1, 0.9), mat((0.9, 0.15, 0.12)))   # fallen apples
+    if LEVEL >= 3:
+        for x, c in [(-2.45, (0.7, 0.5, 1)), (-1.0, (1, 0.5, 0.2)), (1.65, (0.7, 0.5, 1)), (2.75, (1, 0.85, 0.2))]: flowerfg(x, -4.55, c, 1.0)
 # move the props from the design band (y~-4.3) into the camera's real near band (y~8) and scale them up
 K = 3.2
 for o in list(bpy.data.objects):

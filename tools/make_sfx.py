@@ -144,6 +144,20 @@ def s_roar():       # friendly "rawr": voiced harmonics through vowel formants, 
     y *= 1 - .3 * (.5 + .5 * np.sin(2 * np.pi * 31 * t))
     return y * np.minimum(1, t / .05) * np.minimum(1, (.8 - t) / .28)
 
+def s_neigh():      # cute cartoon whinny: high voiced glide down with a fast flutter ("hee-hee-hee"), never harsh
+    n = int(.8 * SR); t = np.arange(n) / SR
+    flut = np.sin(2 * np.pi * 11.5 * t) * np.minimum(1, t / .12)
+    f0 = np.interp(t, [0, .07, .22, .5, .8], [760, 1280, 1180, 860, 520]) * (1 + .075 * flut)
+    ph = 2 * np.pi * np.cumsum(f0) / SR; y = np.zeros(n)
+    f1 = np.interp(t, [0, .25, .8], [1150, 1350, 900]); f2 = np.interp(t, [0, .25, .8], [2500, 2800, 2100])
+    for k in range(1, 9):
+        fk = k * f0
+        g = np.exp(-((fk - f1) / 420) ** 2) + .5 * np.exp(-((fk - f2) / 520) ** 2) + (.3 if k == 1 else 0)
+        y += g * np.sin(k * ph) / k ** .6
+    y *= .72 + .28 * flut                                   # the flutter also pulses the loudness
+    y += .05 * noise(n, 1500, 5000) * np.exp(-t / .25)       # a little breath at the start
+    return y * np.minimum(1, t / .035) * np.minimum(1, (.8 - t) / .3)
+
 def s_splash():
     n = int(.6 * SR); t = np.arange(n) / SR
     y = svf_bp(noise(n, 250, 5000), 500 + 2200 * np.exp(-t / .12), 1.2) * np.minimum(1, t / .008) * np.exp(-t / .16)
@@ -155,7 +169,7 @@ def s_splash():
 
 SFX = {"pop": (s_pop, .15), "wrong": (s_wrong, .3), "win": (s_win, 1.0), "whoosh": (s_whoosh, .3), "combo": (s_combo, 1.2),
        "crack": (s_crack, .25), "hatch": (s_hatch, 1.5), "chest": (s_chest, 1.0), "star": (s_star, .3), "tap": (s_tap, .08),
-       "roar": (s_roar, .8), "splash": (s_splash, .6)}
+       "roar": (s_roar, .8), "splash": (s_splash, .6), "neigh": (s_neigh, .8)}
 
 # ---------- music ----------
 VOICING = {"C": [60, 64, 67], "Am": [57, 60, 64], "F": [57, 60, 65], "G": [59, 62, 67]}
