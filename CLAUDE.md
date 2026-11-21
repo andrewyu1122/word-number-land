@@ -65,6 +65,11 @@ and writes animated WebP. Then:
 - **Read** (home tile): sight words (`SIGHT`, 50 words) — L1 hear & find the word, L2 spell it (reuses the spelling screen with `sight:true`), L3/L4 build a sentence from word tiles (`SENT_EASY` / `SENT_HARD` templates + a picture noun). Progress in `store.sw`, levels in `store.lvl.read1..4`.
 - `EXTRA_WORDS` in index.html lists ~140 picture words from the kids' readers. A word joins the game only when it appears in `ART` (after its 3D art is converted with `--update-art`). Voice: `tools/make_audio8.py`.
 
+## Difficulty rules (learned from play-testing)
+- Never jump a whole level inside a round. `genStretch(level)` goes only a small step past the level (L1 → up to 15, L2 → up to 30) and only at skill ≥ 0.9 or ⚡⚡ stations.
+- After a success the game auto-advances (`autoNext`) as soon as the voice finishes (+0.2 s).
+- Little mode ABC level 1 is "Pop the letters": floating bubbles; a popped letter says its name + sound and shows a picture that starts with it.
+
 ## Medals
 `MEDALS` + `medalEarned()` in index.html; art `assets/objects/medal_{name}_{idle,spin}.webp`; earned medals in `store.medals`; shown in the album and awarded by `checkMedals()` after a round or a hatch.
 Read-mode action sentences use `assets/mascot/mascot_{verb}.webp` (`VERBS`).

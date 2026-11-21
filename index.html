@@ -382,6 +382,17 @@ body.xmas #world .hills,body.xmas #world .hills2{background:#f4f9ff}
 .lcard.no{animation:shake .4s;background:#ffe3ea}
 .lcard.glow{animation:glow .8s ease-in-out infinite;box-shadow:0 0 0 5px var(--sun),var(--shadow)}
 .lcard .cnt{position:absolute;right:8px;top:6px;width:34px;height:34px;border-radius:50%;background:var(--mint);color:#fff;font-weight:700;font-size:20px;display:grid;place-items:center;animation:popin .3s cubic-bezier(.3,1.7,.5,1)}
+.bubbles{position:relative;height:340px;border-radius:24px;background:linear-gradient(180deg,#c9efff,#eafaff);box-shadow:inset 0 0 0 4px #fff,0 8px 0 rgba(0,0,0,.08);overflow:hidden;display:block !important}
+.bubble{position:absolute;width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.95) 0 14%,rgba(255,255,255,.35) 15% 40%,rgba(160,220,255,.35) 100%);box-shadow:inset 0 0 0 3px rgba(255,255,255,.8),0 6px 14px rgba(0,80,140,.15);display:grid;place-items:center;animation:bfloat 4s ease-in-out infinite}
+.bubble img{height:62px;animation:none}
+@keyframes bfloat{0%,100%{transform:translate(0,0)}25%{transform:translate(8px,-14px)}50%{transform:translate(-6px,-24px)}75%{transform:translate(-10px,-8px)}}
+.bubble.popped{background:none;box-shadow:none;animation:none;width:110px;height:auto;margin-left:-13px;z-index:2}
+.bubble.popped>img:first-child{height:54px}
+.bubble .bpic{height:74px !important;max-width:108px;object-fit:contain;animation:popin .4s cubic-bezier(.3,1.7,.5,1)}
+.bubble .blab{display:block;font-weight:700;font-size:18px;color:var(--ink);background:rgba(255,255,255,.9);border-radius:999px;padding:1px 10px;margin-top:2px}
+.bubble .blab b{color:var(--coral)}
+.bubble.popped{display:flex;flex-direction:column;align-items:center}
+@media (min-width:760px){.bubbles{height:460px}.bubble{width:120px;height:120px}.bubble img{height:90px}.bubble .bpic{height:110px !important;max-width:150px}.bubble.popped{width:150px}}
 .letters-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
 .letters-grid button{background:var(--card);border-radius:16px;padding:6px 2px;box-shadow:var(--shadow)}
 .letters-grid img{height:54px}
@@ -926,15 +937,15 @@ let autoT=null;
 function voiceBusy(){try{return q.length>0||(!player.paused&&!player.ended&&!!player.src)||(('speechSynthesis' in window)&&speechSynthesis.speaking);}catch(e){return false;}}
 function autoNext(id,delay){
   const b=$('#'+id);clearInterval(autoT);const t0=Date.now();let quiet=0;
-  setTimeout(()=>b.classList.add('show'),delay||800);
+  setTimeout(()=>b.classList.add('show'),Math.min(delay||800,450));
   autoT=setInterval(()=>{
     const dt=Date.now()-t0;const sc=b.closest('.screen');
     if(dt>(delay||800)+200&&(!b.classList.contains('show')||(sc&&!sc.classList.contains('on')))){clearInterval(autoT);return;}   /* already moved on, or left the game */
     if(document.querySelector('.overlay.on')||document.hidden){quiet=0;return;}                                               /* a popup (new horse, treasure, bedtime...) is open: wait */
     if(voiceBusy()&&dt<12000){quiet=0;return;}
-    quiet+=200;
-    if(dt>=2400&&quiet>=600){clearInterval(autoT);b.click();}
-  },200);
+    quiet+=100;
+    if(dt>=1300&&quiet>=200){clearInterval(autoT);b.click();}
+  },100);
 }
 const mkey=p=>p.a+(p.op==='+'?'p':p.op==='-'?'m':'x')+p.b;
 const spellOut=w=>w.charAt(0).toUpperCase()+w.slice(1)+'! '+[...w].map(c=>c.toUpperCase()).join(', ')+'. '+w+'!';
@@ -1488,7 +1499,19 @@ function renderLittle(){
       L.say=()=>say(['p_more'],'Which has more?');}
   }else if(k==='abc'){
     const AL='abcdefghijklmnopqrstuvwxyz'.split('');
-    if(lv===1){lbar(letterArt('a','idle'),'<h2>Tap a letter!</h2>');g.className='letters-grid';L.taps=0;AL.forEach(l=>{const b=document.createElement('button');b.appendChild(img(letterArt(l,'idle')));b.onclick=()=>{b.classList.remove('hit');void b.offsetWidth;b.classList.add('hit');const im=b.querySelector('img');im.src=letterArt(l,'jump');setTimeout(()=>{im.src=letterArt(l,'idle');},1100);sfxPop(l.charCodeAt(0)%8);say(['l_'+l,'f_'+l],l.toUpperCase());L.taps++;if(L.taps===8&&!L.done)littleDone(true);};g.appendChild(b);});L.say=()=>say(['p_tapthe'],'Tap a letter!');}
+    if(lv===1){ // letter bubbles: pop a floating letter -> it says its name + sound and a picture that starts with it pops out
+      lbar(A+'mascot/mascot_wave.webp','<h2>Pop the letters!</h2><p id="lpop">Tap a bubble</p>');g.className='bubbles';
+      const used=L.usedLetters||[];let pool=AL.filter(l=>!used.includes(l));if(pool.length<5){L.usedLetters=[];pool=AL.slice();}
+      const five=shuffle(pool).slice(0,5);L.usedLetters=(L.usedLetters||[]).concat(five);let left=five.length;
+      const byLetter={};Object.values(WORDS).flat().forEach(w=>{if(ART[w[0]]&&w[0].length<=6)(byLetter[w[0][0]]=byLetter[w[0][0]]||[]).push(w[0]);});
+      five.forEach((l,i)=>{const b=document.createElement('button');b.className='bubble';b.style.left=(6+i*18.5+Math.random()*4)+'%';b.style.top=(8+((i*37)%50)+Math.random()*8)+'%';b.style.animationDelay=(-i*0.7)+'s';b.style.animationDuration=(3.2+Math.random()*1.6)+'s';b.appendChild(img(letterArt(l,'idle')));
+        b.onclick=()=>{if(b.classList.contains('popped'))return;b.classList.add('popped');sfxPop(8-left);vib(15);const r=b.getBoundingClientRect();burstAt(r.left+r.width/2,r.top+r.height/2,['🫧','✨','⭐']);
+          const w=byLetter[l]?pick(byLetter[l]):null;const im=b.querySelector('img');im.src=letterArt(l,'jump');
+          if(w){const pic=img(wordArt(w,'anim'));pic.className='bpic';b.appendChild(pic);const lab=document.createElement('span');lab.className='blab';lab.innerHTML='<b>'+l+'</b>'+w.slice(1);b.appendChild(lab);}
+          $('#lpop').textContent=w?(l.toUpperCase()+' is for '+w):l.toUpperCase();say(w?['l_'+l,'f_'+l,'w_'+w]:['l_'+l,'f_'+l],l.toUpperCase()+(w?'. '+w:''));
+          left--;if(left===0&&!L.done)setTimeout(()=>littleDone(),1600);};
+        g.appendChild(b);});
+      L.say=()=>say(['p_tapthe'],'Pop the letters!');}
     else{const n=[0,3,5,8,5][lv-1];const opts=shuffle(AL.slice()).slice(0,n);const t=pick(opts);const bySound=lv===5;lbar(bySound?A+'mascot/mascot_think.webp':letterArt(t,'jump'),bySound?'<h2>Which letter says…? 🔊</h2>':'<h2>Find the letter <b>'+t+'</b>!</h2>');
       pickOne(g,opts.map(o=>({key:o,el:lcard(letterArt(o,'idle'),o)})),t,(ok,o,c)=>{if(ok){c.firstChild.src=letterArt(o.key,'jump');say(['l_'+o.key,'f_'+o.key,'p_welldone'],o.key.toUpperCase()+'! Well done!');}else say(['l_'+o.key],o.key.toUpperCase());},n<=3?3:n<=5?3:4);
       L.say=()=>bySound?say(['f_'+t,'f_'+t],t):say(['p_findletter','l_'+t],'Find the letter '+t.toUpperCase()+'!');}
@@ -1597,12 +1620,22 @@ function genChain(level,tier){
   }
   return null;
 }
+/* a small step beyond the level (never a whole level up): L1 -> up to 15, L2 -> up to 30 */
+function genStretch(level){
+  const cap=level===1?15:30;let a,b,op=Math.random()<.6?'+':'-';
+  for(let i=0;i<40;i++){
+    if(level===1){if(op==='+'){a=rnd(5,9);b=rnd(3,cap-a);}else{a=rnd(11,cap);b=rnd(2,6);}}
+    else{if(op==='+'){a=rnd(12,24);b=rnd(3,Math.min(9,cap-a));}else{a=rnd(21,cap);b=rnd(3,9);}}
+    const ans=op==='+'?a+b:a-b;if(b>=2&&ans>=0&&ans<=cap&&ans>(level===1?10:20)===(op==='+'))return{a,b,op,ans,visual:'objects',input:'choices',stretch:true};
+  }
+  return null;
+}
 function genProblem(level,tier){
   tier=tier||0;let sk=Math.max(mathSkill(level),tier*0.45);
   // multi-step chains (1+2-4+8) once the kid is strong or on advanced stations
   if(level<4&&(tier>=1||sk>=.8)&&Math.random()<(tier>=2?.4:.3)){const c=genChain(level,tier);if(c)return c;}
   // stretch: strong skill or a high-tier station mixes in problems from the next level
-  if(level<4&&(tier>=2||sk>=.9)&&Math.random()<(tier>=2?.45:.3))return genProblem(level+1,0);
+  if(level<3&&(tier>=2||sk>=.9)&&Math.random()<(tier>=2?.35:.2)){const g=genStretch(level);if(g)return g;}
   let a,b,op;const hard=Math.random()<sk;
   const sub=Math.random()<(.25+sk*.35);                                    // subtraction share grows with skill
   if(level===1){op=sub?'-':'+';const top=hard?10:6;if(op==='+'){a=rnd(1,top-1);b=rnd(1,top-a);}else{a=rnd(2,top);b=rnd(1,a);}}
